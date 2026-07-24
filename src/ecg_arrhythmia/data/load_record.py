@@ -1,9 +1,12 @@
 import logging
+from pathlib import Path
 from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
 import wfdb
+
+from ecg_arrhythmia.preprocessing.beat_extraction import BEAT_SYMBOLS
 
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
@@ -140,4 +143,161 @@ def plot_record(
     plt.legend()
     plt.tight_layout()
     plt.savefig("ecg_plot.png")
+    plt.close()
+
+
+def plot_r_peak_comparison(
+    record_name: str,
+    signal: np.ndarray,
+    annotation: wfdb.Annotation,
+    detected_peaks: np.ndarray,
+    lead_name: str,
+    detector_name: str,
+    start: int = 0,
+    end: int = 3000,
+    output_path: str | Path = "r_peak_comparison.png",
+) -> None:
+    """
+    Plot an ECG segment with expert heartbeat annotations and detected
+    R-peak positions.
+
+    Parameters
+    ----------
+    record_name:
+        Name of the MIT-BIH record being plotted.
+
+    signal:
+        One-dimensional ECG signal for the selected lead.
+
+    annotation:
+        Expert WFDB annotations for the record.
+
+    detected_peaks:
+        Absolute sample indices returned by an R-peak detector.
+
+    lead_name:
+        Name of the selected ECG lead.
+
+    detector_name:
+        Name of the R-peak detector used.
+
+    start:
+        First absolute sample index included in the plot.
+
+    end:
+        First absolute sample index excluded from the plot.
+
+    output_path:
+        Location where the generated plot should be saved.
+    """
+
+    if signal.ndim != 1:
+        raise ValueError(
+            f"ECG signal must be one-dimensional, but received shape {signal.shape}."
+        )
+
+    if annotation.symbol is None:
+        raise ValueError(f"Record {record_name} contains no annotation symbols.")
+
+    if start < 0:
+        raise ValueError("Plot start index must not be negative.")
+
+    if end <= start:
+        raise ValueError("Plot end index must be greater than the start index.")
+
+    if end > len(signal):
+        raise ValueError(f"Plot end index {end} exceeds signal length {len(signal)}.")
+
+    detected_peaks = np.asarray(detected_peaks, dtype=np.int64)
+
+    # Keep only expert annotations representing genuine heartbeats and
+    # lying inside the requested plot range.
+    visible_expert_beats = [
+        (sample, symbol)
+        for sample, symbol in zip(
+            annotation.sample,
+            annotation.symbol,
+            strict=True,
+        )
+        if symbol in BEAT_SYMBOLS and start <= sample < end
+    ]
+
+    expert_samples = np.array(
+        [sample for sample, _ in visible_expert_beats],
+        dtype=np.int64,
+    )
+
+    expert_symbols = [symbol for _, symbol in visible_expert_beats]
+
+    # Keep only detector outputs lying inside the requested plot range.
+    visible_detected_peaks = detected_peaks[
+        (detected_peaks >= start) & (detected_peaks < end)
+    ]
+
+    # Use absolute sample positions on the x-axis.
+    sample_positions = np.arange(start, end)
+
+    plt.figure(figsize=(14, 5))
+
+    plt.plot(
+        sample_positions,
+        signal[start:end],
+        label=f"{lead_name} ECG signal",
+    )
+
+    if expert_samples.size > 0:
+        # Mark the expert annotation positions directly on the ECG.
+        plt.scatter(
+            expert_samples,
+            signal[expert_samples],
+            marker="x",
+            s=80,
+            color="green",
+            linewidths=2,
+            label="Expert annotations",
+            zorder=5,
+        )
+
+        # Display the expert beat symbol beside each annotation.
+        for sample, symbol in zip(
+            expert_samples,
+            expert_symbols,
+            strict=True,
+        ):
+            plt.text(
+                sample,
+                float(signal[sample]),
+                f" {symbol}",
+                fontsize=8,
+                verticalalignment="bottom",
+            )
+
+    if visible_detected_peaks.size > 0:
+        # Use hollow circular markers so detections can be compared
+        # directly with the expert annotation markers.
+        plt.scatter(
+            visible_detected_peaks,
+            signal[visible_detected_peaks],
+            marker="o",
+            facecolors="none",
+            edgecolors="red",
+            s=120,
+            linewidths=2,
+            label=f"{detector_name.upper()} detections",
+            zorder=4,
+        )
+
+    plt.title(
+        f"MIT-BIH Record {record_name}: {detector_name.upper()} R-Peak Comparison"
+    )
+    plt.xlabel("Absolute sample index")
+    plt.ylabel("ECG amplitude")
+    plt.legend()
+    plt.tight_layout()
+
+    plt.savefig(
+        output_path,
+        dpi=300,
+        bbox_inches="tight",
+    )
     plt.close()
