@@ -11,7 +11,9 @@ from ecg_arrhythmia.evaluation.r_peak_evaluator import (
     evaluate_r_peak_records,
 )
 
-SPLIT_SUMMARY_PATH = Path("data/splits_sequences_matched/split_summary_metrics.json")
+SPLIT_SUMMARY_PATH = Path(
+    "data/splits_sequences_matched/split_summary_metrics.json"
+)
 
 OUTPUT_DIR = Path("artifacts/results/detection_evaluation")
 
@@ -89,6 +91,35 @@ def summarise_evaluation(
     }
 
 
+def _round_floats_for_output(
+    value: object,
+    decimals: int = 4,
+) -> object:
+    """
+    Recursively round floats in a JSON-compatible output structure.
+
+    The evaluation dataclasses retain full precision. Rounding is applied
+    only to the copied data written to the result files.
+    """
+
+    if isinstance(value, float):
+        return round(value, decimals)
+
+    if isinstance(value, dict):
+        return {
+            key: _round_floats_for_output(item, decimals)
+            for key, item in value.items()
+        }
+
+    if isinstance(value, list):
+        return [
+            _round_floats_for_output(item, decimals)
+            for item in value
+        ]
+
+    return value
+
+
 def _format_optional(
     value: float | None,
     width: int,
@@ -141,13 +172,13 @@ def print_comparison_table(
             f"{row['true_positives']:>7}"
             f"{row['false_positives']:>6}"
             f"{row['false_negatives']:>6}"
-            f"{row['precision']:>11.6f}"
-            f"{row['recall']:>10.6f}"
-            f"{row['f1']:>10.6f}"
-            f"{_format_optional(row['mean_absolute_offset_ms'], 10, 3)}"
-            f"{_format_optional(row['maximum_absolute_offset_ms'], 11, 3)}"
-            f"{row['runtime_seconds']:>12.3f}"
-            f"{row['processing_speedup']:>10.1f}"
+            f"{row['precision']:>11.4f}"
+            f"{row['recall']:>10.4f}"
+            f"{row['f1']:>10.4f}"
+            f"{_format_optional(row['mean_absolute_offset_ms'], 10, 4)}"
+            f"{_format_optional(row['maximum_absolute_offset_ms'], 11, 4)}"
+            f"{row['runtime_seconds']:>12.4f}"
+            f"{row['processing_speedup']:>10.4f}"
         )
 
 
@@ -237,8 +268,12 @@ def main() -> None:
 
         # Save the detailed per-detector evaluation.
         detector_output_path = OUTPUT_DIR / f"{detector.name}_metrics.json"
+        serialised_evaluation = _round_floats_for_output(
+            asdict(evaluation),
+            decimals=4,
+        )
         with detector_output_path.open("w", encoding="utf-8") as file:
-            json.dump(asdict(evaluation), file, indent=2)
+            json.dump(serialised_evaluation, file, indent=2)
 
         print(f"Saved detailed results to {detector_output_path}")
 
@@ -258,8 +293,12 @@ def main() -> None:
     }
 
     comparison_output_path = OUTPUT_DIR / "detector_comparison.json"
+    serialised_comparison = _round_floats_for_output(
+        comparison,
+        decimals=4,
+    )
     with comparison_output_path.open("w", encoding="utf-8") as file:
-        json.dump(comparison, file, indent=2)
+        json.dump(serialised_comparison, file, indent=2)
 
     print(
         f"\nMatching tolerance: {MATCHING_TOLERANCE_MS:.1f} ms "

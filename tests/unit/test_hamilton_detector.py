@@ -4,10 +4,15 @@ import numpy as np
 
 from ecg_arrhythmia.detection.hamilton_detector import HamiltonDetector
 
-# NeuroKit2 is looked up as `nk` inside the shared base module, so the
-# library functions are patched there rather than in neurokit2 itself.
-CLEAN_TARGET = "ecg_arrhythmia.detection.neurokit_detector.nk.ecg_clean"
-PEAKS_TARGET = "ecg_arrhythmia.detection.neurokit_detector.nk.ecg_peaks"
+# The detector imports these functions directly into the shared base
+# module, so the tests patch the names where the detector looks them up.
+CLEAN_TARGET = (
+    "ecg_arrhythmia.detection.neurokit_detector.ecg_clean"
+)
+
+PEAKS_TARGET = (
+    "ecg_arrhythmia.detection.neurokit_detector.ecg_peaks"
+)
 
 
 def test_hamilton_detector_has_expected_name():
