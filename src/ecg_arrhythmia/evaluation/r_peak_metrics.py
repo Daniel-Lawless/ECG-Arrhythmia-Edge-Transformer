@@ -134,18 +134,18 @@ def compute_r_peak_metrics(
         standard_deviation_offset_samples=standard_deviation_offset_samples,
         maximum_absolute_offset_samples=maximum_absolute_offset_samples,
         mean_offset_ms=round(mean_offset_samples * milliseconds_per_sample, 4),
-        mean_absolute_offset_ms=round((
-            mean_absolute_offset_samples * milliseconds_per_sample
-        ), 4),
-        median_absolute_offset_ms=round((
-            median_absolute_offset_samples * milliseconds_per_sample
-        ), 4),
-        standard_deviation_offset_ms=round((
-            standard_deviation_offset_samples * milliseconds_per_sample
-        ), 4),
-        maximum_absolute_offset_ms=round((
-            maximum_absolute_offset_samples * milliseconds_per_sample
-        ), 4)
+        mean_absolute_offset_ms=round(
+            (mean_absolute_offset_samples * milliseconds_per_sample), 4
+        ),
+        median_absolute_offset_ms=round(
+            (median_absolute_offset_samples * milliseconds_per_sample), 4
+        ),
+        standard_deviation_offset_ms=round(
+            (standard_deviation_offset_samples * milliseconds_per_sample), 4
+        ),
+        maximum_absolute_offset_ms=round(
+            (maximum_absolute_offset_samples * milliseconds_per_sample), 4
+        ),
     )
 
 

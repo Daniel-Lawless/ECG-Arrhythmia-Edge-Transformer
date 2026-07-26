@@ -1,0 +1,12 @@
+{
+    "total_predictions": 15352,
+    "matching_predictions": 15352,
+    "prediction_agreement": 1.0,
+    "maximum_absolute_logit_difference": 1.633167266845703e-05,
+    "mean_absolute_logit_difference": 5.601321010612079e-07,
+    "relative_tolerance": 0.0001,
+    "absolute_tolerance": 1e-05,
+    "logits_within_tolerance": true,
+    "predictions_match": true,
+    "parity_passed": true
+}

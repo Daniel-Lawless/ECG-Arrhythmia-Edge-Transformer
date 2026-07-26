@@ -234,8 +234,8 @@ def evaluate_r_peak_records(
         detector_name=detector.name,
         split_name=split_name,
         tolerance_ms=round(float(tolerance_ms), 4),
-        total_signal_duration_seconds= round(total_signal_duration_seconds, 4),
-        total_detector_runtime_seconds=round(total_detector_runtime_seconds,4),
+        total_signal_duration_seconds=round(total_signal_duration_seconds, 4),
+        total_detector_runtime_seconds=round(total_detector_runtime_seconds, 4),
         processing_speedup=round(processing_speedup, 4),
         metrics=aggregate_metrics,
         symbol_metrics=aggregate_symbol_metrics,
@@ -432,10 +432,13 @@ def _aggregate_symbol_metrics(
             annotations=annotation_counts[symbol],
             matched=matched_counts[symbol],
             missed=missed_counts[symbol],
-            recall=round(_safe_divide(
-                matched_counts[symbol],
-                annotation_counts[symbol],
-            ), 4),
+            recall=round(
+                _safe_divide(
+                    matched_counts[symbol],
+                    annotation_counts[symbol],
+                ),
+                4,
+            ),
         )
         for symbol in sorted(annotation_counts)
     }

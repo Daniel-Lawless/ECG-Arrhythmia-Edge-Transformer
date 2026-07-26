@@ -27,6 +27,7 @@ MATCHING_TOLERANCE_MS = 100.0
 # constant.
 EXPECTED_VALIDATION_RECORDS = ["114", "122", "209", "210", "231", "233"]
 
+
 def load_validation_record_names(
     summary_path: Path,
 ) -> list[str]:
@@ -230,7 +231,7 @@ def main() -> None:
             split_name=SPLIT_NAME,
         )
 
-        # Add this evaluation object 
+        # Add this evaluation object
         evaluations.append(evaluation)
         comparison_rows.append(summarise_evaluation(evaluation))
 
