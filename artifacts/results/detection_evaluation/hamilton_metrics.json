@@ -1,0 +1,412 @@
+{
+  "detector_name": "hamilton",
+  "split_name": "validation",
+  "tolerance_ms": 100.0,
+  "total_signal_duration_seconds": 10833.3336,
+  "total_detector_runtime_seconds": 2.633,
+  "processing_speedup": 4114.445,
+  "metrics": {
+    "num_records": 6,
+    "num_annotations": 14660,
+    "num_detections": 14571,
+    "true_positives": 14558,
+    "false_positives": 13,
+    "false_negatives": 102,
+    "precision": 0.9991,
+    "recall": 0.993,
+    "f1": 0.996,
+    "mean_offset_ms": 53.3512,
+    "mean_absolute_offset_ms": 53.4714,
+    "median_absolute_offset_ms": 61.1111,
+    "standard_deviation_offset_ms": 18.2375,
+    "maximum_absolute_offset_ms": 91.6667
+  },
+  "symbol_metrics": {
+    "A": {
+      "annotations": 401,
+      "matched": 400,
+      "missed": 1,
+      "recall": 0.9975
+    },
+    "E": {
+      "annotations": 1,
+      "matched": 0,
+      "missed": 1,
+      "recall": 0.0
+    },
+    "F": {
+      "annotations": 25,
+      "matched": 20,
+      "missed": 5,
+      "recall": 0.8
+    },
+    "J": {
+      "annotations": 2,
+      "matched": 2,
+      "missed": 0,
+      "recall": 1.0
+    },
+    "N": {
+      "annotations": 11884,
+      "matched": 11874,
+      "missed": 10,
+      "recall": 0.9992
+    },
+    "R": {
+      "annotations": 1254,
+      "matched": 1253,
+      "missed": 1,
+      "recall": 0.9992
+    },
+    "V": {
+      "annotations": 1071,
+      "matched": 992,
+      "missed": 79,
+      "recall": 0.9262
+    },
+    "a": {
+      "annotations": 22,
+      "matched": 17,
+      "missed": 5,
+      "recall": 0.7727
+    }
+  },
+  "records": [
+    {
+      "record_name": "114",
+      "detector_name": "hamilton",
+      "lead_name": "MLII",
+      "sampling_rate": 360.0,
+      "signal_length": 650000,
+      "signal_duration_seconds": 1805.5556,
+      "tolerance_samples": 36,
+      "tolerance_ms": 100.0,
+      "detector_runtime_seconds": 0.5276,
+      "processing_speedup": 3421.9121,
+      "metrics": {
+        "num_annotations": 1879,
+        "num_detections": 1880,
+        "true_positives": 1877,
+        "false_positives": 3,
+        "false_negatives": 2,
+        "precision": 0.9984,
+        "recall": 0.9989,
+        "f1": 0.9986,
+        "mean_offset_samples": 14.8855,
+        "mean_absolute_offset_samples": 14.8887,
+        "median_absolute_offset_samples": 13.0,
+        "standard_deviation_offset_samples": 5.415,
+        "maximum_absolute_offset_samples": 30.0,
+        "mean_offset_ms": 41.3486,
+        "mean_absolute_offset_ms": 41.3575,
+        "median_absolute_offset_ms": 36.1111,
+        "standard_deviation_offset_ms": 15.0417,
+        "maximum_absolute_offset_ms": 83.3333
+      },
+      "symbol_metrics": {
+        "A": {
+          "annotations": 10,
+          "matched": 9,
+          "missed": 1,
+          "recall": 0.9
+        },
+        "F": {
+          "annotations": 4,
+          "matched": 4,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "J": {
+          "annotations": 2,
+          "matched": 2,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "N": {
+          "annotations": 1820,
+          "matched": 1819,
+          "missed": 1,
+          "recall": 0.9995
+        },
+        "V": {
+          "annotations": 43,
+          "matched": 43,
+          "missed": 0,
+          "recall": 1.0
+        }
+      }
+    },
+    {
+      "record_name": "122",
+      "detector_name": "hamilton",
+      "lead_name": "MLII",
+      "sampling_rate": 360.0,
+      "signal_length": 650000,
+      "signal_duration_seconds": 1805.5556,
+      "tolerance_samples": 36,
+      "tolerance_ms": 100.0,
+      "detector_runtime_seconds": 0.4385,
+      "processing_speedup": 4117.9606,
+      "metrics": {
+        "num_annotations": 2476,
+        "num_detections": 2476,
+        "true_positives": 2475,
+        "false_positives": 1,
+        "false_negatives": 1,
+        "precision": 0.9996,
+        "recall": 0.9996,
+        "f1": 0.9996,
+        "mean_offset_samples": 17.1705,
+        "mean_absolute_offset_samples": 17.1705,
+        "median_absolute_offset_samples": 18.0,
+        "standard_deviation_offset_samples": 5.0684,
+        "maximum_absolute_offset_samples": 29.0,
+        "mean_offset_ms": 47.6958,
+        "mean_absolute_offset_ms": 47.6958,
+        "median_absolute_offset_ms": 50.0,
+        "standard_deviation_offset_ms": 14.0789,
+        "maximum_absolute_offset_ms": 80.5556
+      },
+      "symbol_metrics": {
+        "N": {
+          "annotations": 2476,
+          "matched": 2475,
+          "missed": 1,
+          "recall": 0.9996
+        }
+      }
+    },
+    {
+      "record_name": "209",
+      "detector_name": "hamilton",
+      "lead_name": "MLII",
+      "sampling_rate": 360.0,
+      "signal_length": 650000,
+      "signal_duration_seconds": 1805.5556,
+      "tolerance_samples": 36,
+      "tolerance_ms": 100.0,
+      "detector_runtime_seconds": 0.4231,
+      "processing_speedup": 4267.4376,
+      "metrics": {
+        "num_annotations": 3005,
+        "num_detections": 3006,
+        "true_positives": 3004,
+        "false_positives": 2,
+        "false_negatives": 1,
+        "precision": 0.9993,
+        "recall": 0.9997,
+        "f1": 0.9995,
+        "mean_offset_samples": 20.4893,
+        "mean_absolute_offset_samples": 20.4893,
+        "median_absolute_offset_samples": 23.0,
+        "standard_deviation_offset_samples": 4.6796,
+        "maximum_absolute_offset_samples": 24.0,
+        "mean_offset_ms": 56.9147,
+        "mean_absolute_offset_ms": 56.9147,
+        "median_absolute_offset_ms": 63.8889,
+        "standard_deviation_offset_ms": 12.9989,
+        "maximum_absolute_offset_ms": 66.6667
+      },
+      "symbol_metrics": {
+        "A": {
+          "annotations": 383,
+          "matched": 383,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "N": {
+          "annotations": 2621,
+          "matched": 2620,
+          "missed": 1,
+          "recall": 0.9996
+        },
+        "V": {
+          "annotations": 1,
+          "matched": 1,
+          "missed": 0,
+          "recall": 1.0
+        }
+      }
+    },
+    {
+      "record_name": "210",
+      "detector_name": "hamilton",
+      "lead_name": "MLII",
+      "sampling_rate": 360.0,
+      "signal_length": 650000,
+      "signal_duration_seconds": 1805.5556,
+      "tolerance_samples": 36,
+      "tolerance_ms": 100.0,
+      "detector_runtime_seconds": 0.4749,
+      "processing_speedup": 3802.3055,
+      "metrics": {
+        "num_annotations": 2650,
+        "num_detections": 2569,
+        "true_positives": 2565,
+        "false_positives": 4,
+        "false_negatives": 85,
+        "precision": 0.9984,
+        "recall": 0.9679,
+        "f1": 0.9829,
+        "mean_offset_samples": 21.8803,
+        "mean_absolute_offset_samples": 21.8811,
+        "median_absolute_offset_samples": 23.0,
+        "standard_deviation_offset_samples": 5.5506,
+        "maximum_absolute_offset_samples": 29.0,
+        "mean_offset_ms": 60.7786,
+        "mean_absolute_offset_ms": 60.7808,
+        "median_absolute_offset_ms": 63.8889,
+        "standard_deviation_offset_ms": 15.4183,
+        "maximum_absolute_offset_ms": 80.5556
+      },
+      "symbol_metrics": {
+        "E": {
+          "annotations": 1,
+          "matched": 0,
+          "missed": 1,
+          "recall": 0.0
+        },
+        "F": {
+          "annotations": 10,
+          "matched": 5,
+          "missed": 5,
+          "recall": 0.5
+        },
+        "N": {
+          "annotations": 2423,
+          "matched": 2418,
+          "missed": 5,
+          "recall": 0.9979
+        },
+        "V": {
+          "annotations": 194,
+          "matched": 125,
+          "missed": 69,
+          "recall": 0.6443
+        },
+        "a": {
+          "annotations": 22,
+          "matched": 17,
+          "missed": 5,
+          "recall": 0.7727
+        }
+      }
+    },
+    {
+      "record_name": "231",
+      "detector_name": "hamilton",
+      "lead_name": "MLII",
+      "sampling_rate": 360.0,
+      "signal_length": 650000,
+      "signal_duration_seconds": 1805.5556,
+      "tolerance_samples": 36,
+      "tolerance_ms": 100.0,
+      "detector_runtime_seconds": 0.4229,
+      "processing_speedup": 4269.5538,
+      "metrics": {
+        "num_annotations": 1571,
+        "num_detections": 1572,
+        "true_positives": 1570,
+        "false_positives": 2,
+        "false_negatives": 1,
+        "precision": 0.9987,
+        "recall": 0.9994,
+        "f1": 0.999,
+        "mean_offset_samples": 18.2688,
+        "mean_absolute_offset_samples": 18.2688,
+        "median_absolute_offset_samples": 22.0,
+        "standard_deviation_offset_samples": 5.0063,
+        "maximum_absolute_offset_samples": 26.0,
+        "mean_offset_ms": 50.7467,
+        "mean_absolute_offset_ms": 50.7467,
+        "median_absolute_offset_ms": 61.1111,
+        "standard_deviation_offset_ms": 13.9064,
+        "maximum_absolute_offset_ms": 72.2222
+      },
+      "symbol_metrics": {
+        "A": {
+          "annotations": 1,
+          "matched": 1,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "N": {
+          "annotations": 314,
+          "matched": 314,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "R": {
+          "annotations": 1254,
+          "matched": 1253,
+          "missed": 1,
+          "recall": 0.9992
+        },
+        "V": {
+          "annotations": 2,
+          "matched": 2,
+          "missed": 0,
+          "recall": 1.0
+        }
+      }
+    },
+    {
+      "record_name": "233",
+      "detector_name": "hamilton",
+      "lead_name": "MLII",
+      "sampling_rate": 360.0,
+      "signal_length": 650000,
+      "signal_duration_seconds": 1805.5556,
+      "tolerance_samples": 36,
+      "tolerance_ms": 100.0,
+      "detector_runtime_seconds": 0.346,
+      "processing_speedup": 5219.0966,
+      "metrics": {
+        "num_annotations": 3079,
+        "num_detections": 3068,
+        "true_positives": 3067,
+        "false_positives": 1,
+        "false_negatives": 12,
+        "precision": 0.9997,
+        "recall": 0.9961,
+        "f1": 0.9979,
+        "mean_offset_samples": 20.4809,
+        "mean_absolute_offset_samples": 20.6837,
+        "median_absolute_offset_samples": 24.0,
+        "standard_deviation_offset_samples": 9.025,
+        "maximum_absolute_offset_samples": 33.0,
+        "mean_offset_ms": 56.8914,
+        "mean_absolute_offset_ms": 57.4547,
+        "median_absolute_offset_ms": 66.6667,
+        "standard_deviation_offset_ms": 25.0694,
+        "maximum_absolute_offset_ms": 91.6667
+      },
+      "symbol_metrics": {
+        "A": {
+          "annotations": 7,
+          "matched": 7,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "F": {
+          "annotations": 11,
+          "matched": 11,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "N": {
+          "annotations": 2230,
+          "matched": 2228,
+          "missed": 2,
+          "recall": 0.9991
+        },
+        "V": {
+          "annotations": 831,
+          "matched": 821,
+          "missed": 10,
+          "recall": 0.988
+        }
+      }
+    }
+  ]
+}

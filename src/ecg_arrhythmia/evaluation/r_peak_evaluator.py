@@ -196,9 +196,9 @@ def evaluate_r_peak_records(
         true_positives=total_true_positives,
         false_positives=total_false_posititives,
         false_negatives=total_false_negatives,
-        precision=precision,
-        recall=recall,
-        f1=f1,
+        precision=round(precision, 4),
+        recall=round(recall, 4),
+        f1=round(f1, 4),
         # This unpacks the timing_metrics dict into this object.
         # The keywords in this dict must match what this dataclass
         # expects
@@ -233,10 +233,10 @@ def evaluate_r_peak_records(
     return DatasetRPeakEvaluation(
         detector_name=detector.name,
         split_name=split_name,
-        tolerance_ms=float(tolerance_ms),
-        total_signal_duration_seconds=total_signal_duration_seconds,
-        total_detector_runtime_seconds=total_detector_runtime_seconds,
-        processing_speedup=processing_speedup,
+        tolerance_ms=round(float(tolerance_ms), 4),
+        total_signal_duration_seconds= round(total_signal_duration_seconds, 4),
+        total_detector_runtime_seconds=round(total_detector_runtime_seconds,4),
+        processing_speedup=round(processing_speedup, 4),
         metrics=aggregate_metrics,
         symbol_metrics=aggregate_symbol_metrics,
         records=record_results,
@@ -363,11 +363,11 @@ def _evaluate_r_peak_record(
         lead_name=lead_name,
         sampling_rate=sampling_rate,
         signal_length=len(signal),
-        signal_duration_seconds=signal_duration_seconds,
+        signal_duration_seconds=round(signal_duration_seconds, 4),
         tolerance_samples=tolerance_samples,
-        tolerance_ms=tolerance_ms,
-        detector_runtime_seconds=detector_runtime_seconds,
-        processing_speedup=processing_speedup,
+        tolerance_ms=round(tolerance_ms, 4),
+        detector_runtime_seconds=round(detector_runtime_seconds, 4),
+        processing_speedup=round(processing_speedup, 4),
         metrics=metrics,
         symbol_metrics=symbol_metrics,
     )
@@ -432,10 +432,10 @@ def _aggregate_symbol_metrics(
             annotations=annotation_counts[symbol],
             matched=matched_counts[symbol],
             missed=missed_counts[symbol],
-            recall=_safe_divide(
+            recall=round(_safe_divide(
                 matched_counts[symbol],
                 annotation_counts[symbol],
-            ),
+            ), 4),
         )
         for symbol in sorted(annotation_counts)
     }
@@ -460,13 +460,13 @@ def _calculate_aggregate_timing_metrics(
     return {
         # Signed mean indicates whether the detector tends to be early
         # or late relative to expert annotations.
-        "mean_offset_ms": float(np.mean(offsets_ms)),
+        "mean_offset_ms": round(float(np.mean(offsets_ms)), 4),
         # Mean absolute offset represents the average timing error
         # regardless of whether the detector was early or late.
-        "mean_absolute_offset_ms": float(np.mean(absolute_offsets_ms)),
-        "median_absolute_offset_ms": float(np.median(absolute_offsets_ms)),
-        "standard_deviation_offset_ms": float(np.std(offsets_ms)),
-        "maximum_absolute_offset_ms": float(np.max(absolute_offsets_ms)),
+        "mean_absolute_offset_ms": round(float(np.mean(absolute_offsets_ms)), 4),
+        "median_absolute_offset_ms": round(float(np.median(absolute_offsets_ms)), 4),
+        "standard_deviation_offset_ms": round(float(np.std(offsets_ms)), 4),
+        "maximum_absolute_offset_ms": round(float(np.max(absolute_offsets_ms)), 4),
     }
 
 
@@ -501,4 +501,4 @@ def _safe_divide(
     if denominator == 0:
         return 0.0
 
-    return float(numerator / denominator)
+    return round(float(numerator / denominator), 4)
