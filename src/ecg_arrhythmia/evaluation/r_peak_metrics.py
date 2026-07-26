@@ -113,11 +113,11 @@ def compute_r_peak_metrics(
     milliseconds_per_sample = 1000.0 / sampling_rate
 
     # Calculate timing metrics
-    mean_offset_samples = round(float(np.mean(offsets_float)), 4)
-    mean_absolute_offset_samples = round(float(np.mean(absolute_offsets)), 4)
-    median_absolute_offset_samples = round(float(np.median(absolute_offsets)), 4)
-    standard_deviation_offset_samples = round(float(np.std(offsets_float)), 4)
-    maximum_absolute_offset_samples = round(float(np.max(absolute_offsets)), 4)
+    mean_offset_samples = float(np.mean(offsets_float))
+    mean_absolute_offset_samples = float(np.mean(absolute_offsets))
+    median_absolute_offset_samples = float(np.median(absolute_offsets))
+    standard_deviation_offset_samples = float(np.std(offsets_float))
+    maximum_absolute_offset_samples = float(np.max(absolute_offsets))
 
     return RPeakMetrics(
         num_annotations=num_annotations,
@@ -133,18 +133,18 @@ def compute_r_peak_metrics(
         median_absolute_offset_samples=median_absolute_offset_samples,
         standard_deviation_offset_samples=standard_deviation_offset_samples,
         maximum_absolute_offset_samples=maximum_absolute_offset_samples,
-        mean_offset_ms=round(mean_offset_samples * milliseconds_per_sample, 4),
-        mean_absolute_offset_ms=round(
-            (mean_absolute_offset_samples * milliseconds_per_sample), 4
+        mean_offset_ms=mean_offset_samples * milliseconds_per_sample,
+        mean_absolute_offset_ms=(
+            mean_absolute_offset_samples * milliseconds_per_sample
         ),
-        median_absolute_offset_ms=round(
-            (median_absolute_offset_samples * milliseconds_per_sample), 4
+        median_absolute_offset_ms=(
+            median_absolute_offset_samples * milliseconds_per_sample
         ),
-        standard_deviation_offset_ms=round(
-            (standard_deviation_offset_samples * milliseconds_per_sample), 4
+        standard_deviation_offset_ms=(
+            standard_deviation_offset_samples * milliseconds_per_sample
         ),
-        maximum_absolute_offset_ms=round(
-            (maximum_absolute_offset_samples * milliseconds_per_sample), 4
+        maximum_absolute_offset_ms=(
+            maximum_absolute_offset_samples * milliseconds_per_sample
         ),
     )
 
@@ -158,7 +158,7 @@ def _safe_divide(
     if denominator == 0:
         return 0.0
 
-    return round(float(numerator / denominator), 4)
+    return float(numerator / denominator)
 
 
 def _validate_sampling_rate(

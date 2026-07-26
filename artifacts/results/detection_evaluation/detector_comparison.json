@@ -23,8 +23,8 @@
       "f1": 0.9972,
       "mean_absolute_offset_ms": 1.9661,
       "maximum_absolute_offset_ms": 44.4444,
-      "runtime_seconds": 12.3136,
-      "processing_speedup": 879.7861
+      "runtime_seconds": 12.1572,
+      "processing_speedup": 891.1025
     },
     {
       "detector": "hamilton",
@@ -36,11 +36,11 @@
       "false_negatives": 102,
       "precision": 0.9991,
       "recall": 0.993,
-      "f1": 0.996,
+      "f1": 0.9961,
       "mean_absolute_offset_ms": 53.4714,
       "maximum_absolute_offset_ms": 91.6667,
-      "runtime_seconds": 2.633,
-      "processing_speedup": 4114.445
+      "runtime_seconds": 2.6247,
+      "processing_speedup": 4127.4244
     },
     {
       "detector": "elgendi",
@@ -55,8 +55,8 @@
       "f1": 0.9791,
       "mean_absolute_offset_ms": 71.2104,
       "maximum_absolute_offset_ms": 100.0,
-      "runtime_seconds": 5.4342,
-      "processing_speedup": 1993.5471
+      "runtime_seconds": 5.5544,
+      "processing_speedup": 1950.4092
     }
   ]
 }

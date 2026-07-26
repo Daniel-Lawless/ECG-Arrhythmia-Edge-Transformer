@@ -2,9 +2,9 @@
   "detector_name": "elgendi",
   "split_name": "validation",
   "tolerance_ms": 100.0,
-  "total_signal_duration_seconds": 10833.3336,
-  "total_detector_runtime_seconds": 5.4342,
-  "processing_speedup": 1993.5471,
+  "total_signal_duration_seconds": 10833.3333,
+  "total_detector_runtime_seconds": 5.5544,
+  "processing_speedup": 1950.4092,
   "metrics": {
     "num_records": 6,
     "num_annotations": 14660,
@@ -81,8 +81,8 @@
       "signal_duration_seconds": 1805.5556,
       "tolerance_samples": 36,
       "tolerance_ms": 100.0,
-      "detector_runtime_seconds": 0.905,
-      "processing_speedup": 1995.1375,
+      "detector_runtime_seconds": 0.922,
+      "processing_speedup": 1958.4022,
       "metrics": {
         "num_annotations": 1879,
         "num_detections": 1891,
@@ -97,8 +97,8 @@
         "median_absolute_offset_samples": 27.0,
         "standard_deviation_offset_samples": 6.0145,
         "maximum_absolute_offset_samples": 36.0,
-        "mean_offset_ms": 71.84,
-        "mean_absolute_offset_ms": 73.4864,
+        "mean_offset_ms": 71.8401,
+        "mean_absolute_offset_ms": 73.4865,
         "median_absolute_offset_ms": 75.0,
         "standard_deviation_offset_ms": 16.7069,
         "maximum_absolute_offset_ms": 100.0
@@ -145,8 +145,8 @@
       "signal_duration_seconds": 1805.5556,
       "tolerance_samples": 36,
       "tolerance_ms": 100.0,
-      "detector_runtime_seconds": 0.9071,
-      "processing_speedup": 1990.3787,
+      "detector_runtime_seconds": 1.022,
+      "processing_speedup": 1766.7062,
       "metrics": {
         "num_annotations": 2476,
         "num_detections": 2476,
@@ -164,7 +164,7 @@
         "mean_offset_ms": 76.4786,
         "mean_absolute_offset_ms": 76.4786,
         "median_absolute_offset_ms": 77.7778,
-        "standard_deviation_offset_ms": 2.0725,
+        "standard_deviation_offset_ms": 2.0726,
         "maximum_absolute_offset_ms": 80.5556
       },
       "symbol_metrics": {
@@ -185,8 +185,8 @@
       "signal_duration_seconds": 1805.5556,
       "tolerance_samples": 36,
       "tolerance_ms": 100.0,
-      "detector_runtime_seconds": 0.9028,
-      "processing_speedup": 1999.9158,
+      "detector_runtime_seconds": 0.9283,
+      "processing_speedup": 1945.0501,
       "metrics": {
         "num_annotations": 3005,
         "num_detections": 3005,
@@ -201,8 +201,8 @@
         "median_absolute_offset_samples": 25.0,
         "standard_deviation_offset_samples": 1.3906,
         "maximum_absolute_offset_samples": 28.0,
-        "mean_offset_ms": 68.7686,
-        "mean_absolute_offset_ms": 68.7964,
+        "mean_offset_ms": 68.7687,
+        "mean_absolute_offset_ms": 68.7965,
         "median_absolute_offset_ms": 69.4444,
         "standard_deviation_offset_ms": 3.8628,
         "maximum_absolute_offset_ms": 77.7778
@@ -237,8 +237,8 @@
       "signal_duration_seconds": 1805.5556,
       "tolerance_samples": 36,
       "tolerance_ms": 100.0,
-      "detector_runtime_seconds": 0.9075,
-      "processing_speedup": 1989.4985,
+      "detector_runtime_seconds": 0.895,
+      "processing_speedup": 2017.3605,
       "metrics": {
         "num_annotations": 2650,
         "num_detections": 2631,
@@ -254,9 +254,9 @@
         "standard_deviation_offset_samples": 3.8995,
         "maximum_absolute_offset_samples": 35.0,
         "mean_offset_ms": 73.3031,
-        "mean_absolute_offset_ms": 73.5292,
+        "mean_absolute_offset_ms": 73.529,
         "median_absolute_offset_ms": 75.0,
-        "standard_deviation_offset_ms": 10.8319,
+        "standard_deviation_offset_ms": 10.832,
         "maximum_absolute_offset_ms": 97.2222
       },
       "symbol_metrics": {
@@ -301,8 +301,8 @@
       "signal_duration_seconds": 1805.5556,
       "tolerance_samples": 36,
       "tolerance_ms": 100.0,
-      "detector_runtime_seconds": 0.9028,
-      "processing_speedup": 1999.9055,
+      "detector_runtime_seconds": 0.8964,
+      "processing_speedup": 2014.2952,
       "metrics": {
         "num_annotations": 1571,
         "num_detections": 2003,
@@ -317,10 +317,10 @@
         "median_absolute_offset_samples": 28.0,
         "standard_deviation_offset_samples": 9.8734,
         "maximum_absolute_offset_samples": 32.0,
-        "mean_offset_ms": 63.4978,
-        "mean_absolute_offset_ms": 63.4978,
+        "mean_offset_ms": 63.4977,
+        "mean_absolute_offset_ms": 63.4977,
         "median_absolute_offset_ms": 77.7778,
-        "standard_deviation_offset_ms": 27.4261,
+        "standard_deviation_offset_ms": 27.426,
         "maximum_absolute_offset_ms": 88.8889
       },
       "symbol_metrics": {
@@ -359,8 +359,8 @@
       "signal_duration_seconds": 1805.5556,
       "tolerance_samples": 36,
       "tolerance_ms": 100.0,
-      "detector_runtime_seconds": 0.909,
-      "processing_speedup": 1986.2265,
+      "detector_runtime_seconds": 0.8908,
+      "processing_speedup": 2026.9266,
       "metrics": {
         "num_annotations": 3079,
         "num_detections": 3074,
@@ -378,7 +378,7 @@
         "mean_offset_ms": 69.9175,
         "mean_absolute_offset_ms": 69.9175,
         "median_absolute_offset_ms": 77.7778,
-        "standard_deviation_offset_ms": 15.3186,
+        "standard_deviation_offset_ms": 15.3187,
         "maximum_absolute_offset_ms": 100.0
       },
       "symbol_metrics": {

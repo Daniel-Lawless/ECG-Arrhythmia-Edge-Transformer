@@ -19,6 +19,9 @@ dependencies = [
     "matplotlib",
     "scikit-learn",
     "torch",
+    # Provides established Hamilton and Elgendi QRS detectors used by the
+    # HamiltonDetector and ElgendiDetector R-peak wrappers.
+    "neurokit2",
 ]
 
 
