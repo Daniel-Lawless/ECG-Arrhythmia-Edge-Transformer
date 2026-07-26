@@ -1,0 +1,412 @@
+{
+  "detector_name": "elgendi",
+  "split_name": "validation",
+  "tolerance_ms": 100.0,
+  "total_signal_duration_seconds": 10833.3336,
+  "total_detector_runtime_seconds": 5.4342,
+  "processing_speedup": 1993.5471,
+  "metrics": {
+    "num_records": 6,
+    "num_annotations": 14660,
+    "num_detections": 15080,
+    "true_positives": 14559,
+    "false_positives": 521,
+    "false_negatives": 101,
+    "precision": 0.9655,
+    "recall": 0.9931,
+    "f1": 0.9791,
+    "mean_offset_ms": 70.9563,
+    "mean_absolute_offset_ms": 71.2104,
+    "median_absolute_offset_ms": 75.0,
+    "standard_deviation_offset_ms": 14.2731,
+    "maximum_absolute_offset_ms": 100.0
+  },
+  "symbol_metrics": {
+    "A": {
+      "annotations": 401,
+      "matched": 401,
+      "missed": 0,
+      "recall": 1.0
+    },
+    "E": {
+      "annotations": 1,
+      "matched": 1,
+      "missed": 0,
+      "recall": 1.0
+    },
+    "F": {
+      "annotations": 25,
+      "matched": 25,
+      "missed": 0,
+      "recall": 1.0
+    },
+    "J": {
+      "annotations": 2,
+      "matched": 2,
+      "missed": 0,
+      "recall": 1.0
+    },
+    "N": {
+      "annotations": 11884,
+      "matched": 11822,
+      "missed": 62,
+      "recall": 0.9948
+    },
+    "R": {
+      "annotations": 1254,
+      "matched": 1252,
+      "missed": 2,
+      "recall": 0.9984
+    },
+    "V": {
+      "annotations": 1071,
+      "matched": 1036,
+      "missed": 35,
+      "recall": 0.9673
+    },
+    "a": {
+      "annotations": 22,
+      "matched": 20,
+      "missed": 2,
+      "recall": 0.9091
+    }
+  },
+  "records": [
+    {
+      "record_name": "114",
+      "detector_name": "elgendi",
+      "lead_name": "MLII",
+      "sampling_rate": 360.0,
+      "signal_length": 650000,
+      "signal_duration_seconds": 1805.5556,
+      "tolerance_samples": 36,
+      "tolerance_ms": 100.0,
+      "detector_runtime_seconds": 0.905,
+      "processing_speedup": 1995.1375,
+      "metrics": {
+        "num_annotations": 1879,
+        "num_detections": 1891,
+        "true_positives": 1839,
+        "false_positives": 52,
+        "false_negatives": 40,
+        "precision": 0.9725,
+        "recall": 0.9787,
+        "f1": 0.9756,
+        "mean_offset_samples": 25.8624,
+        "mean_absolute_offset_samples": 26.4551,
+        "median_absolute_offset_samples": 27.0,
+        "standard_deviation_offset_samples": 6.0145,
+        "maximum_absolute_offset_samples": 36.0,
+        "mean_offset_ms": 71.84,
+        "mean_absolute_offset_ms": 73.4864,
+        "median_absolute_offset_ms": 75.0,
+        "standard_deviation_offset_ms": 16.7069,
+        "maximum_absolute_offset_ms": 100.0
+      },
+      "symbol_metrics": {
+        "A": {
+          "annotations": 10,
+          "matched": 10,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "F": {
+          "annotations": 4,
+          "matched": 4,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "J": {
+          "annotations": 2,
+          "matched": 2,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "N": {
+          "annotations": 1820,
+          "matched": 1780,
+          "missed": 40,
+          "recall": 0.978
+        },
+        "V": {
+          "annotations": 43,
+          "matched": 43,
+          "missed": 0,
+          "recall": 1.0
+        }
+      }
+    },
+    {
+      "record_name": "122",
+      "detector_name": "elgendi",
+      "lead_name": "MLII",
+      "sampling_rate": 360.0,
+      "signal_length": 650000,
+      "signal_duration_seconds": 1805.5556,
+      "tolerance_samples": 36,
+      "tolerance_ms": 100.0,
+      "detector_runtime_seconds": 0.9071,
+      "processing_speedup": 1990.3787,
+      "metrics": {
+        "num_annotations": 2476,
+        "num_detections": 2476,
+        "true_positives": 2476,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_offset_samples": 27.5323,
+        "mean_absolute_offset_samples": 27.5323,
+        "median_absolute_offset_samples": 28.0,
+        "standard_deviation_offset_samples": 0.7461,
+        "maximum_absolute_offset_samples": 29.0,
+        "mean_offset_ms": 76.4786,
+        "mean_absolute_offset_ms": 76.4786,
+        "median_absolute_offset_ms": 77.7778,
+        "standard_deviation_offset_ms": 2.0725,
+        "maximum_absolute_offset_ms": 80.5556
+      },
+      "symbol_metrics": {
+        "N": {
+          "annotations": 2476,
+          "matched": 2476,
+          "missed": 0,
+          "recall": 1.0
+        }
+      }
+    },
+    {
+      "record_name": "209",
+      "detector_name": "elgendi",
+      "lead_name": "MLII",
+      "sampling_rate": 360.0,
+      "signal_length": 650000,
+      "signal_duration_seconds": 1805.5556,
+      "tolerance_samples": 36,
+      "tolerance_ms": 100.0,
+      "detector_runtime_seconds": 0.9028,
+      "processing_speedup": 1999.9158,
+      "metrics": {
+        "num_annotations": 3005,
+        "num_detections": 3005,
+        "true_positives": 3005,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_offset_samples": 24.7567,
+        "mean_absolute_offset_samples": 24.7667,
+        "median_absolute_offset_samples": 25.0,
+        "standard_deviation_offset_samples": 1.3906,
+        "maximum_absolute_offset_samples": 28.0,
+        "mean_offset_ms": 68.7686,
+        "mean_absolute_offset_ms": 68.7964,
+        "median_absolute_offset_ms": 69.4444,
+        "standard_deviation_offset_ms": 3.8628,
+        "maximum_absolute_offset_ms": 77.7778
+      },
+      "symbol_metrics": {
+        "A": {
+          "annotations": 383,
+          "matched": 383,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "N": {
+          "annotations": 2621,
+          "matched": 2621,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "V": {
+          "annotations": 1,
+          "matched": 1,
+          "missed": 0,
+          "recall": 1.0
+        }
+      }
+    },
+    {
+      "record_name": "210",
+      "detector_name": "elgendi",
+      "lead_name": "MLII",
+      "sampling_rate": 360.0,
+      "signal_length": 650000,
+      "signal_duration_seconds": 1805.5556,
+      "tolerance_samples": 36,
+      "tolerance_ms": 100.0,
+      "detector_runtime_seconds": 0.9075,
+      "processing_speedup": 1989.4985,
+      "metrics": {
+        "num_annotations": 2650,
+        "num_detections": 2631,
+        "true_positives": 2606,
+        "false_positives": 25,
+        "false_negatives": 44,
+        "precision": 0.9905,
+        "recall": 0.9834,
+        "f1": 0.9869,
+        "mean_offset_samples": 26.3891,
+        "mean_absolute_offset_samples": 26.4705,
+        "median_absolute_offset_samples": 27.0,
+        "standard_deviation_offset_samples": 3.8995,
+        "maximum_absolute_offset_samples": 35.0,
+        "mean_offset_ms": 73.3031,
+        "mean_absolute_offset_ms": 73.5292,
+        "median_absolute_offset_ms": 75.0,
+        "standard_deviation_offset_ms": 10.8319,
+        "maximum_absolute_offset_ms": 97.2222
+      },
+      "symbol_metrics": {
+        "E": {
+          "annotations": 1,
+          "matched": 1,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "F": {
+          "annotations": 10,
+          "matched": 10,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "N": {
+          "annotations": 2423,
+          "matched": 2410,
+          "missed": 13,
+          "recall": 0.9946
+        },
+        "V": {
+          "annotations": 194,
+          "matched": 165,
+          "missed": 29,
+          "recall": 0.8505
+        },
+        "a": {
+          "annotations": 22,
+          "matched": 20,
+          "missed": 2,
+          "recall": 0.9091
+        }
+      }
+    },
+    {
+      "record_name": "231",
+      "detector_name": "elgendi",
+      "lead_name": "MLII",
+      "sampling_rate": 360.0,
+      "signal_length": 650000,
+      "signal_duration_seconds": 1805.5556,
+      "tolerance_samples": 36,
+      "tolerance_ms": 100.0,
+      "detector_runtime_seconds": 0.9028,
+      "processing_speedup": 1999.9055,
+      "metrics": {
+        "num_annotations": 1571,
+        "num_detections": 2003,
+        "true_positives": 1562,
+        "false_positives": 441,
+        "false_negatives": 9,
+        "precision": 0.7798,
+        "recall": 0.9943,
+        "f1": 0.8741,
+        "mean_offset_samples": 22.8592,
+        "mean_absolute_offset_samples": 22.8592,
+        "median_absolute_offset_samples": 28.0,
+        "standard_deviation_offset_samples": 9.8734,
+        "maximum_absolute_offset_samples": 32.0,
+        "mean_offset_ms": 63.4978,
+        "mean_absolute_offset_ms": 63.4978,
+        "median_absolute_offset_ms": 77.7778,
+        "standard_deviation_offset_ms": 27.4261,
+        "maximum_absolute_offset_ms": 88.8889
+      },
+      "symbol_metrics": {
+        "A": {
+          "annotations": 1,
+          "matched": 1,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "N": {
+          "annotations": 314,
+          "matched": 307,
+          "missed": 7,
+          "recall": 0.9777
+        },
+        "R": {
+          "annotations": 1254,
+          "matched": 1252,
+          "missed": 2,
+          "recall": 0.9984
+        },
+        "V": {
+          "annotations": 2,
+          "matched": 2,
+          "missed": 0,
+          "recall": 1.0
+        }
+      }
+    },
+    {
+      "record_name": "233",
+      "detector_name": "elgendi",
+      "lead_name": "MLII",
+      "sampling_rate": 360.0,
+      "signal_length": 650000,
+      "signal_duration_seconds": 1805.5556,
+      "tolerance_samples": 36,
+      "tolerance_ms": 100.0,
+      "detector_runtime_seconds": 0.909,
+      "processing_speedup": 1986.2265,
+      "metrics": {
+        "num_annotations": 3079,
+        "num_detections": 3074,
+        "true_positives": 3071,
+        "false_positives": 3,
+        "false_negatives": 8,
+        "precision": 0.999,
+        "recall": 0.9974,
+        "f1": 0.9982,
+        "mean_offset_samples": 25.1703,
+        "mean_absolute_offset_samples": 25.1703,
+        "median_absolute_offset_samples": 28.0,
+        "standard_deviation_offset_samples": 5.5147,
+        "maximum_absolute_offset_samples": 36.0,
+        "mean_offset_ms": 69.9175,
+        "mean_absolute_offset_ms": 69.9175,
+        "median_absolute_offset_ms": 77.7778,
+        "standard_deviation_offset_ms": 15.3186,
+        "maximum_absolute_offset_ms": 100.0
+      },
+      "symbol_metrics": {
+        "A": {
+          "annotations": 7,
+          "matched": 7,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "F": {
+          "annotations": 11,
+          "matched": 11,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "N": {
+          "annotations": 2230,
+          "matched": 2228,
+          "missed": 2,
+          "recall": 0.9991
+        },
+        "V": {
+          "annotations": 831,
+          "matched": 825,
+          "missed": 6,
+          "recall": 0.9928
+        }
+      }
+    }
+  ]
+}

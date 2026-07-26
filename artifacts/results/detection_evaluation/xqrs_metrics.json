@@ -1,0 +1,412 @@
+{
+  "detector_name": "xqrs",
+  "split_name": "validation",
+  "tolerance_ms": 100.0,
+  "total_signal_duration_seconds": 10833.3336,
+  "total_detector_runtime_seconds": 12.3136,
+  "processing_speedup": 879.7861,
+  "metrics": {
+    "num_records": 6,
+    "num_annotations": 14660,
+    "num_detections": 14588,
+    "true_positives": 14583,
+    "false_positives": 5,
+    "false_negatives": 77,
+    "precision": 0.9997,
+    "recall": 0.9947,
+    "f1": 0.9972,
+    "mean_offset_ms": -0.8461,
+    "mean_absolute_offset_ms": 1.9661,
+    "median_absolute_offset_ms": 0.0,
+    "standard_deviation_offset_ms": 7.7956,
+    "maximum_absolute_offset_ms": 44.4444
+  },
+  "symbol_metrics": {
+    "A": {
+      "annotations": 401,
+      "matched": 400,
+      "missed": 1,
+      "recall": 0.9975
+    },
+    "E": {
+      "annotations": 1,
+      "matched": 0,
+      "missed": 1,
+      "recall": 0.0
+    },
+    "F": {
+      "annotations": 25,
+      "matched": 22,
+      "missed": 3,
+      "recall": 0.88
+    },
+    "J": {
+      "annotations": 2,
+      "matched": 2,
+      "missed": 0,
+      "recall": 1.0
+    },
+    "N": {
+      "annotations": 11884,
+      "matched": 11881,
+      "missed": 3,
+      "recall": 0.9997
+    },
+    "R": {
+      "annotations": 1254,
+      "matched": 1254,
+      "missed": 0,
+      "recall": 1.0
+    },
+    "V": {
+      "annotations": 1071,
+      "matched": 1005,
+      "missed": 66,
+      "recall": 0.9384
+    },
+    "a": {
+      "annotations": 22,
+      "matched": 19,
+      "missed": 3,
+      "recall": 0.8636
+    }
+  },
+  "records": [
+    {
+      "record_name": "114",
+      "detector_name": "xqrs",
+      "lead_name": "MLII",
+      "sampling_rate": 360.0,
+      "signal_length": 650000,
+      "signal_duration_seconds": 1805.5556,
+      "tolerance_samples": 36,
+      "tolerance_ms": 100.0,
+      "detector_runtime_seconds": 2.1585,
+      "processing_speedup": 836.4688,
+      "metrics": {
+        "num_annotations": 1879,
+        "num_detections": 1878,
+        "true_positives": 1878,
+        "false_positives": 0,
+        "false_negatives": 1,
+        "precision": 1.0,
+        "recall": 0.9995,
+        "f1": 0.9997,
+        "mean_offset_samples": 0.1667,
+        "mean_absolute_offset_samples": 0.2327,
+        "median_absolute_offset_samples": 0.0,
+        "standard_deviation_offset_samples": 0.5887,
+        "maximum_absolute_offset_samples": 12.0,
+        "mean_offset_ms": 0.4631,
+        "mean_absolute_offset_ms": 0.6464,
+        "median_absolute_offset_ms": 0.0,
+        "standard_deviation_offset_ms": 1.6353,
+        "maximum_absolute_offset_ms": 33.3333
+      },
+      "symbol_metrics": {
+        "A": {
+          "annotations": 10,
+          "matched": 9,
+          "missed": 1,
+          "recall": 0.9
+        },
+        "F": {
+          "annotations": 4,
+          "matched": 4,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "J": {
+          "annotations": 2,
+          "matched": 2,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "N": {
+          "annotations": 1820,
+          "matched": 1820,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "V": {
+          "annotations": 43,
+          "matched": 43,
+          "missed": 0,
+          "recall": 1.0
+        }
+      }
+    },
+    {
+      "record_name": "122",
+      "detector_name": "xqrs",
+      "lead_name": "MLII",
+      "sampling_rate": 360.0,
+      "signal_length": 650000,
+      "signal_duration_seconds": 1805.5556,
+      "tolerance_samples": 36,
+      "tolerance_ms": 100.0,
+      "detector_runtime_seconds": 2.0154,
+      "processing_speedup": 895.8777,
+      "metrics": {
+        "num_annotations": 2476,
+        "num_detections": 2477,
+        "true_positives": 2476,
+        "false_positives": 1,
+        "false_negatives": 0,
+        "precision": 0.9996,
+        "recall": 1.0,
+        "f1": 0.9998,
+        "mean_offset_samples": -0.0961,
+        "mean_absolute_offset_samples": 0.0969,
+        "median_absolute_offset_samples": 0.0,
+        "standard_deviation_offset_samples": 0.2961,
+        "maximum_absolute_offset_samples": 1.0,
+        "mean_offset_ms": -0.2669,
+        "mean_absolute_offset_ms": 0.2692,
+        "median_absolute_offset_ms": 0.0,
+        "standard_deviation_offset_ms": 0.8225,
+        "maximum_absolute_offset_ms": 2.7778
+      },
+      "symbol_metrics": {
+        "N": {
+          "annotations": 2476,
+          "matched": 2476,
+          "missed": 0,
+          "recall": 1.0
+        }
+      }
+    },
+    {
+      "record_name": "209",
+      "detector_name": "xqrs",
+      "lead_name": "MLII",
+      "sampling_rate": 360.0,
+      "signal_length": 650000,
+      "signal_duration_seconds": 1805.5556,
+      "tolerance_samples": 36,
+      "tolerance_ms": 100.0,
+      "detector_runtime_seconds": 2.0242,
+      "processing_speedup": 891.9711,
+      "metrics": {
+        "num_annotations": 3005,
+        "num_detections": 3005,
+        "true_positives": 3005,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_offset_samples": 0.1458,
+        "mean_absolute_offset_samples": 0.1464,
+        "median_absolute_offset_samples": 0.0,
+        "standard_deviation_offset_samples": 0.4022,
+        "maximum_absolute_offset_samples": 11.0,
+        "mean_offset_ms": 0.405,
+        "mean_absolute_offset_ms": 0.4067,
+        "median_absolute_offset_ms": 0.0,
+        "standard_deviation_offset_ms": 1.1172,
+        "maximum_absolute_offset_ms": 30.5556
+      },
+      "symbol_metrics": {
+        "A": {
+          "annotations": 383,
+          "matched": 383,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "N": {
+          "annotations": 2621,
+          "matched": 2621,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "V": {
+          "annotations": 1,
+          "matched": 1,
+          "missed": 0,
+          "recall": 1.0
+        }
+      }
+    },
+    {
+      "record_name": "210",
+      "detector_name": "xqrs",
+      "lead_name": "MLII",
+      "sampling_rate": 360.0,
+      "signal_length": 650000,
+      "signal_duration_seconds": 1805.5556,
+      "tolerance_samples": 36,
+      "tolerance_ms": 100.0,
+      "detector_runtime_seconds": 2.0137,
+      "processing_speedup": 896.6367,
+      "metrics": {
+        "num_annotations": 2650,
+        "num_detections": 2594,
+        "true_positives": 2590,
+        "false_positives": 4,
+        "false_negatives": 60,
+        "precision": 0.9985,
+        "recall": 0.9774,
+        "f1": 0.9878,
+        "mean_offset_samples": -0.1517,
+        "mean_absolute_offset_samples": 0.3386,
+        "median_absolute_offset_samples": 0.0,
+        "standard_deviation_offset_samples": 1.8346,
+        "maximum_absolute_offset_samples": 16.0,
+        "mean_offset_ms": -0.4214,
+        "mean_absolute_offset_ms": 0.9406,
+        "median_absolute_offset_ms": 0.0,
+        "standard_deviation_offset_ms": 5.0961,
+        "maximum_absolute_offset_ms": 44.4444
+      },
+      "symbol_metrics": {
+        "E": {
+          "annotations": 1,
+          "matched": 0,
+          "missed": 1,
+          "recall": 0.0
+        },
+        "F": {
+          "annotations": 10,
+          "matched": 7,
+          "missed": 3,
+          "recall": 0.7
+        },
+        "N": {
+          "annotations": 2423,
+          "matched": 2421,
+          "missed": 2,
+          "recall": 0.9992
+        },
+        "V": {
+          "annotations": 194,
+          "matched": 143,
+          "missed": 51,
+          "recall": 0.7371
+        },
+        "a": {
+          "annotations": 22,
+          "matched": 19,
+          "missed": 3,
+          "recall": 0.8636
+        }
+      }
+    },
+    {
+      "record_name": "231",
+      "detector_name": "xqrs",
+      "lead_name": "MLII",
+      "sampling_rate": 360.0,
+      "signal_length": 650000,
+      "signal_duration_seconds": 1805.5556,
+      "tolerance_samples": 36,
+      "tolerance_ms": 100.0,
+      "detector_runtime_seconds": 2.058,
+      "processing_speedup": 877.3451,
+      "metrics": {
+        "num_annotations": 1571,
+        "num_detections": 1570,
+        "true_positives": 1570,
+        "false_positives": 0,
+        "false_negatives": 1,
+        "precision": 1.0,
+        "recall": 0.9994,
+        "f1": 0.9997,
+        "mean_offset_samples": -0.0006,
+        "mean_absolute_offset_samples": 0.0847,
+        "median_absolute_offset_samples": 0.0,
+        "standard_deviation_offset_samples": 0.2911,
+        "maximum_absolute_offset_samples": 1.0,
+        "mean_offset_ms": -0.0017,
+        "mean_absolute_offset_ms": 0.2353,
+        "median_absolute_offset_ms": 0.0,
+        "standard_deviation_offset_ms": 0.8086,
+        "maximum_absolute_offset_ms": 2.7778
+      },
+      "symbol_metrics": {
+        "A": {
+          "annotations": 1,
+          "matched": 1,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "N": {
+          "annotations": 314,
+          "matched": 314,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "R": {
+          "annotations": 1254,
+          "matched": 1254,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "V": {
+          "annotations": 2,
+          "matched": 1,
+          "missed": 1,
+          "recall": 0.5
+        }
+      }
+    },
+    {
+      "record_name": "233",
+      "detector_name": "xqrs",
+      "lead_name": "MLII",
+      "sampling_rate": 360.0,
+      "signal_length": 650000,
+      "signal_duration_seconds": 1805.5556,
+      "tolerance_samples": 36,
+      "tolerance_ms": 100.0,
+      "detector_runtime_seconds": 2.0438,
+      "processing_speedup": 883.4302,
+      "metrics": {
+        "num_annotations": 3079,
+        "num_detections": 3064,
+        "true_positives": 3064,
+        "false_positives": 0,
+        "false_negatives": 15,
+        "precision": 1.0,
+        "recall": 0.9951,
+        "f1": 0.9975,
+        "mean_offset_samples": -1.4886,
+        "mean_absolute_offset_samples": 2.6746,
+        "median_absolute_offset_samples": 0.0,
+        "standard_deviation_offset_samples": 5.6847,
+        "maximum_absolute_offset_samples": 16.0,
+        "mean_offset_ms": -4.135,
+        "mean_absolute_offset_ms": 7.4294,
+        "median_absolute_offset_ms": 0.0,
+        "standard_deviation_offset_ms": 15.7908,
+        "maximum_absolute_offset_ms": 44.4444
+      },
+      "symbol_metrics": {
+        "A": {
+          "annotations": 7,
+          "matched": 7,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "F": {
+          "annotations": 11,
+          "matched": 11,
+          "missed": 0,
+          "recall": 1.0
+        },
+        "N": {
+          "annotations": 2230,
+          "matched": 2229,
+          "missed": 1,
+          "recall": 0.9996
+        },
+        "V": {
+          "annotations": 831,
+          "matched": 817,
+          "missed": 14,
+          "recall": 0.9832
+        }
+      }
+    }
+  ]
+}
