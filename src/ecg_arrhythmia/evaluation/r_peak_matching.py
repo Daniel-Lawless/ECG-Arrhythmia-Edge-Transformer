@@ -120,15 +120,11 @@ def match_r_peaks(
 
     # Any annotations left after the detections array has been
     # fully processed, they are unmatched, and hence false negatives.
-    unmatched_annotation_indices.extend(
-        range(annotation_index, annotation_array.size)
-    )
+    unmatched_annotation_indices.extend(range(annotation_index, annotation_array.size))
 
     # Any detections left after the annotation array has been
     # fully processed, are wrong predictions, and hence false positives.
-    unmatched_detection_indices.extend(
-        range(detection_index, detection_array.size)
-    )
+    unmatched_detection_indices.extend(range(detection_index, detection_array.size))
 
     # Return this information as a dataclass object
     return PeakMatchResult(
@@ -165,8 +161,7 @@ def _validate_sample_indices(
 
     if sample_array.ndim != 1:
         raise ValueError(
-            f"{name} must be one-dimensional, but received shape "
-            f"{sample_array.shape}."
+            f"{name} must be one-dimensional, but received shape {sample_array.shape}."
         )
 
     # Empty annotation or detection arrays are valid.

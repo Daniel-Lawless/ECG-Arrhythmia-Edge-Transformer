@@ -11,9 +11,7 @@ from ecg_arrhythmia.evaluation.r_peak_evaluator import (
     evaluate_r_peak_records,
 )
 
-SPLIT_SUMMARY_PATH = Path(
-    "data/splits_sequences_matched/split_summary_metrics.json"
-)
+SPLIT_SUMMARY_PATH = Path("data/splits_sequences_matched/split_summary_metrics.json")
 
 OUTPUT_DIR = Path("artifacts/results/detection_evaluation")
 
@@ -107,15 +105,11 @@ def _round_floats_for_output(
 
     if isinstance(value, dict):
         return {
-            key: _round_floats_for_output(item, decimals)
-            for key, item in value.items()
+            key: _round_floats_for_output(item, decimals) for key, item in value.items()
         }
 
     if isinstance(value, list):
-        return [
-            _round_floats_for_output(item, decimals)
-            for item in value
-        ]
+        return [_round_floats_for_output(item, decimals) for item in value]
 
     return value
 

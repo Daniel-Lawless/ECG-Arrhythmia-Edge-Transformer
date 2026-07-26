@@ -6,13 +6,9 @@ from ecg_arrhythmia.detection.hamilton_detector import HamiltonDetector
 
 # The detector imports these functions directly into the shared base
 # module, so the tests patch the names where the detector looks them up.
-CLEAN_TARGET = (
-    "ecg_arrhythmia.detection.neurokit_detector.ecg_clean"
-)
+CLEAN_TARGET = "ecg_arrhythmia.detection.neurokit_detector.ecg_clean"
 
-PEAKS_TARGET = (
-    "ecg_arrhythmia.detection.neurokit_detector.ecg_peaks"
-)
+PEAKS_TARGET = "ecg_arrhythmia.detection.neurokit_detector.ecg_peaks"
 
 
 def test_hamilton_detector_has_expected_name():
