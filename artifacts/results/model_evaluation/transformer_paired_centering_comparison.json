@@ -1,0 +1,104 @@
+{
+    "checkpoint_path": "artifacts/models/ecg_sequence_transformer_tuned.pt",
+    "num_layers": 3,
+    "pairing_summary": {
+        "total_expert_targets": 14625,
+        "total_xqrs_targets": 14548,
+        "paired_targets": 14548,
+        "expert_only_excluded": 77,
+        "xqrs_only_excluded": 0,
+        "paired_class_support": {
+            "F": 22,
+            "N": 13103,
+            "S": 421,
+            "V": 1002
+        }
+    },
+    "expert_centered": {
+        "loss": 0.3073,
+        "accuracy": 0.9687,
+        "macro_f1": 0.692,
+        "per_class": {
+            "N": {
+                "precision": 0.9918,
+                "recall": 0.9751,
+                "f1": 0.9834,
+                "total_class_count": 13103
+            },
+            "S": {
+                "precision": 0.8989,
+                "recall": 0.7815,
+                "f1": 0.8361,
+                "total_class_count": 421
+            },
+            "V": {
+                "precision": 0.9004,
+                "recall": 0.983,
+                "f1": 0.9399,
+                "total_class_count": 1002
+            },
+            "F": {
+                "precision": 0.0049,
+                "recall": 0.0455,
+                "f1": 0.0088,
+                "total_class_count": 22
+            }
+        }
+    },
+    "xqrs_centered": {
+        "loss": 0.3257,
+        "accuracy": 0.9634,
+        "macro_f1": 0.6752,
+        "per_class": {
+            "N": {
+                "precision": 0.9909,
+                "recall": 0.9705,
+                "f1": 0.9806,
+                "total_class_count": 13103
+            },
+            "S": {
+                "precision": 0.8307,
+                "recall": 0.7577,
+                "f1": 0.7925,
+                "total_class_count": 421
+            },
+            "V": {
+                "precision": 0.8821,
+                "recall": 0.978,
+                "f1": 0.9276,
+                "total_class_count": 1002
+            },
+            "F": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "total_class_count": 22
+            }
+        }
+    },
+    "change": {
+        "overall_change": {
+            "loss": 0.0185,
+            "accuracy": -0.0053,
+            "macro_f1": -0.0169
+        },
+        "per_class_f1_change": {
+            "N": -0.0028,
+            "S": -0.0436,
+            "V": -0.0123,
+            "F": -0.0088
+        }
+    },
+    "prediction_agreement": {
+        "num_targets": 14548,
+        "identical_count": 14407,
+        "identical_fraction": 0.9903,
+        "changed_count": 141
+    },
+    "correctness_transitions": {
+        "correct_to_correct": 13984,
+        "correct_to_incorrect": 108,
+        "incorrect_to_correct": 31,
+        "incorrect_to_incorrect": 425
+    }
+}
