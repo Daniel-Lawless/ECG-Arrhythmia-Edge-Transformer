@@ -54,8 +54,7 @@ def load_split_record_names(summary_path: Path, split_name: str) -> list[str]:
     Record names come from
     ``summary["per_split"][split_name]["selected_patient_ids"]`` and grouped
     patient IDs such as ``"201_202"`` are expanded into ``"201"`` and
-    ``"202"``. Only ``"train"`` and ``"val"`` are supported; any other name
-    (including ``"test"``) raises a clear error.
+    ``"202"``.
     """
 
     if split_name not in ALLOWED_SPLIT_NAMES:
@@ -106,7 +105,7 @@ def assert_splits_pairwise_disjoint(summary_path: Path) -> dict[str, list[str]]:
 
 
 # ---------------------------------------------------------------------
-#                          Data Our Types
+#                          Our Data Types
 # ---------------------------------------------------------------------
 
 
