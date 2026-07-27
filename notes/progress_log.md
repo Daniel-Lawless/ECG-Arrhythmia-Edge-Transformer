@@ -758,3 +758,108 @@ Key lesson:
 - Successfully exporting a model does not guarantee that its behaviour has been preserved.
 - The parity check confirms both models have numerical equivalent logits and agree on the final predictions.
 - The exported ONNX model now provides a validated deployment representation of the tuned PyTorch Transformer.
+
+## Milestone 18 — R-Peak Matching and Detector Validation
+
+### Implemented
+
+- Added a shared `RPeakDetector` interface with validation for ECG signals, sampling rates, and returned peak indices.
+- Implemented and tested three interchangeable detectors:
+  - XQRS
+  - Hamilton
+  - Elgendi
+- Added chronological one-to-one matching between expert annotations and detected R-peaks.
+- Enforced that each annotation can match only one detection and each detection can match only one annotation.
+- Defined the signed timing offset as:
+
+```text
+detected sample - expert annotation sample
+```
+
+- Added validation metrics for:
+  - true positives, false positives, and false negatives;
+  - precision, recall, and F1;
+  - mean and median timing offset;
+  - mean and maximum absolute timing error;
+  - detector runtime and real-time speed;
+  - per-record and per-symbol performance.
+- Added `evaluate_r_peak_validation.py` to evaluate all detectors consistently on the validation records.
+
+### Validation Results
+
+| Detector | F1 | False Positives | False Negatives | Mean Absolute Offset |
+|:---:|:---:|:---:|:---:|:---:|
+| XQRS | **0.9972** | **5** | **77** | **1.97 ms** |
+| Hamilton | 0.9961 | 13 | 102 | 53.47 ms |
+| Elgendi | 0.9791 | 521 | 101 | 71.21 ms |
+
+XQRS was selected because it achieved the best overall detection quality and substantially better peak-localisation accuracy while remaining fast enough for real-time inference.
+
+### Saved Outputs
+
+```text
+artifacts/results/detection_evaluation/xqrs_metrics.json
+```
+
+### Key Lesson
+
+A high detector F1 alone is not enough for this project. Accurate R-peak localisation is also important because timing errors shift the ECG windows and RR features supplied to the transformer. XQRS provided the best balance of recall, precision, and localisation accuracy.
+
+## Milestone 19 — XQRS-Centred Dataset and Paired Validation Comparison
+
+### Implemented
+
+- Added an XQRS-centred sequence dataset builder for deployment-style model inputs.
+- Centred ECG windows on detected R-peaks rather than expert annotation locations.
+- Calculated RR features from the full detected R-peak timeline.
+- Allowed unmatched detections to influence RR features and sequence context.
+- Used only matched detections with supported AAMI labels as scored targets.
+- Added audit arrays for:
+  - record identity;
+  - detected and expert annotation samples;
+  - timing offsets in samples and milliseconds;
+  - unmatched detections within sequence context.
+- Rebuilt the expert-centred validation sequences while retaining stable target identities.
+- Matched expert-centred and XQRS-centred targets using:
+
+```python
+(record_name, expert_annotation_sample)
+```
+
+- Created aligned paired dataset views containing the same targets in the same order.
+- Evaluated the original tuned transformer checkpoint under both centring conditions.
+- Added checks to confirm that target identities, labels, sequence counts, and prediction ordering remained aligned.
+- Compared:
+  - loss, accuracy, and macro F1;
+  - per-class F1;
+  - prediction agreement;
+  - correct-to-incorrect and incorrect-to-correct transitions.
+
+### Paired Validation Result
+
+The paired comparison contained `14,548` shared validation targets.
+
+| Metric | Expert-Centred | XQRS-Centred | Change |
+|---|---:|---:|---:|
+| Accuracy | **0.9687** | 0.9634 | -0.0053 |
+| Macro F1 | **0.6920** | 0.6752 | -0.0168 |
+
+Prediction agreement was `99.03%`.
+
+The original transformer remained highly stable when expert-centred windows were replaced with XQRS-centred windows. The small reduction in performance established the deployment gap before any XQRS-specific fine-tuning was applied.
+
+### Saved Outputs
+
+```text
+data/splits_sequences_xqrs/val/
+
+data/splits_sequences_paired/expert_centered/
+data/splits_sequences_paired/xqrs_centered/
+
+artifacts/results/model_evaluation/transformer_paired_centering_comparison.json
+```
+
+### Key Lesson
+
+A detector can achieve excellent R-peak metrics while still changing the exact ECG morphology and RR context seen by the classifier. Pairing the same targets across expert-centred and XQRS-centred inputs provided a controlled measurement of this effect. XQRS caused only a small reduction in performance, confirming that it was suitable for the deployment pipeline while providing a baseline for later fine-tuning.
+
