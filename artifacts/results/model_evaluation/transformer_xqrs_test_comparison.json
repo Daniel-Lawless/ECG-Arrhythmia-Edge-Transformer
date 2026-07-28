@@ -1,0 +1,248 @@
+{
+    "evaluation_type": "final_xqrs_centered_test_comparison",
+    "test_dataset_dir": "data/splits_sequences_xqrs/test",
+    "test_dataset_summary": {
+        "split_name": "test",
+        "record_names": [
+            "100",
+            "103",
+            "118",
+            "121",
+            "207",
+            "221",
+            "223"
+        ],
+        "num_records": 7,
+        "num_final_sequences": 15263,
+        "target_class_distribution": {
+            "F": 14,
+            "N": 13923,
+            "S": 312,
+            "V": 1014
+        }
+    },
+    "configuration": {
+        "num_layers": 3,
+        "dropout": 0.3,
+        "batch_size": 64,
+        "class_weighting": "capped_inverse",
+        "max_class_weight": 5.0
+    },
+    "original": {
+        "checkpoint_path": "artifacts/models/ecg_sequence_transformer_tuned.pt",
+        "checkpoint_sha256": "4db8b43b0df5ed555cf7e9855ae86513d7b801cdce43e98b265d29a18cc1596b",
+        "metrics": {
+            "loss": 0.4119,
+            "accuracy": 0.9465,
+            "macro_f1": 0.5268,
+            "per_class": {
+                "N": {
+                    "precision": 0.9741,
+                    "recall": 0.9752,
+                    "f1": 0.9747,
+                    "total_class_count": 13923
+                },
+                "S": {
+                    "precision": 0.2687,
+                    "recall": 0.2885,
+                    "f1": 0.2782,
+                    "total_class_count": 312
+                },
+                "V": {
+                    "precision": 0.89,
+                    "recall": 0.7663,
+                    "f1": 0.8235,
+                    "total_class_count": 1014
+                },
+                "F": {
+                    "precision": 0.0172,
+                    "recall": 0.1429,
+                    "f1": 0.0308,
+                    "total_class_count": 14
+                }
+            },
+            "confusion_matrix": {
+                "description": "Rows are true labels; columns are predicted labels.",
+                "labels": [
+                    "N",
+                    "S",
+                    "V",
+                    "F"
+                ],
+                "rows": [
+                    {
+                        "true_label": "N",
+                        "predictions": {
+                            "N": 13578,
+                            "S": 222,
+                            "V": 15,
+                            "F": 108
+                        },
+                        "total": 13923
+                    },
+                    {
+                        "true_label": "S",
+                        "predictions": {
+                            "N": 144,
+                            "S": 90,
+                            "V": 78,
+                            "F": 0
+                        },
+                        "total": 312
+                    },
+                    {
+                        "true_label": "V",
+                        "predictions": {
+                            "N": 208,
+                            "S": 23,
+                            "V": 777,
+                            "F": 6
+                        },
+                        "total": 1014
+                    },
+                    {
+                        "true_label": "F",
+                        "predictions": {
+                            "N": 9,
+                            "S": 0,
+                            "V": 3,
+                            "F": 2
+                        },
+                        "total": 14
+                    }
+                ]
+            }
+        }
+    },
+    "expc": {
+        "checkpoint_path": "artifacts/models/ecg_sequence_transformer_xqrs_EXPC.pt",
+        "checkpoint_sha256": "5ed0eb1e6d1560416df7943571c0e6598a647fbab641e33178a5b397ec6136b2",
+        "metrics": {
+            "loss": 0.4241,
+            "accuracy": 0.9518,
+            "macro_f1": 0.5001,
+            "per_class": {
+                "N": {
+                    "precision": 0.9785,
+                    "recall": 0.9813,
+                    "f1": 0.9799,
+                    "total_class_count": 13923
+                },
+                "S": {
+                    "precision": 0.3063,
+                    "recall": 0.2179,
+                    "f1": 0.2547,
+                    "total_class_count": 312
+                },
+                "V": {
+                    "precision": 0.7474,
+                    "recall": 0.785,
+                    "f1": 0.7658,
+                    "total_class_count": 1014
+                },
+                "F": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "total_class_count": 14
+                }
+            },
+            "confusion_matrix": {
+                "description": "Rows are true labels; columns are predicted labels.",
+                "labels": [
+                    "N",
+                    "S",
+                    "V",
+                    "F"
+                ],
+                "rows": [
+                    {
+                        "true_label": "N",
+                        "predictions": {
+                            "N": 13663,
+                            "S": 144,
+                            "V": 107,
+                            "F": 9
+                        },
+                        "total": 13923
+                    },
+                    {
+                        "true_label": "S",
+                        "predictions": {
+                            "N": 86,
+                            "S": 68,
+                            "V": 158,
+                            "F": 0
+                        },
+                        "total": 312
+                    },
+                    {
+                        "true_label": "V",
+                        "predictions": {
+                            "N": 204,
+                            "S": 10,
+                            "V": 796,
+                            "F": 4
+                        },
+                        "total": 1014
+                    },
+                    {
+                        "true_label": "F",
+                        "predictions": {
+                            "N": 10,
+                            "S": 0,
+                            "V": 4,
+                            "F": 0
+                        },
+                        "total": 14
+                    }
+                ]
+            }
+        }
+    },
+    "change": {
+        "overall": {
+            "loss": 0.0122,
+            "accuracy": 0.0052,
+            "macro_f1": -0.0267
+        },
+        "per_class": {
+            "N": {
+                "precision": 0.0044,
+                "recall": 0.0061,
+                "f1": 0.0052,
+                "support": 13923
+            },
+            "S": {
+                "precision": 0.0376,
+                "recall": -0.0706,
+                "f1": -0.0235,
+                "support": 312
+            },
+            "V": {
+                "precision": -0.1426,
+                "recall": 0.0187,
+                "f1": -0.0577,
+                "support": 1014
+            },
+            "F": {
+                "precision": -0.0172,
+                "recall": -0.1429,
+                "f1": -0.0308,
+                "support": 14
+            }
+        }
+    },
+    "prediction_agreement": {
+        "num_targets": 15263,
+        "identical_count": 14813,
+        "identical_fraction": 0.9705,
+        "changed_count": 450
+    },
+    "correctness_transitions": {
+        "correct_to_correct": 14311,
+        "correct_to_incorrect": 136,
+        "incorrect_to_correct": 216,
+        "incorrect_to_incorrect": 600
+    }
+}
