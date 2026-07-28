@@ -1,4 +1,5 @@
 import argparse
+import json
 import logging
 import random
 from pathlib import Path
@@ -262,6 +263,117 @@ def train_one_epoch(
 
 
 # ---------------------------------------------------------------------
+#                     Fine-Tuning Helpers
+# ---------------------------------------------------------------------
+
+
+def load_initial_checkpoint(
+    model: nn.Module,
+    checkpoint_path: Path,
+    device: torch.device,
+) -> None:
+    """
+    Initialise ``model`` in place from a saved checkpoint.
+
+    The state dictionary is loaded with ``strict=True`` so that any
+    architecture mismatch fails loudly rather than silently.
+    """
+
+    if not checkpoint_path.exists():
+        raise FileNotFoundError(f"No initial checkpoint found at {checkpoint_path}")
+
+    state_dict = torch.load(checkpoint_path, map_location=device)
+    model.load_state_dict(state_dict, strict=True)
+
+
+def update_best_checkpoint(
+    candidate_macro_f1: float,
+    best_macro_f1: float,
+    model: nn.Module,
+    output_path: Path,
+) -> tuple[float, bool]:
+    """
+    Save ``model`` only when it strictly improves the best macro F1.
+
+    Returns the (possibly updated) best macro F1 and whether the
+    checkpoint was written.
+    """
+
+    if candidate_macro_f1 > best_macro_f1:
+        torch.save(model.state_dict(), output_path)
+        return candidate_macro_f1, True
+
+    return best_macro_f1, False
+
+
+def _metrics_block(metrics: EvaluationMetrics) -> dict[str, object]:
+    """Compact metric summary (loss, accuracy, macro F1, per class)."""
+
+    return {
+        "loss": round(metrics["loss"], 4),
+        "accuracy": round(metrics["accuracy"], 4),
+        "macro_f1": round(metrics["macro_f1"], 4),
+        "per_class": metrics["per_class"],
+    }
+
+
+def _metrics_change(
+    baseline_metrics: EvaluationMetrics,
+    finetuned_metrics: EvaluationMetrics,
+) -> dict[str, object]:
+    """Absolute change from the baseline to the fine-tuned model."""
+
+    return {
+        "loss": round(finetuned_metrics["loss"] - baseline_metrics["loss"], 4),
+        "accuracy": round(
+            finetuned_metrics["accuracy"] - baseline_metrics["accuracy"], 4
+        ),
+        "macro_f1": round(
+            finetuned_metrics["macro_f1"] - baseline_metrics["macro_f1"], 4
+        ),
+        "per_class_f1": {
+            label: round(
+                finetuned_metrics["per_class"][label]["f1"]
+                - baseline_metrics["per_class"][label]["f1"],
+                4,
+            )
+            for label in CLASS_LABELS
+        },
+    }
+
+
+def build_finetuning_summary(
+    initial_checkpoint_path: Path,
+    finetuned_checkpoint_path: Path,
+    train_set_dir: Path,
+    validation_set_dir: Path,
+    configuration: dict[str, object],
+    baseline_metrics: EvaluationMetrics,
+    finetuned_metrics: EvaluationMetrics,
+    epochs_completed: int,
+    best_epoch: int,
+    stopped_early: bool,
+) -> dict[str, object]:
+    """Build the compact fine-tuning comparison summary."""
+
+    return {
+        "initial_checkpoint_path": str(initial_checkpoint_path),
+        "finetuned_checkpoint_path": str(finetuned_checkpoint_path),
+        "train_set_dir": str(train_set_dir),
+        "validation_set_dir": str(validation_set_dir),
+        "configuration": configuration,
+        "training": {
+            "epochs_completed": epochs_completed,
+            "best_epoch": best_epoch,
+            "stopped_early": stopped_early,
+        },
+        "baseline": _metrics_block(baseline_metrics),
+        "finetuned": _metrics_block(finetuned_metrics),
+        "change": _metrics_change(baseline_metrics, finetuned_metrics),
+    }
+
+
+# ---------------------------------------------------------------------
 #                             CLI Parser
 # ---------------------------------------------------------------------
 
@@ -355,6 +467,30 @@ def parse_args() -> argparse.Namespace:
         default=10.0,
         help="Maximum class weight when using capped_inverse.",
     )
+
+    parser.add_argument(
+        "--initial-checkpoint-path",
+        type=Path,
+        default=None,
+        help=(
+            "Optional checkpoint to initialise the model from before training. "
+            "When omitted, training starts from random initialisation."
+        ),
+    )
+
+    parser.add_argument(
+        "--finetuning-summary-path",
+        type=Path,
+        default=Path(
+            "artifacts/results/model_evaluation/"
+            "transformer_xqrs_finetuning_summary.json"
+        ),
+        help=(
+            "Where to save the fine-tuning comparison summary. Only written "
+            "when an initial checkpoint is supplied."
+        ),
+    )
+
     return parser.parse_args()
 
 
@@ -403,6 +539,16 @@ def main() -> None:
         dropout=args.dropout,
     ).to(device)
 
+    # Optionally initialise the model from an existing checkpoint. This is
+    # what turns an ordinary run into fine-tuning, and it happens before the
+    # optimiser is created.
+    finetuning = args.initial_checkpoint_path is not None
+    if finetuning:
+        load_initial_checkpoint(model, args.initial_checkpoint_path, device)
+        logger.info(
+            "Initialised model from checkpoint %s", args.initial_checkpoint_path
+        )
+
     # Use target-label frequencies from the training sequence dataset to
     # give minority classes larger contributions to the loss.
     class_weights = compute_class_weights(
@@ -434,12 +580,37 @@ def main() -> None:
     model_output_path.parent.mkdir(parents=True, exist_ok=True)
     logger.info("model output path: %s", model_output_path)
 
-    # Use negative infinity so the first completed epoch is always
-    # the initial best checkpoint.
-    best_macro_f1 = float("-inf")
+    # When fine-tuning, evaluate the loaded checkpoint before any optimisation
+    # and save it as the initial best. This guarantees that if no epoch
+    # improves, the output checkpoint stays equivalent to the initial one.
+    if finetuning:
+        baseline_metrics = evaluate(
+            model=model,
+            split_loader=val_loader,
+            criterion=criterion,
+            device=device,
+        )
+        best_macro_f1 = baseline_metrics["macro_f1"]
+        torch.save(model.state_dict(), model_output_path)
+        logger.info(
+            "Baseline validation | macro f1: %.4f | acc: %.4f | loss: %.4f",
+            best_macro_f1,
+            baseline_metrics["accuracy"],
+            baseline_metrics["loss"],
+        )
+        log_per_class_metrics(baseline_metrics)
+        log_confusion_matrix(baseline_metrics)
+    else:
+        # Use negative infinity so the first completed epoch is always
+        # the initial best checkpoint.
+        baseline_metrics = None
+        best_macro_f1 = float("-inf")
 
     epochs_without_improvement = 0
     patience = args.patience
+    best_epoch = 0
+    epochs_completed = 0
+    stopped_early = False
 
     logger.info("Initialising training for %s epochs...", args.epochs)
 
@@ -460,6 +631,7 @@ def main() -> None:
         )
 
         macro_f1 = val_metrics["macro_f1"]
+        epochs_completed = epoch
 
         logger.info(
             "epoch: %s | train loss: %.4f | val macro f1: %.4f | "
@@ -471,15 +643,17 @@ def main() -> None:
             val_metrics["loss"],
         )
 
-        # Save the weights from the epoch with the highest validation macro F1.
-        if macro_f1 > best_macro_f1:
-            best_macro_f1 = macro_f1
-            epochs_without_improvement = 0
+        # Save the weights only when validation macro F1 strictly improves.
+        best_macro_f1, saved = update_best_checkpoint(
+            candidate_macro_f1=macro_f1,
+            best_macro_f1=best_macro_f1,
+            model=model,
+            output_path=model_output_path,
+        )
 
-            torch.save(
-                model.state_dict(),
-                model_output_path,
-            )
+        if saved:
+            best_epoch = epoch
+            epochs_without_improvement = 0
 
             logger.info("New best validation macro F1")
             log_per_class_metrics(val_metrics)
@@ -493,10 +667,69 @@ def main() -> None:
                 "early stopping after %d epochs without improvement",
                 patience,
             )
+            stopped_early = True
             break
 
     logger.info("best_macro_f1: %.4f", best_macro_f1)
     logger.info("saved best model weights to: %s", model_output_path)
+
+    # When fine-tuning, evaluate the best saved checkpoint and write the
+    # compact fine-tuning comparison summary.
+    if finetuning:
+        assert baseline_metrics is not None
+
+        best_state = torch.load(model_output_path, map_location=device)
+        model.load_state_dict(best_state, strict=True)
+        finetuned_metrics = evaluate(
+            model=model,
+            split_loader=val_loader,
+            criterion=criterion,
+            device=device,
+        )
+
+        configuration = {
+            "num_layers": args.num_layers,
+            "dropout": args.dropout,
+            "learning_rate": args.learning_rate,
+            "batch_size": args.batch_size,
+            "maximum_epochs": args.epochs,
+            "patience": args.patience,
+            "seed": args.seed,
+            "class_weighting": args.class_weighting,
+        }
+
+        summary = build_finetuning_summary(
+            initial_checkpoint_path=args.initial_checkpoint_path,
+            finetuned_checkpoint_path=model_output_path,
+            train_set_dir=args.train_set_dir,
+            validation_set_dir=args.val_set_dir,
+            configuration=configuration,
+            baseline_metrics=baseline_metrics,
+            finetuned_metrics=finetuned_metrics,
+            epochs_completed=epochs_completed,
+            best_epoch=best_epoch,
+            stopped_early=stopped_early,
+        )
+
+        args.finetuning_summary_path.parent.mkdir(parents=True, exist_ok=True)
+        with args.finetuning_summary_path.open("w", encoding="utf-8") as file:
+            json.dump(summary, file, indent=4)
+        logger.info("Saved fine-tuning summary to %s", args.finetuning_summary_path)
+
+        change = summary["change"]
+        improved = finetuned_metrics["macro_f1"] > baseline_metrics["macro_f1"]
+        logger.info(
+            "Fine-tuned macro F1 improved over baseline: %s (macro f1 change %+.4f)",
+            improved,
+            change["macro_f1"],
+        )
+        logger.info(
+            "Per-class F1 change | N: %+.4f | S: %+.4f | V: %+.4f | F: %+.4f",
+            change["per_class_f1"]["N"],
+            change["per_class_f1"]["S"],
+            change["per_class_f1"]["V"],
+            change["per_class_f1"]["F"],
+        )
 
 
 if __name__ == "__main__":
