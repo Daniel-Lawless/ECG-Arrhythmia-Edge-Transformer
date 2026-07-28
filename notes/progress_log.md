@@ -863,3 +863,145 @@ artifacts/results/model_evaluation/transformer_paired_centering_comparison.json
 
 A detector can achieve excellent R-peak metrics while still changing the exact ECG morphology and RR context seen by the classifier. Pairing the same targets across expert-centred and XQRS-centred inputs provided a controlled measurement of this effect. XQRS caused only a small reduction in performance, confirming that it was suitable for the deployment pipeline while providing a baseline for later fine-tuning.
 
+## Milestone 20 — XQRS-Centred Fine-Tuning and Final Test Evaluation
+
+### Implemented
+
+- Extended `transformer_training.py` to support optional checkpoint initialisation through `--initial-checkpoint-path`.
+- Loaded initial weights with `strict=True` before creating the optimiser.
+- Evaluated the loaded checkpoint on the XQRS-centred validation set before epoch 1.
+- Saved the baseline checkpoint as the initial best model so that a worse fine-tuning epoch could not replace it.
+- Saved a compact fine-tuning summary containing:
+  - configuration;
+  - completed epochs and best epoch;
+  - baseline metrics;
+  - fine-tuned metrics;
+  - absolute overall and per-class changes.
+- Built an XQRS-centred test split from the held-out test records.
+- Added `evaluate_xqrs_test_checkpoints.py` to evaluate the original and EXPC checkpoints on the exact same test sequences.
+- Recorded:
+  - loss, accuracy, macro F1 and per-class metrics;
+  - confusion matrices;
+  - prediction agreement;
+  - correctness transitions;
+  - EXPC-minus-original metric changes.
+
+### Selected Fine-Tuning Configuration
+
+The validation-best configuration was saved as the EXPC checkpoint:
+
+```text
+Initial checkpoint:  artifacts/models/ecg_sequence_transformer_tuned.pt
+Output checkpoint:   artifacts/models/ecg_sequence_transformer_xqrs_EXPC.pt
+
+Transformer layers:  3
+Dropout:              0.3
+Learning rate:        7e-6
+Batch size:           64
+Maximum epochs:       40
+Patience:             15
+Seed:                 42
+Class weighting:      capped inverse
+Maximum class weight: 5
+```
+
+Training stopped early after 19 completed epochs, with the best checkpoint selected at epoch 4.
+
+### XQRS-Centred Validation Result
+
+| Metric | Original | EXPC | Change |
+|:---:|:---:|:---:|:---:|
+| Loss | 0.2119 | **0.1952** | -0.0166 |
+| Accuracy | 0.9634 | **0.9791** | +0.0157 |
+| Macro F1 | 0.6752 | **0.6872** | +0.0120 |
+| N F1 | 0.9806 | **0.9893** | +0.0087 |
+| S F1 | 0.7925 | **0.8146** | +0.0221 |
+| V F1 | 0.9276 | **0.9449** | +0.0173 |
+| F F1 | 0.0000 | 0.0000 | 0.0000 |
+
+The EXPC checkpoint improved validation accuracy, macro F1, and the N, S and V class F1 scores.
+
+### Final XQRS-Centred Test Set
+
+The locked test dataset contained seven unseen records:
+
+```text
+100, 103, 118, 121, 207, 221, 223
+```
+
+```text
+Final sequences: 15,263
+
+Class distribution:
+N: 13,923
+S:    312
+V:  1,014
+F:     14
+```
+
+### Final Locked Test Comparison
+
+| Metric | Original | EXPC | Change |
+|:---:|:---:|:---:|:---:|
+| Loss | **0.4119** | 0.4241 | +0.0122 |
+| Accuracy | 0.9465 | **0.9518** | +0.0052 |
+| Macro F1 | **0.5268** | 0.5001 | -0.0267 |
+| N F1 | 0.9747 | **0.9799** | +0.0052 |
+| S F1 | **0.2782** | 0.2547 | -0.0235 |
+| V F1 | **0.8235** | 0.7658 | -0.0577 |
+| F F1 | **0.0308** | 0.0000 | -0.0308 |
+
+Prediction comparison:
+
+```text
+Targets:                 15,263
+Identical predictions:   14,813
+Prediction agreement:    97.05%
+Changed predictions:        450
+
+Correct → correct:       14,311
+Correct → incorrect:        136
+Incorrect → correct:        216
+Incorrect → incorrect:      600
+```
+
+EXPC corrected 216 predictions that the original model got wrong, while changing 136 originally correct predictions into errors. This produced a net increase in accuracy.
+
+However, the additional correct predictions were concentrated in the dominant N class. EXPC reduced S, V and F performance, causing test macro F1 to fall.
+
+### Final Decision
+
+The validation improvement from XQRS-centred fine-tuning did not generalise to the held-out test patients.
+
+The original tuned checkpoint was retained as the final deployment model:
+
+```text
+artifacts/models/ecg_sequence_transformer_tuned.pt
+```
+
+The EXPC checkpoint was preserved as the validation-selected fine-tuning candidate, but it was not selected for deployment because the original checkpoint achieved:
+
+- higher test macro F1;
+- stronger S performance;
+- substantially stronger V performance;
+- non-zero F performance;
+- lower test loss.
+
+### Saved Outputs
+
+```text
+data/splits_sequences_xqrs/train/
+data/splits_sequences_xqrs/val/
+data/splits_sequences_xqrs/test/
+
+artifacts/models/ecg_sequence_transformer_xqrs_EXPC.pt
+
+artifacts/results/model_evaluation/transformer_xqrs_EXPC_summary.json
+artifacts/results/model_evaluation/transformer_xqrs_test_comparison.json
+```
+
+### Key Lesson
+
+Matching the training distribution to deployment inputs can improve validation performance, but the improvement must be confirmed on unseen patients.
+
+XQRS-centred fine-tuning increased validation macro F1 and final test accuracy, but reduced final test macro F1 by weakening the minority arrhythmia classes. This concludes this portion of the project of evaluating the detectors. This has told me that the original tuned model on expert annotated beats is robust enough to perform well on detected beats. This has also allowed me to select the best detector out of xqrs, elgendi, and hamilton to use for the upcoming real time inference portion of the project.   
