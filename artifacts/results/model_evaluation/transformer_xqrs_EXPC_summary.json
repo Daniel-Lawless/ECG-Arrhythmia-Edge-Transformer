@@ -1,0 +1,94 @@
+{
+    "initial_checkpoint_path": "artifacts/models/ecg_sequence_transformer_tuned.pt",
+    "finetuned_checkpoint_path": "artifacts/models/ecg_sequence_transformer_xqrs_EXPC.pt",
+    "train_set_dir": "data/splits_sequences_xqrs/train",
+    "validation_set_dir": "data/splits_sequences_xqrs/val",
+    "configuration": {
+        "num_layers": 3,
+        "dropout": 0.3,
+        "learning_rate": 7e-06,
+        "batch_size": 64,
+        "maximum_epochs": 40,
+        "patience": 15,
+        "seed": 42,
+        "class_weighting": "capped_inverse"
+    },
+    "training": {
+        "epochs_completed": 19,
+        "best_epoch": 4,
+        "stopped_early": true
+    },
+    "baseline": {
+        "loss": 0.2119,
+        "accuracy": 0.9634,
+        "macro_f1": 0.6752,
+        "per_class": {
+            "N": {
+                "precision": 0.9909,
+                "recall": 0.9705,
+                "f1": 0.9806,
+                "total_class_count": 13103
+            },
+            "S": {
+                "precision": 0.8307,
+                "recall": 0.7577,
+                "f1": 0.7925,
+                "total_class_count": 421
+            },
+            "V": {
+                "precision": 0.8821,
+                "recall": 0.978,
+                "f1": 0.9276,
+                "total_class_count": 1002
+            },
+            "F": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "total_class_count": 22
+            }
+        }
+    },
+    "finetuned": {
+        "loss": 0.1952,
+        "accuracy": 0.9791,
+        "macro_f1": 0.6872,
+        "per_class": {
+            "N": {
+                "precision": 0.9921,
+                "recall": 0.9866,
+                "f1": 0.9893,
+                "total_class_count": 13103
+            },
+            "S": {
+                "precision": 0.8683,
+                "recall": 0.7672,
+                "f1": 0.8146,
+                "total_class_count": 421
+            },
+            "V": {
+                "precision": 0.902,
+                "recall": 0.992,
+                "f1": 0.9449,
+                "total_class_count": 1002
+            },
+            "F": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "total_class_count": 22
+            }
+        }
+    },
+    "change": {
+        "loss": -0.0166,
+        "accuracy": 0.0157,
+        "macro_f1": 0.012,
+        "per_class_f1": {
+            "N": 0.0087,
+            "S": 0.0221,
+            "V": 0.0173,
+            "F": 0.0
+        }
+    }
+}
