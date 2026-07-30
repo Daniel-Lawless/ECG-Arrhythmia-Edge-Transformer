@@ -1005,3 +1005,61 @@ artifacts/results/model_evaluation/transformer_xqrs_test_comparison.json
 Matching the training distribution to deployment inputs can improve validation performance, but the improvement must be confirmed on unseen patients.
 
 XQRS-centred fine-tuning increased validation macro F1 and final test accuracy, but reduced final test macro F1 by weakening the minority arrhythmia classes. This concludes this portion of the project of evaluating the detectors. This has told me that the original tuned model on expert annotated beats is robust enough to perform well on detected beats. This has also allowed me to select the best detector out of xqrs, elgendi, and hamilton to use for the upcoming real time inference portion of the project.   
+
+## Milestone 21 — Real-Time Streaming Replay Foundation
+
+### Implemented
+
+Added the first stage of the real-time ECG streaming pipeline.
+
+Created:
+
+- `SampleChunk` for immutable, validated ECG sample blocks;
+- `ReplaySource` for yielding records as consecutive chunks;
+- accelerated and real-time replay modes;
+- `StreamingEngine` for validating stream continuity;
+- `StreamState` for tracking the current record;
+- a replay command-line tool with JSON summary output.
+
+The replay source preserves sample order and absolute indices, includes final partial chunks, and uses absolute monotonic-clock targets in real-time mode to avoid accumulated timing drift.
+
+The streaming engine rejects:
+
+- missing samples;
+- duplicate chunks;
+- overlapping or out-of-order chunks;
+- sampling-rate changes within a record.
+
+Added unit and integration tests for chunk validation, sample preservation, replay timing, continuity checks, state resets and real MIT-BIH replay.
+
+### Validation Results
+
+Accelerated replay of record `114`:
+
+| Metric | Result |
+|---|---:|
+| Samples accepted | 650,000 |
+| Chunks emitted | 18,056 |
+| Elapsed time | 0.1032 s |
+| Continuity valid | True |
+
+Ten-second real-time replay of record `114`:
+
+| Metric | Result |
+|---|---:|
+| Samples accepted | 3,600 |
+| Chunks emitted | 100 |
+| Elapsed time | 10.0002 s |
+| Continuity valid | True |
+
+Saved outputs:
+
+```text
+artifacts/results/streaming_evaluation/record_114_accelerated_replay_summary.json
+artifacts/results/streaming_evaluation/record_114_real_time_10s_replay_summary.json
+```
+
+### Key Lesson
+
+A real-time inference system first needs a reliable sample-transport layer. Separating the replay source, chunk representation and streaming engine allows MIT-BIH replay to later be replaced by a Raspberry Pi or live ECG source without changing the downstream interface.
+
