@@ -169,7 +169,6 @@ class ReplaySource:
                 # if the time it has taken so far is less than the target time,
                 # we are ahead of schedule, so we sleep the remaining seconds
                 # until we deliever the chunk to stay at real time.
-                print(start_time - self._clock())
                 if remaining_seconds > 0:
                     self._sleep(remaining_seconds)
 
