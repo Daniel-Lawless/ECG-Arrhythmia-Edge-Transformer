@@ -13,7 +13,7 @@ class StreamContinuityError(ValueError):
 @dataclass
 class StreamState:
     """
-    A StreamState object records the progress through 
+    A StreamState object records the progress through
     the processing of a record. It is mutable to allow us to
     update the state as we are processing.
 
@@ -172,7 +172,7 @@ class StreamingEngine:
 
         # If the stop index of the next chunk is equal to the expected index,
         # then this is the chunk that we just processed, so it has been
-        # duplicated and thus should be rejected. 
+        # duplicated and thus should be rejected.
         if chunk.stop_index == expected_index:
             raise StreamContinuityError(
                 f"Duplicate chunk covering samples {chunk.start_index} to "
