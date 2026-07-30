@@ -1,0 +1,14 @@
+{
+    "record_name": "114",
+    "lead_name": "MLII",
+    "replay_mode": "accelerated",
+    "sampling_rate": 360.0,
+    "chunk_size": 36,
+    "total_input_samples": 650000,
+    "total_emitted_chunks": 18056,
+    "total_samples_accepted": 650000,
+    "first_sample_index": 0,
+    "final_sample_index": 649999,
+    "continuity_validated": true,
+    "elapsed_seconds": 0.10318346304120496
+}

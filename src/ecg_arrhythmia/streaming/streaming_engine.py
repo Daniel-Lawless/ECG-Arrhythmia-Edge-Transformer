@@ -125,8 +125,11 @@ class StreamingEngine:
         if self._state.first_sample_index is None:
             self._state.first_sample_index = chunk.start_index
 
+        # This will be the sampling rate used for this entire record.
+        if self._state.sampling_rate is None:
+            self._state.sampling_rate = chunk.sampling_rate
+
         # Update this records state.
-        self._state.sampling_rate = chunk.sampling_rate
         self._state.next_expected_index = chunk.stop_index
         self._state.total_samples_accepted += chunk.num_samples
         self._state.num_chunks_accepted += 1
