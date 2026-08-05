@@ -1,3 +1,5 @@
+from collections.abc import Sequence
+
 import numpy as np
 
 # Recognised heartbeat annotations. This will exclude non heart beat annotations
@@ -26,6 +28,42 @@ MIN_RR_SECONDS = 0.25
 MAX_RR_SECONDS = 3.0
 MIN_RR_RATIO = 0.25
 MAX_RR_RATIO = 4.0
+
+# Number of beats the trained transformer consumes per input.
+SEQUENCE_LENGTH = 5
+
+
+def previous_rr_seconds(peak_sample: int, previous_peak_sample: int) -> float:
+
+    # This calculates the number of seconds between this peak and the
+    # previous peak
+    rr_seconds = (peak_sample - previous_peak_sample) / SAMPLING_RATE
+
+    # We then clip the result so unusually small or large intervals
+    # cannot be outside of MIN_RR_SECONDS and MAX_RR_SECONDS
+    return float(np.clip(rr_seconds, MIN_RR_SECONDS, MAX_RR_SECONDS))
+
+
+def rr_ratio(prev_rr_seconds: float, recent_rr_seconds: Sequence[float]) -> float:
+
+    # LOCAL_RR_WINDOW is how much intervals we are considering
+    # in recent_rr_seconds each element in recent_rr_seconds
+    # is a time between 2 peaks.
+    local_history = list(recent_rr_seconds)[-LOCAL_RR_WINDOW:]
+    # We calculate the mean of the local window. If we haven't seen any
+    # time between peaks yet, then we just take prev_rr_seconds to
+    # be out mean
+    local_mean_rr = np.mean(local_history) if local_history else prev_rr_seconds
+
+    # This returns how this peaks timeframe to the previous peak differs
+    # from the mean.
+    return float(
+        np.clip(
+            prev_rr_seconds / (local_mean_rr + 1e-8),
+            MIN_RR_RATIO,
+            MAX_RR_RATIO,
+        )
+    )
 
 
 # Extract beats and labels for a given signal.
@@ -62,13 +100,10 @@ def extract_beats(
         start = sample_index - SAMPLES_BEFORE
         end = sample_index + SAMPLES_AFTER
 
-        # Calculate time between each beat
-        rr_samples = sample_index - previous_heartbeat_sample
-        prev_rr_seconds = rr_samples / SAMPLING_RATE
-        # Keeps interval values between these values. Helps combat outliers
-        prev_rr_seconds = float(
-            np.clip(prev_rr_seconds, MIN_RR_SECONDS, MAX_RR_SECONDS)
-        )
+        # Time from the previous heartbeat, clipped to combat outliers.
+        # Every heartbeat advances the RR chain, including the ones whose
+        # window is found to be incomplete just below.
+        prev_rr = previous_rr_seconds(sample_index, previous_heartbeat_sample)
 
         previous_heartbeat_sample = sample_index
 
@@ -83,13 +118,6 @@ def extract_beats(
         if normalise:
             beat = (beat - beat.mean()) / (beat.std() + 1e-8)
 
-        if recent_rr_seconds:
-            # Calculates the mean of the most recent LOCAL_RR_WINDOW time intervals
-            local_mean_rr = np.mean(recent_rr_seconds[-LOCAL_RR_WINDOW:])
-        else:
-            # If recent_rr_seconds is empty, just use this intervals time as the mean
-            local_mean_rr = prev_rr_seconds
-
         # Compare the current RR interval against the recent rhythm for this record.
         # local_mean_rr is the average RR interval from recent previous beats.
         # Example: if local_mean_rr = 0.80s and prev_rr_seconds = 0.50s,
@@ -99,16 +127,15 @@ def extract_beats(
         # rr_ratio > 1 means the beat arrived later than expected.
         # This is useful for S beats because they can look similar to normal beats,
         # but are often premature, so timing can help distinguish them from N.
-        rr_ratio = prev_rr_seconds / (local_mean_rr + 1e-8)
-        rr_ratio = float(np.clip(rr_ratio, MIN_RR_RATIO, MAX_RR_RATIO))
+        ratio = rr_ratio(prev_rr, recent_rr_seconds)
 
         # Append window and corresponding symbol.
         extracted_beats.append(beat)
         extracted_labels.append(symbol)
-        rr_features.append([prev_rr_seconds, rr_ratio])
+        rr_features.append([prev_rr, ratio])
 
-        # Append the time to the last beat to recent_rr_seconds
-        recent_rr_seconds.append(prev_rr_seconds)
+        # Only completed beats contribute to the local rhythm.
+        recent_rr_seconds.append(prev_rr)
 
     # Converts the list of labels into a numpy array
     labels = np.array(extracted_labels)
