@@ -1,7 +1,7 @@
-from pathlib import Path
-
 import matplotlib.pyplot as plt
 import numpy as np
+
+from ecg_arrhythmia.plotting import MODEL_EVALUATION_FIGURES_DIR
 
 EXPERIMENT_NAMES = [
     "Baseline",
@@ -31,7 +31,7 @@ BEST_VAL_MACRO_F1 = [
 
 
 def main() -> None:
-    figures_dir = Path("artifacts/figures")
+    figures_dir = MODEL_EVALUATION_FIGURES_DIR
     figures_dir.mkdir(parents=True, exist_ok=True)
 
     x = np.arange(len(EXPERIMENT_NAMES))

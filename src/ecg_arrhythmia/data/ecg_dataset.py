@@ -4,15 +4,11 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
+from ecg_arrhythmia.data.label_mapping import LABEL_TO_INDEX
+
 # PyTorch’s nn.CrossEntropyLoss() expects the
 # target labels to be integer class indices,
-# as a LongTensor:
-LABEL_TO_INDEX = {
-    "N": 0,
-    "S": 1,
-    "V": 2,
-    "F": 3,
-}
+# as a LongTensor, which is what LABEL_TO_INDEX provides.
 
 
 class ECGDataset(Dataset):

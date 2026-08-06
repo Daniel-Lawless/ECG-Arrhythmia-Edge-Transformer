@@ -4,14 +4,13 @@ from pathlib import Path
 
 import torch
 
+from ecg_arrhythmia.data.label_mapping import NUM_CLASSES
 from ecg_arrhythmia.models.sequence_transformer import ECGSequenceTransformer
-from ecg_arrhythmia.training.transformer_training import NUM_CLASSES
 
 logger = logging.getLogger(__name__)
 
 WINDOW_SIZE = 240
 RR_FEATURE_DIM = 2
-
 # A singleton example dimension may be seen as fixed during
 # torch.export. Using 2 provides a non-singleton example while
 # dynamic_shapes explicitly declares the batch dimension as dynamic.

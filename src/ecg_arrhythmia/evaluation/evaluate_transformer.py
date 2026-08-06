@@ -8,10 +8,9 @@ from torch import nn
 from torch.utils.data import DataLoader
 
 from ecg_arrhythmia.data.ecg_sequence_dataset import ECGSequenceDataset
+from ecg_arrhythmia.data.label_mapping import CLASS_LABELS, NUM_CLASSES
 from ecg_arrhythmia.models.sequence_transformer import ECGSequenceTransformer
 from ecg_arrhythmia.training.transformer_training import (
-    CLASS_LABELS,
-    NUM_CLASSES,
     EvaluationMetrics,
     compute_class_weights,
     evaluate,
