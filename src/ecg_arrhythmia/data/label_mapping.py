@@ -36,6 +36,20 @@ AAMI_LABEL_MAP = {
 # fmt: on
 
 
+# Shared model class-index mappings.
+LABEL_TO_INDEX = {
+    "N": 0,
+    "S": 1,
+    "V": 2,
+    "F": 3,
+}
+
+INDEX_TO_LABEL = {index: label for label, index in LABEL_TO_INDEX.items()}
+NUM_CLASSES = len(LABEL_TO_INDEX)
+CLASS_LABELS = [INDEX_TO_LABEL[index] for index in range(NUM_CLASSES)]
+CLASS_INDICES = list(range(NUM_CLASSES))
+
+
 def map_labels_to_aami(labels: np.ndarray) -> np.ndarray:
     """
     Map raw MIT-BIH beat annotation symbols to AAMI classes.

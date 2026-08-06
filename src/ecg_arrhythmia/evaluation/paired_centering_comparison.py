@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.typing import NDArray
 
-from ecg_arrhythmia.training.transformer_training import CLASS_LABELS
+from ecg_arrhythmia.data.label_mapping import CLASS_LABELS
 
 # ---------------------------------------------------------------------
 #                        Compact Metric Comparison

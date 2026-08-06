@@ -4,12 +4,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-LABEL_TO_INDEX = {
-    "N": 0,
-    "S": 1,
-    "V": 2,
-    "F": 3,
-}
+from ecg_arrhythmia.data.label_mapping import LABEL_TO_INDEX
 
 
 class ECGSequenceDataset(Dataset):

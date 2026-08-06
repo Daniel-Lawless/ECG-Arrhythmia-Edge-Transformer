@@ -4,6 +4,11 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
+from ecg_arrhythmia.visualisation.matrix_plots import (
+    MODEL_EVALUATION_FIGURES_DIR,
+    plot_row_normalised_matrix,
+)
+
 
 def load_metrics(metrics_path: Path) -> dict:
     """
@@ -31,21 +36,6 @@ def extract_confusion_matrix(summary: dict) -> tuple[np.ndarray, list[str]]:
     )
 
     return matrix, labels
-
-
-def row_normalise(matrix: np.ndarray) -> np.ndarray:
-    """
-    Turn the confusion matrix counts into row-wise proportions.
-    """
-
-    row_sums = matrix.sum(axis=1, keepdims=True)
-
-    return np.divide(
-        matrix,
-        row_sums,
-        out=np.zeros_like(matrix, dtype=float),
-        where=row_sums != 0,
-    )
 
 
 def plot_overall_metrics(
@@ -179,67 +169,20 @@ def plot_confusion_matrix(
 
     matrix, labels = extract_confusion_matrix(summary)
 
-    # Convert row-wise proportions into percentages.
-    percentage_matrix = row_normalise(matrix) * 100
-
-    plt.figure(figsize=(7, 6))
-    ax = plt.gca()
-
-    image = ax.imshow(
-        percentage_matrix,
-        interpolation="nearest",
-        aspect="auto",
+    plot_row_normalised_matrix(
+        matrix=matrix,
+        labels=labels,
+        title=title,
+        output_path=output_path,
         cmap=cmap,
+        x_label="Predicted label",
+        y_label="True label",
     )
-
-    plt.colorbar(image, label="Percentage")
-
-    ax.set_xticks(np.arange(len(labels)))
-    ax.set_yticks(np.arange(len(labels)))
-    ax.set_xticklabels(labels)
-    ax.set_yticklabels(labels)
-
-    ax.set_xlabel("Predicted label")
-    ax.set_ylabel("True label")
-    ax.set_title(title)
-
-    # Add thick black borders around every cell.
-    ax.set_xticks(np.arange(-0.5, len(labels), 1), minor=True)
-    ax.set_yticks(np.arange(-0.5, len(labels), 1), minor=True)
-    ax.grid(which="minor", color="black", linestyle="-", linewidth=2)
-    ax.tick_params(which="minor", bottom=False, left=False)
-
-    # Use white text on darker cells so it stays readable.
-    threshold = percentage_matrix.max() / 2.0
-
-    for row_index in range(len(labels)):
-        for column_index in range(len(labels)):
-            count = matrix[row_index, column_index]
-            percentage = percentage_matrix[row_index, column_index]
-
-            cell_text = f"{count}\n({percentage:.1f}%)"
-
-            ax.text(
-                column_index,
-                row_index,
-                cell_text,
-                ha="center",
-                va="center",
-                color=(
-                    "white"
-                    if percentage_matrix[row_index, column_index] > threshold
-                    else "black"
-                ),
-            )
-
-    plt.tight_layout()
-    plt.savefig(output_path, dpi=300, bbox_inches="tight")
-    plt.close()
 
 
 def main() -> None:
     # Create the directory we're going to save our figures to.
-    figures_dir = Path("artifacts/figures")
+    figures_dir = MODEL_EVALUATION_FIGURES_DIR
     figures_dir.mkdir(parents=True, exist_ok=True)
 
     # define where our results are kept

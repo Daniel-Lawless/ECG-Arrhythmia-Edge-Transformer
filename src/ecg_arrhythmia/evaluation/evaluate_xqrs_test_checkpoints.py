@@ -16,6 +16,7 @@ from ecg_arrhythmia.data.build_xqrs_centered_dataset import (
     load_split_record_names,
 )
 from ecg_arrhythmia.data.ecg_sequence_dataset import ECGSequenceDataset
+from ecg_arrhythmia.data.label_mapping import CLASS_LABELS, NUM_CLASSES
 from ecg_arrhythmia.evaluation.evaluate_transformer import format_metrics_for_json
 from ecg_arrhythmia.evaluation.paired_centering_comparison import (
     compute_correctness_transitions,
@@ -23,8 +24,6 @@ from ecg_arrhythmia.evaluation.paired_centering_comparison import (
 )
 from ecg_arrhythmia.models.sequence_transformer import ECGSequenceTransformer
 from ecg_arrhythmia.training.transformer_training import (
-    CLASS_LABELS,
-    NUM_CLASSES,
     EvaluationMetrics,
     compute_class_weights,
     evaluate,

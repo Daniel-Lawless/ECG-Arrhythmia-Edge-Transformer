@@ -11,20 +11,15 @@ from sklearn.metrics import classification_report, confusion_matrix
 from torch import nn
 from torch.utils.data import DataLoader
 
-from ecg_arrhythmia.data.ecg_sequence_dataset import (
-    LABEL_TO_INDEX,
-    ECGSequenceDataset,
+from ecg_arrhythmia.data.ecg_sequence_dataset import ECGSequenceDataset
+from ecg_arrhythmia.data.label_mapping import (
+    CLASS_INDICES,
+    CLASS_LABELS,
+    NUM_CLASSES,
 )
 from ecg_arrhythmia.models.sequence_transformer import ECGSequenceTransformer
 
 logger = logging.getLogger(__name__)
-
-NUM_CLASSES = len(LABEL_TO_INDEX)
-
-# Allows us to convert index to label.
-INDEX_TO_LABEL = {value: key for key, value in LABEL_TO_INDEX.items()}
-CLASS_LABELS = [INDEX_TO_LABEL[index] for index in range(NUM_CLASSES)]
-CLASS_INDICES = list(range(NUM_CLASSES))
 
 
 # ---------------------------------------------------------------------
