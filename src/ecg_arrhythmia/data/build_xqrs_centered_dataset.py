@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import argparse
 import json
 import logging
@@ -23,13 +21,11 @@ from ecg_arrhythmia.preprocessing.beat_extraction import (
     BEAT_SYMBOLS,
     SAMPLES_AFTER,
     SAMPLES_BEFORE,
+    SEQUENCE_LENGTH,
     extract_beats,
 )
 
 logger = logging.getLogger(__name__)
-
-# Default sequence length used by the trained transformer.
-SEQUENCE_LENGTH = 5
 
 # Default matching tolerance for transferring expert labels to detections.
 MATCHING_TOLERANCE_MS = 100.0

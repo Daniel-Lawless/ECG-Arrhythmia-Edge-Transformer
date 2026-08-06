@@ -1,0 +1,63 @@
+{
+    "num_records_evaluated": 6,
+    "record_names": [
+        "114",
+        "122",
+        "209",
+        "210",
+        "231",
+        "233"
+    ],
+    "chunk_size": 36,
+    "sampling_rates": {
+        "114": 360.0,
+        "122": 360.0,
+        "209": 360.0,
+        "210": 360.0,
+        "231": 360.0,
+        "233": 360.0
+    },
+    "total_input_samples": 3900000,
+    "total_samples_accepted": 3900000,
+    "total_whole_record_peaks": 14588,
+    "total_streaming_peaks": 14591,
+    "total_exact_peak_matches": 14587,
+    "total_offline_targets_expected": 14548,
+    "total_streaming_sequences_emitted": 14556,
+    "total_exactly_matched_sequences": 14496,
+    "total_ecg_mismatches_explained_by_peak_history": 18,
+    "total_rr_mismatches_explained_by_peak_history": 51,
+    "total_missing_peaks": 1,
+    "total_extra_peaks": 4,
+    "total_missing_targets": 1,
+    "total_extra_targets": 9,
+    "total_peak_index_mismatches": 18,
+    "total_ecg_window_mismatches": 18,
+    "total_rr_feature_mismatches": 51,
+    "total_expected_deployment_only_targets": 5,
+    "total_causal_detector_only_targets": 4,
+    "total_missing_targets_due_to_causal_divergence": 1,
+    "total_unexplained_extra_targets": 0,
+    "total_unexplained_missing_targets": 0,
+    "total_unexplained_content_mismatches": 0,
+    "largest_absolute_peak_offset": 0,
+    "records_with_perfect_peak_parity": [
+        "114",
+        "122",
+        "209",
+        "231",
+        "233"
+    ],
+    "records_with_perfect_sequence_parity": [
+        "114",
+        "209",
+        "231",
+        "233"
+    ],
+    "failed_records": [],
+    "all_records_continuity_validated": true,
+    "all_records_exact_parity": false,
+    "num_records_with_all_differences_explained": 6,
+    "records_with_unexplained_differences": [],
+    "all_records_differences_explained": true
+}
