@@ -1,0 +1,36 @@
+{
+    "record_name": "122",
+    "sampling_rate": 360.0,
+    "chunk_size": 36,
+    "total_input_samples": 650000,
+    "samples_accepted": 650000,
+    "continuity_validated": true,
+    "whole_record_peaks": 2477,
+    "streaming_peaks": 2477,
+    "exact_peak_matches": 2477,
+    "largest_absolute_peak_offset": 0,
+    "missing_peaks": [],
+    "extra_peaks": [],
+    "offline_targets_expected": 2470,
+    "streaming_sequences_emitted": 2471,
+    "exactly_matched_sequences": 2470,
+    "missing_targets": [],
+    "extra_targets": [
+        137246
+    ],
+    "peak_index_mismatches": [],
+    "ecg_window_mismatches": [],
+    "rr_feature_mismatches": [],
+    "expected_deployment_only_targets": [
+        137246
+    ],
+    "causal_detector_only_targets": [],
+    "missing_targets_due_to_causal_divergence": [],
+    "unexplained_extra_targets": [],
+    "unexplained_missing_targets": [],
+    "ecg_mismatches_explained_by_peak_history": 0,
+    "rr_mismatches_explained_by_peak_history": 0,
+    "unexplained_content_mismatches": [],
+    "exact_parity": false,
+    "all_differences_explained": true
+}

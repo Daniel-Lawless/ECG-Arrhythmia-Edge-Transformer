@@ -26,14 +26,60 @@ def _source(num_samples=20, chunk_size=4):
     )
 
 
-class FailingEngine(StreamingEngine):
+class CountingEngine(StreamingEngine):
+    """Engine that records how many times it was flushed."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.flush_calls = 0
+
+    def flush(self) -> list:
+        self.flush_calls += 1
+
+        return super().flush()
+
+
+class FailingEngine(CountingEngine):
     """Engine that rejects the second chunk of any record."""
 
-    def process_chunk(self, chunk: SampleChunk) -> None:
+    def process_chunk(self, chunk: SampleChunk) -> list:
         if self.state.num_chunks_accepted >= 1:
             raise StreamContinuityError("Simulated continuity failure.")
 
-        super().process_chunk(chunk)
+        return super().process_chunk(chunk)
+
+
+class TickingClock:
+    """Deterministic clock that advances one unit per reading."""
+
+    def __init__(self) -> None:
+        self.ticks = 0.0
+
+    def __call__(self) -> float:
+        reading = self.ticks
+        self.ticks += 1.0
+
+        return reading
+
+
+class SlowFlushEngine(CountingEngine):
+    """Engine whose flush consumes one tick of the replay clock."""
+
+    def __init__(self, clock: TickingClock) -> None:
+        super().__init__()
+        self._clock = clock
+
+    def flush(self) -> list:
+        self._clock()
+
+        return super().flush()
+
+
+def _patch_replay_clock(monkeypatch, clock: TickingClock) -> None:
+    monkeypatch.setattr(
+        "ecg_arrhythmia.evaluation.replay_streaming_record.perf_counter",
+        clock,
+    )
 
 
 def test_replay_summary_reports_a_complete_stream():
@@ -91,6 +137,121 @@ def test_broken_stream_is_reported_rather_than_hidden():
     assert summary.continuity_validated is False
     assert summary.total_emitted_chunks == 1
     assert summary.total_samples_accepted == 4
+
+
+# ---------------------------------------------------------------------
+#                        End-Of-Record Flushing
+# ---------------------------------------------------------------------
+
+
+def test_a_complete_replay_flushes_the_engine_once():
+    engine = CountingEngine()
+
+    summary = replay_record(source=_source(num_samples=20, chunk_size=4), engine=engine)
+
+    assert engine.flush_calls == 1
+    assert summary.continuity_validated is True
+    assert summary.total_samples_accepted == summary.total_input_samples
+
+
+def test_an_early_limited_replay_is_not_flushed():
+    engine = CountingEngine()
+
+    summary = replay_record(
+        source=_source(num_samples=100, chunk_size=4),
+        engine=engine,
+        max_samples=12,
+    )
+
+    # The replay stopped short of the end, so it is not a record boundary.
+    assert engine.flush_calls == 0
+    assert summary.total_samples_accepted == 12
+
+
+def test_a_limit_equal_to_the_record_length_flushes():
+    engine = CountingEngine()
+
+    # The chunk that satisfies the limit is also the chunk that finishes
+    # the source, so the record genuinely ended.
+    summary = replay_record(
+        source=_source(num_samples=20, chunk_size=4),
+        engine=engine,
+        max_samples=20,
+    )
+
+    assert engine.flush_calls == 1
+    assert summary.total_samples_accepted == summary.total_input_samples
+
+
+def test_a_limit_beyond_the_record_length_flushes():
+    engine = CountingEngine()
+
+    # The limit is never reached, so the source is exhausted naturally.
+    summary = replay_record(
+        source=_source(num_samples=20, chunk_size=4),
+        engine=engine,
+        max_samples=40,
+    )
+
+    assert engine.flush_calls == 1
+    assert summary.total_samples_accepted == 20
+
+
+def test_a_partial_final_chunk_that_completes_the_source_flushes():
+    engine = CountingEngine()
+
+    # Ten samples in chunks of four ends on a two-sample chunk, which
+    # both satisfies the limit and consumes the source.
+    summary = replay_record(
+        source=_source(num_samples=10, chunk_size=4),
+        engine=engine,
+        max_samples=10,
+    )
+
+    assert engine.flush_calls == 1
+    assert summary.total_emitted_chunks == 3
+    assert summary.total_samples_accepted == 10
+
+
+def test_a_broken_stream_is_not_flushed():
+    engine = FailingEngine()
+
+    summary = replay_record(source=_source(num_samples=20, chunk_size=4), engine=engine)
+
+    assert engine.flush_calls == 0
+    assert summary.continuity_validated is False
+
+
+def test_elapsed_time_includes_the_flush(monkeypatch):
+    clock = TickingClock()
+    _patch_replay_clock(monkeypatch, clock)
+    engine = SlowFlushEngine(clock)
+
+    summary = replay_record(source=_source(num_samples=8, chunk_size=4), engine=engine)
+
+    # The start reads 0, the flush consumes 1, and the final reading is 2.
+    assert engine.flush_calls == 1
+    assert summary.elapsed_seconds == pytest.approx(2.0)
+
+
+def test_elapsed_time_excludes_a_flush_that_never_happens(monkeypatch):
+    clock = TickingClock()
+    _patch_replay_clock(monkeypatch, clock)
+    engine = SlowFlushEngine(clock)
+
+    summary = replay_record(
+        source=_source(num_samples=100, chunk_size=4),
+        engine=engine,
+        max_samples=8,
+    )
+
+    assert engine.flush_calls == 0
+    assert summary.elapsed_seconds == pytest.approx(1.0)
+
+
+# ---------------------------------------------------------------------
+#                           Summary Ratios
+# ---------------------------------------------------------------------
 
 
 def _summary(
