@@ -1063,3 +1063,100 @@ artifacts/results/streaming_evaluation/record_114_real_time_10s_replay_summary.j
 
 A real-time inference system first needs a reliable sample-transport layer. Separating the replay source, chunk representation and streaming engine allows MIT-BIH replay to later be replaced by a Raspberry Pi or live ECG source without changing the downstream interface.
 
+## Milestone 22 — Streaming XQRS Beat-Sequence Pipeline
+
+### Implemented
+
+Completed Section 2 of the real-time streaming pipeline. Incoming ECG chunks can now be converted into model-ready, XQRS-centred causal sequences.
+
+The streaming flow is now:
+
+```text
+SampleChunk
+    → rolling ECG buffer
+    → causal overlapping-window XQRS
+    → confirmed R-peaks
+    → 240-sample beat windows
+    → previous-RR and RR-ratio features
+    → five-beat causal sequences
+```
+
+Each emitted sequence contains:
+
+- ECG input with shape `(5, 1, 240)`;
+- RR input with shape `(5, 2)`;
+- the absolute target R-peak index.
+
+Added separate components for:
+
+- absolute-indexed rolling sample storage
+- streaming XQRS detection with overlap, warm-up and confirmation
+- delayed beat construction once post-peak samples are available
+- shared offline/streaming RR-feature calculation
+- sliding five-beat sequence construction
+- per-record and all-validation parity evaluation
+- diagnostic reporting and plots for detector divergences.
+
+The observed streaming behaviour was also confirmed to be consistent across several chunk sizes.
+
+No model inference is performed yet.
+
+### Validation Results
+
+Evaluated all six validation records:
+
+```text
+114, 122, 209, 210, 231, 233
+```
+
+| Metric | Result |
+|:---:|:---:|
+| Samples accepted | 3,900,000 / 3,900,000 |
+| Continuity validated | True for every record |
+| Whole-record XQRS peaks | 14,588 |
+| Exactly matched peaks | 14,587 |
+| Missing streaming peaks | 1 |
+| Extra streaming peaks | 4 |
+| Maximum shared-peak offset | 0 samples |
+
+Sequence parity results:
+
+| Metric | Result |
+|:---:|:---:|
+| Offline targets | 14,548 |
+| Exactly matched sequences | 14,496 |
+| Expected deployment-only targets | 5 |
+| Causal-detector-only targets | 4 |
+| Missing due to causal divergence | 1 |
+| Unexplained extra targets | 0 |
+| Unexplained missing targets | 0 |
+| Unexplained content mismatches | 0 |
+
+All 18 ECG-window mismatches and all 51 RR-feature mismatches were explained by the small number of causal-versus-whole-record XQRS detection differences.
+
+The final aggregate reports:
+
+```text
+all_records_exact_parity:          False
+all_records_differences_explained: True
+```
+
+Exact parity is false because the causal detector and whole-record detector make a few different decisions, but no unexplained streaming-preprocessing defect was found.
+
+### Important Dataset Caveat
+
+Parity is measured against:
+
+```text
+data/splits_sequences_xqrs/val
+```
+
+This is an XQRS-centred dataset, but it is still expert-influenced. All XQRS detections can affect RR history and sequence context, while only detections matched to supported expert annotations are retained as labelled target sequences.
+
+This explains record `122`, where streaming reproduced every offline target exactly but emitted one additional valid sequence that was excluded from the expert-filtered validation set.
+
+### Key Lesson
+
+The streaming engine now reproduces the validated offline preprocessing behaviour wherever the detector timelines agree.
+The important result is that every remaining peak, ECG-window and RR-feature difference was localised and explained, with no unexplained streaming-preprocessing defect found.
+
