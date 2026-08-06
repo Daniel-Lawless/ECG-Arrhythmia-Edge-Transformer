@@ -4,8 +4,9 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-from ecg_arrhythmia.plotting import (
-    MODEL_EVALUATION_FIGURES_DIR
+from ecg_arrhythmia.visualisation.matrix_plots import (
+    MODEL_EVALUATION_FIGURES_DIR,
+    plot_row_normalised_matrix,
 )
 
 
@@ -35,21 +36,6 @@ def extract_confusion_matrix(summary: dict) -> tuple[np.ndarray, list[str]]:
     )
 
     return matrix, labels
-
-
-def row_normalise(matrix: np.ndarray) -> np.ndarray:
-    """
-    Turn the confusion matrix counts into row-wise proportions.
-    """
-
-    row_sums = matrix.sum(axis=1, keepdims=True)
-
-    return np.divide(
-        matrix,
-        row_sums,
-        out=np.zeros_like(matrix, dtype=float),
-        where=row_sums != 0,
-    )
 
 
 def plot_overall_metrics(

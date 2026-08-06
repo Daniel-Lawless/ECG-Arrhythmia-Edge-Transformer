@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from ecg_arrhythmia.plotting import MODEL_EVALUATION_FIGURES_DIR
+from ecg_arrhythmia.visualisation.matrix_plots import MODEL_EVALUATION_FIGURES_DIR
 
 EXPERIMENT_NAMES = [
     "Baseline",
