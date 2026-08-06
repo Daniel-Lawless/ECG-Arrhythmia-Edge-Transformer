@@ -222,8 +222,7 @@ class StreamingEngine:
         self._prune(chunk.sampling_rate)
 
         logger.debug(
-            "Completed chunk for record %s: confirmed_peaks=%s, "
-            "sequences_emitted=%s",
+            "Completed chunk for record %s: confirmed_peaks=%s, sequences_emitted=%s",
             self._state.record_name,
             len(self._last_confirmed_peaks),
             len(sequences),
@@ -258,8 +257,7 @@ class StreamingEngine:
         sequences = self._advance(sampling_rate, end_of_record=True)
 
         logger.debug(
-            "Finished flushing record %s: confirmed_peaks=%s, "
-            "sequences_emitted=%s",
+            "Finished flushing record %s: confirmed_peaks=%s, sequences_emitted=%s",
             self._state.record_name,
             len(self._last_confirmed_peaks),
             len(sequences),
