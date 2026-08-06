@@ -110,6 +110,9 @@ def replay_record(
     emitted_chunks = 0
     continuity_validated = True
 
+    # Records whether every sample in the source has been consumed.
+    reached_end_of_record = False
+
     # Start the timer.
     start_time = perf_counter()
 
@@ -128,12 +131,25 @@ def replay_record(
                 max_samples is not None
                 and engine.state.total_samples_accepted >= max_samples
             ):
+                # The limit may have landed exactly on the end of the
+                # source, in which case this is a genuine record boundary.
+                reached_end_of_record = (
+                    engine.state.total_samples_accepted >= source.num_samples
+                )
                 break
+        else:
+            # The iterator ended naturally, so the whole source was consumed.
+            reached_end_of_record = True
+
+        if reached_end_of_record:
+            engine.flush()
+
     # This occurs if the sampling rate changes, or the next chunk
     # does not follow validity.
     except StreamContinuityError:
         continuity_validated = False
         logger.exception("Stream continuity validation failed")
+
     # Finally runs regardless how the try statement ends.
     # This will tell us how long it took to process the record.
     finally:
