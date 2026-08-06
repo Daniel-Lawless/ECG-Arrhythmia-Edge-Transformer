@@ -86,6 +86,11 @@ class StreamingEngine:
         # and they must be ints
         self._last_confirmed_peaks: tuple[int, ...] = ()
 
+        logger.debug(
+            "Initialised streaming engine with sequence length %s",
+            sequence_length,
+        )
+
     @property
     def state(self) -> StreamState:
         """Current stream state, scoped to the record being processed."""
@@ -163,6 +168,16 @@ class StreamingEngine:
         one, or several.
         """
 
+        logger.debug(
+            "Received chunk for record %s: start=%s, stop=%s, samples=%s, "
+            "sampling_rate=%s",
+            self._state.record_name,
+            chunk.start_index,
+            chunk.stop_index,
+            chunk.num_samples,
+            chunk.sampling_rate,
+        )
+
         # Validates if this chunks sampling rate matches
         # the StreamState sampling rate for the record it is in
         self._validate_sampling_rate(chunk)
@@ -192,9 +207,26 @@ class StreamingEngine:
         # Appends this chunks samples to the buffer.
         self._buffer.append(chunk.samples, chunk.start_index)
 
+        logger.debug(
+            "Accepted chunk %s for record %s: total_chunks=%s, "
+            "total_samples=%s, next_expected_index=%s",
+            self._state.num_chunks_accepted,
+            self._state.record_name,
+            self._state.num_chunks_accepted,
+            self._state.total_samples_accepted,
+            self._state.next_expected_index,
+        )
+
         #
         sequences = self._advance(chunk.sampling_rate, end_of_record=False)
         self._prune(chunk.sampling_rate)
+
+        logger.debug(
+            "Completed chunk for record %s: confirmed_peaks=%s, sequences_emitted=%s",
+            self._state.record_name,
+            len(self._last_confirmed_peaks),
+            len(sequences),
+        )
 
         return sequences
 
@@ -209,9 +241,29 @@ class StreamingEngine:
         sampling_rate = self._state.sampling_rate
 
         if sampling_rate is None:
+            logger.debug(
+                "Flush requested with no accepted samples for record %s",
+                self._state.record_name,
+            )
             return []
 
-        return self._advance(sampling_rate, end_of_record=True)
+        logger.debug(
+            "Flushing record %s after %s chunks and %s samples",
+            self._state.record_name,
+            self._state.num_chunks_accepted,
+            self._state.total_samples_accepted,
+        )
+
+        sequences = self._advance(sampling_rate, end_of_record=True)
+
+        logger.debug(
+            "Finished flushing record %s: confirmed_peaks=%s, sequences_emitted=%s",
+            self._state.record_name,
+            len(self._last_confirmed_peaks),
+            len(sequences),
+        )
+
+        return sequences
 
     def _advance(
         self,
@@ -226,15 +278,36 @@ class StreamingEngine:
         )
         self._last_confirmed_peaks = tuple(peaks)
 
+        logger.debug(
+            "Detector advance for record %s: end_of_record=%s, peaks=%s",
+            self._state.record_name,
+            end_of_record,
+            self._last_confirmed_peaks,
+        )
+
         # Add the peaks into pending awaiting sequencing
         self._assembler.add_peaks(peaks)
 
         # From these pending peaks, we can create beats, and when we have enough
         # beats we can create sequences.
-        return self._assembler.drain(self._buffer, end_of_record=end_of_record)
+        sequences = self._assembler.drain(
+            self._buffer,
+            end_of_record=end_of_record,
+        )
+
+        logger.debug(
+            "Assembler advance for record %s: sequences=%s, target_peaks=%s",
+            self._state.record_name,
+            len(sequences),
+            tuple(sequence.target_peak_index for sequence in sequences),
+        )
+
+        return sequences
 
     def _prune(self, sampling_rate: float) -> None:
         """Drop history neither the detector nor a pending beat can need."""
+
+        previous_start = self._buffer.start_index
 
         # This is the oldest sample we need for the analysis window
         keep_from = self._detector.history_start(
@@ -254,6 +327,16 @@ class StreamingEngine:
         # from keep_from up to stop_index.
         self._buffer.prune_before(keep_from)
 
+        logger.debug(
+            "Pruned buffer for record %s: previous_start=%s, "
+            "new_start=%s, stop=%s, pending_start=%s",
+            self._state.record_name,
+            previous_start,
+            self._buffer.start_index,
+            self._buffer.stop_index,
+            pending_start,
+        )
+
     def _validate_model_sampling_rate(self, chunk: SampleChunk) -> None:
         """
         Reject input the trained beat and RR contract cannot describe.
@@ -265,6 +348,13 @@ class StreamingEngine:
         """
 
         if chunk.sampling_rate != MODEL_SAMPLING_RATE:
+            logger.warning(
+                "Rejected chunk for record %s because its sampling rate is %s Hz; "
+                "the model requires %s Hz",
+                self._state.record_name,
+                chunk.sampling_rate,
+                MODEL_SAMPLING_RATE,
+            )
             raise ValueError(
                 f"Streaming requires {MODEL_SAMPLING_RATE} Hz input because "
                 "the beat window and RR features are defined at that rate, "
@@ -284,6 +374,13 @@ class StreamingEngine:
             stream_sampling_rate is not None
             and chunk.sampling_rate != stream_sampling_rate
         ):
+            logger.warning(
+                "Rejected chunk for record %s because the sampling rate changed "
+                "from %s Hz to %s Hz",
+                self._state.record_name,
+                stream_sampling_rate,
+                chunk.sampling_rate,
+            )
             raise StreamContinuityError(
                 "Sampling rate changed mid-stream: expected "
                 f"{stream_sampling_rate} Hz but received "
@@ -305,6 +402,14 @@ class StreamingEngine:
         # samples have been skipped, so a continuity error should be thrown.
         if chunk.start_index > expected_index:
             missing_samples = chunk.start_index - expected_index
+            logger.warning(
+                "Rejected chunk for record %s because of a %s-sample gap: "
+                "expected_start=%s, received_start=%s",
+                self._state.record_name,
+                missing_samples,
+                expected_index,
+                chunk.start_index,
+            )
             raise StreamContinuityError(
                 f"Gap of {missing_samples} samples: expected a chunk "
                 f"starting at {expected_index} but received one starting "
@@ -315,6 +420,14 @@ class StreamingEngine:
         # then this is the chunk that we just processed, so it has been
         # duplicated and thus should be rejected.
         if chunk.stop_index == expected_index:
+            logger.warning(
+                "Rejected duplicate chunk for record %s: start=%s, stop=%s, "
+                "stream_position=%s",
+                self._state.record_name,
+                chunk.start_index,
+                chunk.stop_index,
+                expected_index,
+            )
             raise StreamContinuityError(
                 f"Duplicate chunk covering samples {chunk.start_index} to "
                 f"{chunk.last_index}: the stream already reached "
@@ -323,6 +436,14 @@ class StreamingEngine:
 
         # A chunk starting before the expected position is either the
         # previous chunk resent, or an overlapping/out-of-order chunk.
+        logger.warning(
+            "Rejected overlapping or out-of-order chunk for record %s: "
+            "expected_start=%s, received_start=%s, received_stop=%s",
+            self._state.record_name,
+            expected_index,
+            chunk.start_index,
+            chunk.stop_index,
+        )
         raise StreamContinuityError(
             "Overlapping or out-of-order chunk: expected a chunk starting "
             f"at {expected_index} but received one starting at "
