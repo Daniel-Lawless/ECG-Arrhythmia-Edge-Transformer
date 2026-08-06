@@ -5,22 +5,20 @@ from pathlib import Path
 from typing import TypedDict
 
 import numpy as np
+import onnx
 import onnxruntime as ort
 import torch
 from torch.utils.data import DataLoader
 
 from ecg_arrhythmia.data.ecg_sequence_dataset import ECGSequenceDataset
-from ecg_arrhythmia.data.label_mapping import NUM_CLASSES
-from ecg_arrhythmia.inference.onnx_contract import (
-    ONNX_ECG_INPUT_NAME,
-    ONNX_OUTPUT_NAME,
-    ONNX_RR_INPUT_NAME,
-    create_onnx_session,
-    validate_onnx_model,
-)
 from ecg_arrhythmia.models.sequence_transformer import ECGSequenceTransformer
+from ecg_arrhythmia.training.transformer_training import NUM_CLASSES
 
 logger = logging.getLogger(__name__)
+
+ONNX_ECG_INPUT_NAME = "ecg_sequence"
+ONNX_RR_INPUT_NAME = "rr_sequence"
+ONNX_OUTPUT_NAME = "logits"
 
 
 class ParitySummary(TypedDict):
