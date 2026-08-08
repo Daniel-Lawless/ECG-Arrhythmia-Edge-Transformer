@@ -1,6 +1,9 @@
+from pathlib import Path
+
 import numpy as np
 
 from ecg_arrhythmia.evaluation.evaluate_streaming_parity import (
+    DIAGNOSTICS_DIR,
     _compare_sequences,
     _is_exact_parity,
     _is_explained,
@@ -51,6 +54,12 @@ def _run(sequences: dict[int, _Sequence], peaks=None) -> _StreamingRun:
         samples_accepted=1200,
         continuity_validated=True,
     )
+
+
+def test_diagnostic_figures_keep_their_own_directory():
+    # Reorganising the model-evaluation figures must not disturb the
+    # streaming diagnostics.
+    assert DIAGNOSTICS_DIR == Path("artifacts/figures/streaming_diagnostics")
 
 
 # ---------------------------------------------------------------------

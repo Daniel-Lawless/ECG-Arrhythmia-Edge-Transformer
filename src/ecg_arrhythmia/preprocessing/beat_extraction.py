@@ -32,6 +32,9 @@ MAX_RR_RATIO = 4.0
 # Number of beats the trained transformer consumes per input.
 SEQUENCE_LENGTH = 5
 
+# previous_rr_seconds and rr_ratio, the two features produced below.
+RR_FEATURE_DIM = 2
+
 
 def previous_rr_seconds(peak_sample: int, previous_peak_sample: int) -> float:
 
