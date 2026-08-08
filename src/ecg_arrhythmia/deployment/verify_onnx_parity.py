@@ -5,20 +5,22 @@ from pathlib import Path
 from typing import TypedDict
 
 import numpy as np
-import onnx
 import onnxruntime as ort
 import torch
 from torch.utils.data import DataLoader
 
 from ecg_arrhythmia.data.ecg_sequence_dataset import ECGSequenceDataset
+from ecg_arrhythmia.data.label_mapping import NUM_CLASSES
 from ecg_arrhythmia.models.sequence_transformer import ECGSequenceTransformer
-from ecg_arrhythmia.training.transformer_training import NUM_CLASSES
+from ecg_arrhythmia.streaming.onnx_contract import (
+    ONNX_ECG_INPUT_NAME,
+    ONNX_OUTPUT_NAME,
+    ONNX_RR_INPUT_NAME,
+    create_onnx_session,
+    validate_onnx_model,
+)
 
 logger = logging.getLogger(__name__)
-
-ONNX_ECG_INPUT_NAME = "ecg_sequence"
-ONNX_RR_INPUT_NAME = "rr_sequence"
-ONNX_OUTPUT_NAME = "logits"
 
 
 class ParitySummary(TypedDict):
@@ -67,66 +69,6 @@ def load_pytorch_model(
     model.eval()
 
     return model
-
-
-def validate_onnx_model(onnx_path: Path) -> None:
-    """
-    Check that the saved file contains a structurally valid ONNX model.
-    """
-
-    if not onnx_path.exists():
-        raise FileNotFoundError(f"No ONNX model found at {onnx_path}")
-
-    onnx_model = onnx.load(onnx_path)
-    onnx.checker.check_model(onnx_model)
-
-    logger.info("ONNX model passed structural validation")
-
-
-def create_onnx_session(
-    onnx_path: Path,
-) -> ort.InferenceSession:
-    """
-    Load the ONNX graph using the CPU execution provider.
-    """
-
-    session = ort.InferenceSession(
-        onnx_path,
-        providers=["CPUExecutionProvider"],
-    )
-
-    """
-    These are the input and output names we specified in the export. For
-    every distinct input and output node defined in your model's
-    computational graph, ONNX creates a ArgNode object.
-    session.get_inputs returns a list of ArgNode objects, 2 in our case
-    since we defined 2 inputs, that we can iterate through and extract the
-    name of the input (also, the shape or type if we want). Same for the outputs.
-    """
-    input_names = {model_input.name for model_input in session.get_inputs()}
-    output_names = {model_output.name for model_output in session.get_outputs()}
-
-    # Validate that the input and output names are what we expect
-    expected_input_names = {
-        ONNX_ECG_INPUT_NAME,
-        ONNX_RR_INPUT_NAME,
-    }
-
-    if input_names != expected_input_names:
-        raise ValueError(
-            "Unexpected ONNX input names. "
-            f"Expected {expected_input_names}, found {input_names}"
-        )
-
-    if ONNX_OUTPUT_NAME not in output_names:
-        raise ValueError(
-            f"Expected ONNX output named {ONNX_OUTPUT_NAME}. Found {output_names}"
-        )
-
-    logger.info("ONNX inputs: %s", input_names)
-    logger.info("ONNX outputs: %s", output_names)
-
-    return session
 
 
 def verify_parity(
