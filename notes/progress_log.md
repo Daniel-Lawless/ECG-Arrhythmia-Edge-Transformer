@@ -1160,3 +1160,172 @@ This explains record `122`, where streaming reproduced every offline target exac
 The streaming engine now reproduces the validated offline preprocessing behaviour wherever the detector timelines agree.
 The important result is that every remaining peak, ECG-window and RR-feature difference was localised and explained, with no unexplained streaming-preprocessing defect found.
 
+## Milestone 23 — Streaming ONNX Inference and Three-Way Parity
+
+### Implemented
+
+Completed Section 3 of the real-time streaming pipeline. Model-ready `BeatSequence` objects emitted by the streaming engine can now be classified directly with ONNX Runtime.
+
+The streaming flow is now:
+
+```text
+SampleChunk
+    → StreamingEngine
+    → BeatSequence
+    → StreamingPredictor
+    → ONNXSequenceClassifier
+    → PredictionEvent
+```
+
+Added `onnx_contract.py` to define and validate the deployed ONNX interface:
+
+- ECG input name: `ecg_sequence`
+- RR input name: `rr_sequence`
+- output name: `logits`
+- ECG input rank: 4
+- RR input rank: 3
+- logits output rank: 2
+- expected float32 input types
+- expected sequence length, ECG window size, RR-feature dimension and number of output classes
+- CPU ONNX Runtime session creation
+- structural ONNX model validation.
+
+The `onnx` package is imported only when structural model validation is requested, while the normal inference path uses `onnxruntime`.
+
+Added `ONNXSequenceClassifier` to:
+
+- accept one streaming `BeatSequence`;
+- validate the ECG input shape `(5, 1, 240)`;
+- validate the RR input shape `(5, 2)`;
+- convert both inputs to contiguous `float32`;
+- add a batch dimension:
+  - ECG: `(5, 1, 240) -> (1, 5, 1, 240)`
+  - RR: `(5, 2) -> (1, 5, 2)`
+- run the sequence through the ONNX Runtime session;
+- validate the returned logits shape `(1, 4)`;
+- reduce the output to a read-only `(4,)` logit vector;
+- convert the largest logit into the predicted class index and AAMI label.
+
+Added immutable `PredictionEvent` outputs containing:
+
+- target R-peak index;
+- all R-peaks that formed the five-beat sequence;
+- raw model logits;
+- predicted class index;
+- predicted class label.
+
+Added `StreamingPredictor` as a composition layer over `StreamingEngine`.
+
+`StreamingPredictor`:
+
+- forwards each `SampleChunk` through the existing streaming engine;
+- classifies every `BeatSequence` emitted by that chunk;
+- classifies any final sequences released by `flush()`;
+- returns only the predictions produced by the current call;
+- retains no prediction history between records.
+
+Added a three-way inference-parity evaluator using the exact same streaming-emitted `BeatSequence` inputs for:
+
+```text
+PyTorch
+Offline ONNX
+Streaming ONNX
+```
+
+The three comparisons are:
+
+```text
+PyTorch vs Offline ONNX
+Offline ONNX vs Streaming ONNX
+PyTorch vs Streaming ONNX
+```
+
+The streaming classifier records each exact `BeatSequence` that produced a live prediction. Those same sequence objects are then passed through the original PyTorch model and through a second independently created ONNX session, preventing input differences from affecting the parity test.
+
+Added per-sequence comparison of:
+
+- predicted class agreement
+- mean absolute logit difference
+- maximum absolute logit difference
+- exact array equality
+- `np.allclose` tolerance checks using:
+  - `rtol = 1e-5`
+  - `atol = 1e-5`
+- target R-peaks for any class disagreements or tolerance failures
+- class-agreement matrices.
+
+Added optional parity figures:
+
+- row-normalised class-agreement matrices;
+- PyTorch-vs-streaming-ONNX logit scatter plots;
+- per-sequence maximum-logit-difference histograms;
+- logit-difference plots across each ECG record.
+
+Parity results and raw logits are written under:
+
+```text
+artifacts/results/deployment_evaluation/streaming_inference_parity/
+```
+
+Figures are written under:
+
+```text
+artifacts/figures/streaming_inference_parity/
+```
+
+### Validation Results
+
+Evaluated all six validation records:
+
+```text
+114, 122, 209, 210, 231, 233
+```
+
+using a streaming chunk size of 36 samples.
+
+A total of **14,556 streaming-emitted sequences** were compared.
+
+| Comparison | Class agreement | Mean absolute logit difference | Maximum absolute logit difference | Arrays outside tolerance | Exactly equal |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| PyTorch vs Offline ONNX | 100% | 5.665e-07 | 9.418e-06 | 0 | False |
+| Offline ONNX vs Streaming ONNX | 100% | 0.000e+00 | 0.000e+00 | 0 | True |
+| PyTorch vs Streaming ONNX | 100% | 5.665e-07 | 9.418e-06 | 0 | False |
+
+All **14,556 / 14,556** sequences produced the same predicted class in all three inference paths.
+
+All PyTorch-versus-ONNX logit arrays were within the required `rtol=1e-5`, `atol=1e-5` tolerance.
+
+Offline ONNX and streaming ONNX were bit-for-bit identical across every sequence:
+
+```text
+mean absolute logit difference:    0.0
+maximum absolute logit difference: 0.0
+all arrays exactly equal:          True
+```
+
+The aggregate class-agreement matrix was fully diagonal:
+
+| Prediction | N | S | V | F |
+|:---:|:---:|:---:|:---:|:---:|
+| N | 12,836 | 0 | 0 | 0 |
+| S | 0 | 386 | 0 | 0 |
+| V | 0 | 0 | 1,114 | 0 |
+| F | 0 | 0 | 0 | 220 |
+
+These counts represent agreement between inference implementations, not accuracy against expert ground-truth labels.
+
+The final aggregate reports:
+
+```text
+failed_records:              []
+records_failing_parity:      []
+all_records_parity_passed:   True
+```
+
+### Key Lesson
+
+Section 3 confirms that model inference can be attached to the real-time streaming pipeline without changing the model's behaviour.
+
+The exact equality between offline ONNX and streaming ONNX shows that the streaming inference wrapper does not alter the model inputs or outputs. The very small PyTorch-versus-ONNX numerical differences are within the required tolerance and never change the predicted class.
+
+The real-time pipeline now extends from raw ECG chunks through causal R-peak detection and beat-sequence assembly to a traceable `PredictionEvent`, while retaining the behaviour of the original trained PyTorch model.
