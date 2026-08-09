@@ -1,0 +1,135 @@
+{
+    "record_name": "231",
+    "chunk_size": 36,
+    "num_sequences_compared": 1564,
+    "first_target_peak": 1833,
+    "last_target_peak": 649501,
+    "relative_tolerance": 1e-05,
+    "absolute_tolerance": 1e-05,
+    "comparisons": {
+        "pytorch_vs_offline_onnx": {
+            "num_sequences_compared": 1564,
+            "num_class_agreements": 1564,
+            "class_agreement_percentage": 100.0,
+            "mean_absolute_logit_difference": 5.265911795504508e-07,
+            "maximum_absolute_logit_difference": 4.291534423828125e-06,
+            "num_arrays_within_tolerance": 1564,
+            "num_arrays_outside_tolerance": 0,
+            "arrays_exactly_equal": false,
+            "relative_tolerance": 1e-05,
+            "absolute_tolerance": 1e-05,
+            "class_disagreement_target_peaks": [],
+            "tolerance_failure_target_peaks": [],
+            "agreement_matrix": [
+                [
+                    1550,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    13,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    1,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "passed": true
+        },
+        "offline_onnx_vs_streaming_onnx": {
+            "num_sequences_compared": 1564,
+            "num_class_agreements": 1564,
+            "class_agreement_percentage": 100.0,
+            "mean_absolute_logit_difference": 0.0,
+            "maximum_absolute_logit_difference": 0.0,
+            "num_arrays_within_tolerance": 1564,
+            "num_arrays_outside_tolerance": 0,
+            "arrays_exactly_equal": true,
+            "relative_tolerance": 1e-05,
+            "absolute_tolerance": 1e-05,
+            "class_disagreement_target_peaks": [],
+            "tolerance_failure_target_peaks": [],
+            "agreement_matrix": [
+                [
+                    1550,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    13,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    1,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "passed": true
+        },
+        "pytorch_vs_streaming_onnx": {
+            "num_sequences_compared": 1564,
+            "num_class_agreements": 1564,
+            "class_agreement_percentage": 100.0,
+            "mean_absolute_logit_difference": 5.265911795504508e-07,
+            "maximum_absolute_logit_difference": 4.291534423828125e-06,
+            "num_arrays_within_tolerance": 1564,
+            "num_arrays_outside_tolerance": 0,
+            "arrays_exactly_equal": false,
+            "relative_tolerance": 1e-05,
+            "absolute_tolerance": 1e-05,
+            "class_disagreement_target_peaks": [],
+            "tolerance_failure_target_peaks": [],
+            "agreement_matrix": [
+                [
+                    1550,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    13,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    1,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "passed": true
+        }
+    },
+    "parity_passed": true
+}

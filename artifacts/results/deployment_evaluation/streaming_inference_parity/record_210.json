@@ -1,0 +1,135 @@
+{
+    "record_name": "210",
+    "chunk_size": 36,
+    "num_sequences_compared": 2591,
+    "first_target_peak": 1298,
+    "last_target_peak": 649758,
+    "relative_tolerance": 1e-05,
+    "absolute_tolerance": 1e-05,
+    "comparisons": {
+        "pytorch_vs_offline_onnx": {
+            "num_sequences_compared": 2591,
+            "num_class_agreements": 2591,
+            "class_agreement_percentage": 100.0,
+            "mean_absolute_logit_difference": 4.5951981064717984e-07,
+            "maximum_absolute_logit_difference": 6.854534149169922e-06,
+            "num_arrays_within_tolerance": 2591,
+            "num_arrays_outside_tolerance": 0,
+            "arrays_exactly_equal": false,
+            "relative_tolerance": 1e-05,
+            "absolute_tolerance": 1e-05,
+            "class_disagreement_target_peaks": [],
+            "tolerance_failure_target_peaks": [],
+            "agreement_matrix": [
+                [
+                    2387,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    25,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    178,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0,
+                    1
+                ]
+            ],
+            "passed": true
+        },
+        "offline_onnx_vs_streaming_onnx": {
+            "num_sequences_compared": 2591,
+            "num_class_agreements": 2591,
+            "class_agreement_percentage": 100.0,
+            "mean_absolute_logit_difference": 0.0,
+            "maximum_absolute_logit_difference": 0.0,
+            "num_arrays_within_tolerance": 2591,
+            "num_arrays_outside_tolerance": 0,
+            "arrays_exactly_equal": true,
+            "relative_tolerance": 1e-05,
+            "absolute_tolerance": 1e-05,
+            "class_disagreement_target_peaks": [],
+            "tolerance_failure_target_peaks": [],
+            "agreement_matrix": [
+                [
+                    2387,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    25,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    178,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0,
+                    1
+                ]
+            ],
+            "passed": true
+        },
+        "pytorch_vs_streaming_onnx": {
+            "num_sequences_compared": 2591,
+            "num_class_agreements": 2591,
+            "class_agreement_percentage": 100.0,
+            "mean_absolute_logit_difference": 4.5951981064717984e-07,
+            "maximum_absolute_logit_difference": 6.854534149169922e-06,
+            "num_arrays_within_tolerance": 2591,
+            "num_arrays_outside_tolerance": 0,
+            "arrays_exactly_equal": false,
+            "relative_tolerance": 1e-05,
+            "absolute_tolerance": 1e-05,
+            "class_disagreement_target_peaks": [],
+            "tolerance_failure_target_peaks": [],
+            "agreement_matrix": [
+                [
+                    2387,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    25,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    178,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0,
+                    1
+                ]
+            ],
+            "passed": true
+        }
+    },
+    "parity_passed": true
+}

@@ -1,0 +1,131 @@
+{
+    "num_records_evaluated": 6,
+    "record_names": [
+        "114",
+        "122",
+        "209",
+        "210",
+        "231",
+        "233"
+    ],
+    "chunk_size": 36,
+    "total_sequences_compared": 14556,
+    "relative_tolerance": 1e-05,
+    "absolute_tolerance": 1e-05,
+    "comparisons": {
+        "pytorch_vs_offline_onnx": {
+            "total_sequences_compared": 14556,
+            "total_class_agreements": 14556,
+            "class_agreement_percentage": 100.0,
+            "mean_absolute_logit_difference": 5.664725255406218e-07,
+            "maximum_absolute_logit_difference": 9.417533874511719e-06,
+            "total_arrays_within_tolerance": 14556,
+            "total_arrays_outside_tolerance": 0,
+            "all_arrays_exactly_equal": false,
+            "agreement_matrix": [
+                [
+                    12836,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    386,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    1114,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0,
+                    220
+                ]
+            ],
+            "passed": true
+        },
+        "offline_onnx_vs_streaming_onnx": {
+            "total_sequences_compared": 14556,
+            "total_class_agreements": 14556,
+            "class_agreement_percentage": 100.0,
+            "mean_absolute_logit_difference": 0.0,
+            "maximum_absolute_logit_difference": 0.0,
+            "total_arrays_within_tolerance": 14556,
+            "total_arrays_outside_tolerance": 0,
+            "all_arrays_exactly_equal": true,
+            "agreement_matrix": [
+                [
+                    12836,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    386,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    1114,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0,
+                    220
+                ]
+            ],
+            "passed": true
+        },
+        "pytorch_vs_streaming_onnx": {
+            "total_sequences_compared": 14556,
+            "total_class_agreements": 14556,
+            "class_agreement_percentage": 100.0,
+            "mean_absolute_logit_difference": 5.664725255406218e-07,
+            "maximum_absolute_logit_difference": 9.417533874511719e-06,
+            "total_arrays_within_tolerance": 14556,
+            "total_arrays_outside_tolerance": 0,
+            "all_arrays_exactly_equal": false,
+            "agreement_matrix": [
+                [
+                    12836,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    386,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    1114,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0,
+                    220
+                ]
+            ],
+            "passed": true
+        }
+    },
+    "failed_records": [],
+    "records_failing_parity": [],
+    "all_records_parity_passed": true
+}
