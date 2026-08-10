@@ -23,6 +23,7 @@ COMPARISON_CMAPS = {
     "pytorch_vs_streaming_onnx": "Purples",
 }
 
+
 def write_aggregate_agreement_figures(
     comparisons: dict,
     figures_dir: Path,
