@@ -17,7 +17,45 @@ COMPARISON_TITLES = {
     "pytorch_vs_streaming_onnx": ("PyTorch", "Streaming ONNX"),
 }
 
-AGREEMENT_COLOUR_MAP = "Blues"
+COMPARISON_CMAPS = {
+    "pytorch_vs_offline_onnx": "Blues",
+    "offline_onnx_vs_streaming_onnx": "Greens",
+    "pytorch_vs_streaming_onnx": "Purples",
+}
+
+
+def write_aggregate_agreement_figures(
+    comparisons: dict,
+    figures_dir: Path,
+) -> list[Path]:
+    """Save aggregate agreement matrices across all evaluated records."""
+
+    figures_dir.mkdir(parents=True, exist_ok=True)
+    written: list[Path] = []
+
+    for name, comparison in comparisons.items():
+        reference_label, comparison_label = COMPARISON_TITLES[name]
+
+        output_path = figures_dir / f"aggregate_{name}_agreement.png"
+
+        plot_prediction_agreement_matrix(
+            matrix=np.asarray(
+                comparison["agreement_matrix"],
+                dtype=np.int64,
+            ),
+            reference_label=reference_label,
+            comparison_label=comparison_label,
+            comparison_name=name,
+            title=(
+                f"All validation records: {reference_label} vs "
+                f"{comparison_label} prediction agreement"
+            ),
+            output_path=output_path,
+        )
+
+        written.append(output_path)
+
+    return written
 
 
 def write_record_figures(
@@ -41,6 +79,7 @@ def write_record_figures(
             matrix=np.asarray(comparison["agreement_matrix"], dtype=np.int64),
             reference_label=reference_label,
             comparison_label=comparison_label,
+            comparison_name=name,
             title=(
                 f"Record {record_name}: {reference_label} vs "
                 f"{comparison_label} prediction agreement"
@@ -102,25 +141,17 @@ def plot_prediction_agreement_matrix(
     matrix: NDArray[np.int64],
     reference_label: str,
     comparison_label: str,
+    comparison_name: str,
     title: str,
     output_path: Path,
 ) -> None:
-    """
-    Plot how often two inference paths chose the same class.
-
-    This is an agreement matrix, not a confusion matrix: there is no
-    ground truth here, so full parity means every count sits on the
-    diagonal and every off-diagonal cell is zero. Colouring is row
-    normalised by the shared helper, so a class with five sequences in
-    full agreement is as clearly marked as one with two thousand.
-    """
 
     plot_row_normalised_matrix(
-        matrix=np.asarray(matrix, dtype=np.int64),
+        matrix=matrix,
         labels=list(CLASS_LABELS),
         title=title,
         output_path=output_path,
-        cmap=AGREEMENT_COLOUR_MAP,
+        cmap=COMPARISON_CMAPS[comparison_name],
         x_label=f"{comparison_label} prediction",
         y_label=f"{reference_label} prediction",
         colorbar_label="Row percentage",

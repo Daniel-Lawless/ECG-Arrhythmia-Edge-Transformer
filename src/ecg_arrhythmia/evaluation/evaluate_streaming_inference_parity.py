@@ -607,6 +607,22 @@ def main() -> None:
     if not aggregate["all_records_parity_passed"]:
         raise SystemExit(1)
 
+    if args.write_plots:
+        from ecg_arrhythmia.evaluation.streaming_inference_plots import (
+            write_aggregate_agreement_figures,
+        )
+
+        written = write_aggregate_agreement_figures(
+            comparisons=aggregate["comparisons"],
+            figures_dir=args.figures_dir,
+        )
+
+        for path in written:
+            logger.info("Wrote aggregate figure %s", path)
+
+    if not aggregate["all_records_parity_passed"]:
+        raise SystemExit(1)
+
 
 if __name__ == "__main__":
     main()
