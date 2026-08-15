@@ -1,0 +1,52 @@
+{
+    "model": {
+        "path": "artifacts/models/ecg_sequence_transformer.onnx",
+        "precision": "fp32",
+        "size_bytes": 2421745,
+        "size_mib": 2.309556007385254
+    },
+    "benchmark": {
+        "record_names": [
+            "114",
+            "122",
+            "209",
+            "210",
+            "231",
+            "233"
+        ],
+        "num_records": 6,
+        "num_sequences": 14556,
+        "sequences_per_record": {
+            "114": 1873,
+            "122": 2471,
+            "209": 2999,
+            "210": 2591,
+            "231": 1564,
+            "233": 3058
+        },
+        "chunk_size": 36,
+        "warmup_calls": 100,
+        "provider": "CPUExecutionProvider",
+        "classifier_initialisation_ms": 169.744212,
+        "total_timed_inference_seconds": 9.577280228,
+        "latency_ms": {
+            "minimum": 0.523265,
+            "mean": 0.657960993954383,
+            "median": 0.597188,
+            "p95": 1.0060455,
+            "maximum": 9.485927
+        },
+        "throughput_sequences_per_second": 1519.8469349830955
+    },
+    "environment": {
+        "timestamp": "2026-08-15T14:18:19.164520+00:00",
+        "python_version": "3.12.3",
+        "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "machine": "x86_64",
+        "processor": "x86_64",
+        "onnxruntime_version": "1.28.0",
+        "execution_providers": [
+            "CPUExecutionProvider"
+        ]
+    }
+}
