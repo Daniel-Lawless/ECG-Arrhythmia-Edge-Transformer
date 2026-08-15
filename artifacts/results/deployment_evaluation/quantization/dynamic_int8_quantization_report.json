@@ -1,0 +1,116 @@
+{
+    "quantisation": {
+        "source_model_path": "artifacts/models/ecg_sequence_transformer.onnx",
+        "quantised_model_path": "artifacts/models/ecg_sequence_transformer_int8.onnx",
+        "method": "onnxruntime post-training dynamic quantisation",
+        "weight_type": "QInt8",
+        "per_channel": false,
+        "reduce_range": false,
+        "preprocessing_used": true,
+        "preprocessing_mode": "skip_symbolic_shape",
+        "preprocessing_fallback_used": true,
+        "full_preprocessing_error": "AssertionError: ",
+        "source_strict_shape_inference_passed": true,
+        "value_info_entries_removed": 258,
+        "cleaned_strict_shape_inference_passed": true,
+        "preprocessed_model_kept": false
+    },
+    "size": {
+        "fp32_bytes": 2421745,
+        "fp32_mib": 2.309556007385254,
+        "int8_bytes": 852650,
+        "int8_mib": 0.8131504058837891,
+        "reduction_bytes": 1569095,
+        "reduction_mib": 1.4964056015014648,
+        "reduction_percentage": 64.79191657255409
+    },
+    "validation": {
+        "structural_validation_passed": true,
+        "contract_validation_passed": true,
+        "smoke_inference_passed": true,
+        "execution_providers": [
+            "CPUExecutionProvider"
+        ]
+    },
+    "operators": {
+        "fp32_operator_counts": {
+            "Shape": 4,
+            "Squeeze": 6,
+            "Mul": 8,
+            "Reshape": 37,
+            "Concat": 14,
+            "Conv": 4,
+            "Relu": 9,
+            "MaxPool": 3,
+            "Unsqueeze": 4,
+            "ReduceMean": 1,
+            "Gemm": 5,
+            "MatMul": 18,
+            "Add": 19,
+            "Transpose": 24,
+            "Gather": 10,
+            "Slice": 9,
+            "Softmax": 3,
+            "LayerNormalization": 6
+        },
+        "int8_operator_counts": {
+            "Reshape": 41,
+            "Shape": 4,
+            "DynamicQuantizeLinear": 21,
+            "Squeeze": 6,
+            "Concat": 14,
+            "Mul": 50,
+            "MatMulInteger": 17,
+            "Cast": 21,
+            "Add": 28,
+            "Relu": 9,
+            "ConvInteger": 4,
+            "MaxPool": 3,
+            "Unsqueeze": 4,
+            "ReduceMean": 1,
+            "Transpose": 24,
+            "Gather": 10,
+            "Slice": 9,
+            "MatMul": 6,
+            "Softmax": 3,
+            "LayerNormalization": 6
+        },
+        "operator_types_introduced": [
+            "Cast",
+            "ConvInteger",
+            "DynamicQuantizeLinear",
+            "MatMulInteger"
+        ],
+        "operator_types_removed": [
+            "Conv",
+            "Gemm"
+        ],
+        "operator_types_reduced": [
+            "MatMul"
+        ],
+        "quantised_operator_types_present": [
+            "ConvInteger",
+            "DynamicQuantizeLinear",
+            "MatMulInteger"
+        ],
+        "remaining_floating_point_operator_types": [
+            "Add",
+            "Cast",
+            "Concat",
+            "Gather",
+            "LayerNormalization",
+            "MatMul",
+            "MaxPool",
+            "Mul",
+            "ReduceMean",
+            "Relu",
+            "Reshape",
+            "Shape",
+            "Slice",
+            "Softmax",
+            "Squeeze",
+            "Transpose",
+            "Unsqueeze"
+        ]
+    }
+}
