@@ -1329,3 +1329,73 @@ Section 3 confirms that model inference can be attached to the real-time streami
 The exact equality between offline ONNX and streaming ONNX shows that the streaming inference wrapper does not alter the model inputs or outputs. The very small PyTorch-versus-ONNX numerical differences are within the required tolerance and never change the predicted class.
 
 The real-time pipeline now extends from raw ECG chunks through causal R-peak detection and beat-sequence assembly to a traceable `PredictionEvent`, while retaining the behaviour of the original trained PyTorch model.
+
+## Milestone 24 — FP32 ONNX Inference Benchmark
+
+### Implemented
+
+- Added `benchmark_onnx_inference.py` to establish a deployment baseline for the FP32 ONNX Transformer.
+- Benchmarked all six validation records using model-ready sequences from the streaming pipeline.
+- Added warm-up calls and measured:
+  - inference latency;
+  - throughput;
+  - classifier initialisation time;
+  - model size.
+- Added unit tests for benchmark calculations, warm-up behaviour and inference timing.
+
+### Results
+
+| Metric | Result |
+|:------:|:------:|
+| Sequences | 14,556 |
+| Mean latency | 0.658 ms |
+| Median latency | 0.597 ms |
+| p95 latency | 1.006 ms |
+| Throughput | 1,519.85 sequences/s |
+| Model size | 2.310 MiB |
+
+Saved output:
+
+```text
+artifacts/results/deployment_evaluation/onnx_benchmarking/fp32_onnx_benchmark.json
+```
+
+### Key Lesson
+
+The FP32 ONNX model is already very fast on the development machine. This benchmark provides the reference point needed to judge whether INT8 quantisation improves deployment performance.
+
+
+## Milestone 25 — Dynamic INT8 ONNX Quantisation
+
+### Implemented
+
+- Added `quantize_onnx.py` to create a dynamically quantised QInt8 ONNX model.
+- Added ONNX Runtime preprocessing with fallback when symbolic shape inference fails.
+- Removed stale `graph.value_info` metadata before quantisation and revalidated the cleaned graph.
+- Added structural validation, runtime contract validation and smoke inference for the INT8 model.
+- Added unit tests for quantisation flow, metadata cleaning, fallbacks, validation and reporting.
+
+### Results
+
+| Model | Size |
+|:-----:|:----:|
+| FP32 | 2.310 MiB |
+| INT8 | 0.813 MiB |
+
+Model size reduction:
+
+```text
+64.79% ≈ 2.84× smaller
+```
+
+All structural, contract and smoke-inference checks passed.
+
+Saved outputs:
+
+```text
+artifacts/results/deployment_evaluation/quantization/dynamic_int8_quantization_report.json
+```
+
+### Key Lesson
+
+Dynamic quantisation reduced the model size substantially while preserving a valid, executable deployment graph. The next steps are to test FP32-vs-INT8 prediction agreement, classification performance and inference speed.
