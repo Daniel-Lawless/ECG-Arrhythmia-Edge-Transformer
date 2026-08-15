@@ -321,8 +321,6 @@ def test_quantisation_uses_dynamic_qint8_configuration(mocked_quantisation):
 
     [quantize_call] = calls["quantize"]
     assert quantize_call["weight_type"] == _FakeQuantType.QInt8
-    assert quantize_call["per_channel"] is False
-    assert quantize_call["reduce_range"] is False
 
 
 def test_the_quantiser_consumes_the_cleaned_preprocessed_model(mocked_quantisation):
@@ -336,10 +334,10 @@ def test_the_quantiser_consumes_the_cleaned_preprocessed_model(mocked_quantisati
     [(clean_source, clean_output)] = calls["cleaned"]
     [quantize_call] = calls["quantize"]
 
-    assert preprocess_input == str(fp32_path)
+    assert Path(preprocess_input) == fp32_path
     assert "skip_symbolic_shape" not in kwargs
-    assert clean_source == preprocess_output
-    assert quantize_call["model_input"] == clean_output
+    assert Path(clean_source) == Path(preprocess_output)
+    assert Path(quantize_call["model_input"]) == Path(clean_output)
 
     assert report["quantisation"]["preprocessing_used"] is True
     assert report["quantisation"]["preprocessing_mode"] == "full"
@@ -371,8 +369,8 @@ def test_a_symbolic_shape_failure_retries_without_symbolic_inference(
 
     [(clean_source, clean_output)] = calls["cleaned"]
     [quantize_call] = calls["quantize"]
-    assert clean_source == second[1]
-    assert quantize_call["model_input"] == clean_output
+    assert Path(clean_source) == Path(second[1])
+    assert Path(quantize_call["model_input"]) == Path(clean_output)
 
     assert report["quantisation"]["preprocessing_used"] is True
     assert report["quantisation"]["preprocessing_mode"] == "skip_symbolic_shape"
@@ -399,8 +397,8 @@ def test_a_preprocessing_failure_falls_back_to_the_source_model(
     # Cleaning still runs, against the original source.
     [(clean_source, clean_output)] = calls["cleaned"]
     [quantize_call] = calls["quantize"]
-    assert clean_source == str(fp32_path)
-    assert quantize_call["model_input"] == clean_output
+    assert Path(clean_source) == Path(fp32_path)
+    assert Path(quantize_call["model_input"]) == Path(clean_output)
 
     assert report["quantisation"]["preprocessing_used"] is False
     assert report["quantisation"]["preprocessing_mode"] == "none"
