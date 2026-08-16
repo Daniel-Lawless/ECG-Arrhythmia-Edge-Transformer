@@ -1399,3 +1399,85 @@ artifacts/results/deployment_evaluation/quantization/dynamic_int8_quantization_r
 ### Key Lesson
 
 Dynamic quantisation reduced the model size substantially while preserving a valid, executable deployment graph. The next steps are to test FP32-vs-INT8 prediction agreement, classification performance and inference speed.
+
+## Milestone 26 — FP32 vs INT8 Inference Agreement
+
+### Implemented
+
+- Added `evaluate_quantized_inference_agreement.py` to measure the numerical and prediction-level impact of dynamic INT8 quantisation.
+- Evaluated the FP32 and INT8 ONNX models on the exact same real streaming-emitted `BeatSequence` inputs across all six validation records.
+- Added comparison metrics for:
+  - class agreements and disagreements;
+  - class agreement percentage;
+  - FP32-to-INT8 class transition counts;
+  - mean and maximum absolute logit drift;
+  - per-sequence maximum absolute logit drift;
+  - FP32 and INT8 decision margins.
+- Added traceable disagreement records containing the target peak, predicted labels, logits, logit differences and decision margins.
+- Added correctly pooled aggregate statistics across records so records contribute proportionally to their sequence counts.
+- Added `quantization_agreement_plots.py` for:
+  - FP32-vs-INT8 agreement matrices;
+  - FP32-vs-INT8 logit scatter plots;
+  - per-sequence drift histograms;
+  - drift across ECG records;
+  - agreeing-vs-disagreeing FP32 margin comparisons;
+  - aggregate agreement and drift figures.
+- Added unit tests for agreement calculations, logit drift, margins, transition counts, input validation, identical sequence ordering, disagreement tracing, aggregate pooling and plot generation.
+
+### Results
+
+| Metric | Result |
+| ------ | ------: |
+| Validation records | 6 |
+| Sequences compared | 14,556 |
+| Class agreements | 14,461 |
+| Class disagreements | 95 |
+| Class agreement | 99.3473% |
+| Class disagreement | 0.6527% |
+| Mean absolute logit difference | 0.0721 |
+| Maximum absolute logit difference | 1.2124 |
+| Mean per-sequence maximum difference | 0.1409 |
+| Median per-sequence maximum difference | 0.1229 |
+| p95 per-sequence maximum difference | 0.3084 |
+
+Record `122` achieved 100% FP32-vs-INT8 class agreement.
+
+The 95 disagreements were distributed as:
+
+```text
+Record 114: 16
+Record 122:  0
+Record 209: 24
+Record 210:  5
+Record 231:  1
+Record 233: 49
+```
+
+Disagreeing sequences consistently had much smaller FP32 decision margins than agreeing sequences, indicating that quantisation-induced class changes were concentrated around predictions already close to a decision boundary.
+
+Saved outputs:
+
+```text
+artifacts/results/deployment_evaluation/quantization_agreement/
+    quantization_agreement_summary.json
+    fp32_vs_int8_disagreements.json
+    record_<record>.json
+    record_<record>_logits.npz
+
+artifacts/figures/quantization_agreement/
+    aggregate_fp32_vs_int8_agreement.png
+    aggregate_difference_histogram.png
+    record_<record>_fp32_vs_int8_agreement.png
+    record_<record>_logit_scatter.png
+    record_<record>_difference_histogram.png
+    record_<record>_difference_across_record.png
+    record_<record>_margin_comparison.png
+```
+
+### Key Lesson
+
+Dynamic INT8 quantisation preserved the FP32 model's predicted class on **99.35% of 14,556 identical streaming sequences** while introducing only minimal numerical logit drift.
+
+The substantially smaller FP32 margins observed on disagreeing sequences indicate that quantisation primarily changed borderline decisions rather than predictions with strongly separated class logits.
+
+This establishes that the INT8 model retains very high behavioural agreement with the FP32 deployment model. The next step is to compare both models against ground-truth labels to determine whether the remaining prediction changes improve or degrade classification performance.
