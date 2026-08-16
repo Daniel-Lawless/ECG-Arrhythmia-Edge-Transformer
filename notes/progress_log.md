@@ -1462,7 +1462,6 @@ artifacts/results/deployment_evaluation/quantization_agreement/
     quantization_agreement_summary.json
     fp32_vs_int8_disagreements.json
     record_<record>.json
-    record_<record>_logits.npz
 
 artifacts/figures/quantization_agreement/
     aggregate_fp32_vs_int8_agreement.png
