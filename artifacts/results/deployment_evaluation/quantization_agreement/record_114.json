@@ -1,0 +1,92 @@
+{
+    "record_name": "114",
+    "chunk_size": 36,
+    "num_sequences_compared": 1873,
+    "class_agreements": 1857,
+    "class_disagreements": 16,
+    "class_agreement_percentage": 99.145755472504,
+    "class_disagreement_percentage": 0.8542445274959957,
+    "mean_absolute_logit_difference": 0.07864782214164734,
+    "maximum_absolute_logit_difference": 1.2124316692352295,
+    "mean_per_sequence_maximum_absolute_logit_difference": 0.1359167844057083,
+    "median_per_sequence_maximum_absolute_logit_difference": 0.10813373327255249,
+    "p95_per_sequence_maximum_absolute_logit_difference": 0.3353129029273987,
+    "agreement_matrix": [
+        [
+            1657,
+            0,
+            0,
+            16
+        ],
+        [
+            0,
+            5,
+            0,
+            0
+        ],
+        [
+            0,
+            0,
+            48,
+            0
+        ],
+        [
+            0,
+            0,
+            0,
+            147
+        ]
+    ],
+    "transition_counts": {
+        "N_to_S": 0,
+        "N_to_V": 0,
+        "N_to_F": 16,
+        "S_to_N": 0,
+        "S_to_V": 0,
+        "S_to_F": 0,
+        "V_to_N": 0,
+        "V_to_S": 0,
+        "V_to_F": 0,
+        "F_to_N": 0,
+        "F_to_S": 0,
+        "F_to_V": 0
+    },
+    "disagreement_target_peaks": [
+        161261,
+        174846,
+        213906,
+        249158,
+        250269,
+        343282,
+        350627,
+        445232,
+        482149,
+        492870,
+        551370,
+        558288,
+        574629,
+        575527,
+        616131,
+        633513
+    ],
+    "fp32_logit_margin_mean_agreeing": 3.6809680461883545,
+    "fp32_logit_margin_mean_disagreeing": 0.36736637353897095,
+    "largest_drift_sequence": {
+        "target_peak_index": 130682,
+        "fp32_predicted_label": "N",
+        "int8_predicted_label": "N",
+        "fp32_logits": [
+            4.103997707366943,
+            -0.9188974499702454,
+            -3.9249911308288574,
+            0.71832674741745
+        ],
+        "int8_logits": [
+            3.1106958389282227,
+            -1.3910183906555176,
+            -3.774916648864746,
+            1.9307584762573242
+        ],
+        "maximum_absolute_logit_difference": 1.2124316692352295
+    }
+}
