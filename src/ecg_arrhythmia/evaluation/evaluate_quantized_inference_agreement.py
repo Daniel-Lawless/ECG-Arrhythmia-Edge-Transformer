@@ -36,6 +36,7 @@ SUMMARY_FILENAME = "quantization_agreement_summary.json"
 #                          Comparison Helpers
 # ---------------------------------------------------------------------
 
+
 def agreement_matrix(
     reference_classes: NDArray[np.integer],
     comparison_classes: NDArray[np.integer],
@@ -423,14 +424,12 @@ def build_aggregate(
             "One per-sequence difference array is required per record result."
         )
 
-    # Calculate total sequences, agreements, and disagreements for 
+    # Calculate total sequences, agreements, and disagreements for
     # all evaluated records
     total_sequences = sum(
         int(result["num_sequences_compared"]) for result in record_results
     )
-    total_agreements = sum(
-        int(result["class_agreements"]) for result in record_results
-    )
+    total_agreements = sum(int(result["class_agreements"]) for result in record_results)
     total_disagreements = sum(
         int(result["class_disagreements"]) for result in record_results
     )
