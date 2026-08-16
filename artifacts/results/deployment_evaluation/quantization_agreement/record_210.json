@@ -1,0 +1,81 @@
+{
+    "record_name": "210",
+    "chunk_size": 36,
+    "num_sequences_compared": 2591,
+    "class_agreements": 2586,
+    "class_disagreements": 5,
+    "class_agreement_percentage": 99.80702431493633,
+    "class_disagreement_percentage": 0.19297568506368198,
+    "mean_absolute_logit_difference": 0.06972376257181168,
+    "maximum_absolute_logit_difference": 0.6023805141448975,
+    "mean_per_sequence_maximum_absolute_logit_difference": 0.15333068370819092,
+    "median_per_sequence_maximum_absolute_logit_difference": 0.15626907348632812,
+    "p95_per_sequence_maximum_absolute_logit_difference": 0.24352502822875977,
+    "agreement_matrix": [
+        [
+            2385,
+            0,
+            2,
+            0
+        ],
+        [
+            0,
+            25,
+            0,
+            0
+        ],
+        [
+            2,
+            1,
+            175,
+            0
+        ],
+        [
+            0,
+            0,
+            0,
+            1
+        ]
+    ],
+    "transition_counts": {
+        "N_to_S": 0,
+        "N_to_V": 2,
+        "N_to_F": 0,
+        "S_to_N": 0,
+        "S_to_V": 0,
+        "S_to_F": 0,
+        "V_to_N": 2,
+        "V_to_S": 1,
+        "V_to_F": 0,
+        "F_to_N": 0,
+        "F_to_S": 0,
+        "F_to_V": 0
+    },
+    "disagreement_target_peaks": [
+        228154,
+        297761,
+        472613,
+        614276,
+        633270
+    ],
+    "fp32_logit_margin_mean_agreeing": 5.361328125,
+    "fp32_logit_margin_mean_disagreeing": 0.15749946236610413,
+    "largest_drift_sequence": {
+        "target_peak_index": 71935,
+        "fp32_predicted_label": "N",
+        "int8_predicted_label": "N",
+        "fp32_logits": [
+            3.5588958263397217,
+            -1.019967794418335,
+            0.49750611186027527,
+            -1.9826465845108032
+        ],
+        "int8_logits": [
+            2.9641973972320557,
+            -0.8362945318222046,
+            1.0998866558074951,
+            -1.664318561553955
+        ],
+        "maximum_absolute_logit_difference": 0.6023805141448975
+    }
+}

@@ -95,8 +95,8 @@ def write_record_figures(
 
     scatter_path = figures_dir / f"record_{record_name}_logit_scatter.png"
     plot_logit_scatter(
-        pytorch_logits=pytorch_logits,
-        streaming_onnx_logits=streaming_onnx_logits,
+        reference_logits=pytorch_logits,
+        comparison_logits=streaming_onnx_logits,
         title=f"Record {record_name}: PyTorch vs streaming ONNX logits",
         output_path=scatter_path,
     )
@@ -159,20 +159,23 @@ def plot_prediction_agreement_matrix(
 
 
 def plot_logit_scatter(
-    pytorch_logits: NDArray[np.float32],
-    streaming_onnx_logits: NDArray[np.float32],
+    reference_logits: NDArray[np.float32],
+    comparison_logits: NDArray[np.float32],
     title: str,
     output_path: Path,
+    x_label: str = "PyTorch logit",
+    y_label: str = "Streaming ONNX logit",
 ) -> None:
     """
     Plot every class logit from both paths against the ideal y = x.
 
     The axes are shared and equal so the line is a true diagonal and a
-    real disagreement would visibly leave it.
+    real disagreement would visibly leave it. Axis labels default to the
+    Section 3 comparison; other comparisons pass their own.
     """
 
-    reference = np.asarray(pytorch_logits, dtype=np.float32).ravel()
-    comparison = np.asarray(streaming_onnx_logits, dtype=np.float32).ravel()
+    reference = np.asarray(reference_logits, dtype=np.float32).ravel()
+    comparison = np.asarray(comparison_logits, dtype=np.float32).ravel()
 
     plt.figure(figsize=(6, 6))
     ax = plt.gca()

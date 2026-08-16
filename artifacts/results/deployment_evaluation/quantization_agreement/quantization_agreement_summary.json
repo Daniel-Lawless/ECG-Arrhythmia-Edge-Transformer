@@ -1,0 +1,71 @@
+{
+    "num_records_evaluated": 6,
+    "record_names": [
+        "114",
+        "122",
+        "209",
+        "210",
+        "231",
+        "233"
+    ],
+    "chunk_size": 36,
+    "total_sequences_compared": 14556,
+    "total_class_agreements": 14461,
+    "total_class_disagreements": 95,
+    "class_agreement_percentage": 99.34734817257488,
+    "class_disagreement_percentage": 0.6526518274251168,
+    "mean_absolute_logit_difference": 0.07208550067971159,
+    "maximum_absolute_logit_difference": 1.2124316692352295,
+    "mean_per_sequence_maximum_absolute_logit_difference": 0.14085553586483002,
+    "median_per_sequence_maximum_absolute_logit_difference": 0.12294409424066544,
+    "p95_per_sequence_maximum_absolute_logit_difference": 0.3084299564361572,
+    "agreement_matrix": [
+        [
+            12788,
+            20,
+            4,
+            24
+        ],
+        [
+            22,
+            362,
+            2,
+            0
+        ],
+        [
+            9,
+            1,
+            1102,
+            2
+        ],
+        [
+            10,
+            0,
+            1,
+            209
+        ]
+    ],
+    "transition_counts": {
+        "N_to_S": 20,
+        "N_to_V": 4,
+        "N_to_F": 24,
+        "S_to_N": 22,
+        "S_to_V": 2,
+        "S_to_F": 0,
+        "V_to_N": 9,
+        "V_to_S": 1,
+        "V_to_F": 2,
+        "F_to_N": 10,
+        "F_to_S": 0,
+        "F_to_V": 1
+    },
+    "records_with_class_disagreements": [
+        "114",
+        "209",
+        "210",
+        "231",
+        "233"
+    ],
+    "number_of_records_with_class_disagreements": 5,
+    "failed_records": []
+}

@@ -1,0 +1,100 @@
+{
+    "record_name": "209",
+    "chunk_size": 36,
+    "num_sequences_compared": 2999,
+    "class_agreements": 2975,
+    "class_disagreements": 24,
+    "class_agreement_percentage": 99.1997332444148,
+    "class_disagreement_percentage": 0.8002667555851951,
+    "mean_absolute_logit_difference": 0.071322001516819,
+    "maximum_absolute_logit_difference": 1.070923089981079,
+    "mean_per_sequence_maximum_absolute_logit_difference": 0.1329817920923233,
+    "median_per_sequence_maximum_absolute_logit_difference": 0.12769365310668945,
+    "p95_per_sequence_maximum_absolute_logit_difference": 0.21249791979789734,
+    "agreement_matrix": [
+        [
+            2669,
+            20,
+            0,
+            0
+        ],
+        [
+            4,
+            305,
+            0,
+            0
+        ],
+        [
+            0,
+            0,
+            1,
+            0
+        ],
+        [
+            0,
+            0,
+            0,
+            0
+        ]
+    ],
+    "transition_counts": {
+        "N_to_S": 20,
+        "N_to_V": 0,
+        "N_to_F": 0,
+        "S_to_N": 4,
+        "S_to_V": 0,
+        "S_to_F": 0,
+        "V_to_N": 0,
+        "V_to_S": 0,
+        "V_to_F": 0,
+        "F_to_N": 0,
+        "F_to_S": 0,
+        "F_to_V": 0
+    },
+    "disagreement_target_peaks": [
+        69556,
+        118090,
+        142373,
+        154072,
+        203350,
+        204583,
+        205375,
+        208497,
+        208896,
+        209705,
+        209844,
+        218167,
+        218307,
+        221024,
+        254687,
+        266188,
+        268644,
+        287458,
+        295171,
+        333713,
+        346459,
+        355685,
+        465061,
+        582652
+    ],
+    "fp32_logit_margin_mean_agreeing": 4.8084492683410645,
+    "fp32_logit_margin_mean_disagreeing": 0.2478545755147934,
+    "largest_drift_sequence": {
+        "target_peak_index": 355685,
+        "fp32_predicted_label": "N",
+        "int8_predicted_label": "S",
+        "fp32_logits": [
+            2.795745849609375,
+            2.066419839859009,
+            -3.369532823562622,
+            -0.2533969581127167
+        ],
+        "int8_logits": [
+            1.9567536115646362,
+            3.137342929840088,
+            -3.222801923751831,
+            -0.45323604345321655
+        ],
+        "maximum_absolute_logit_difference": 1.070923089981079
+    }
+}
