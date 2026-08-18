@@ -1,0 +1,210 @@
+{
+    "record_name": "122",
+    "chunk_size": 36,
+    "streaming_sequences_observed": 2471,
+    "labelled_sequences_evaluated": 2470,
+    "unlabelled_sequences_excluded": 1,
+    "changed_predictions_excluded_from_ground_truth": 0,
+    "fp32": {
+        "num_sequences": 2470,
+        "accuracy": 0.9995951417004049,
+        "macro_f1": 0.24994938246608625,
+        "per_class": {
+            "N": {
+                "precision": 1.0,
+                "recall": 0.9995951417004049,
+                "f1": 0.999797529864345,
+                "support": 2470
+            },
+            "S": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "support": 0
+            },
+            "V": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "support": 0
+            },
+            "F": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "support": 0
+            }
+        },
+        "confusion_matrix": [
+            [
+                2469,
+                0,
+                1,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                0
+            ]
+        ]
+    },
+    "int8": {
+        "num_sequences": 2470,
+        "accuracy": 0.9995951417004049,
+        "macro_f1": 0.24994938246608625,
+        "per_class": {
+            "N": {
+                "precision": 1.0,
+                "recall": 0.9995951417004049,
+                "f1": 0.999797529864345,
+                "support": 2470
+            },
+            "S": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "support": 0
+            },
+            "V": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "support": 0
+            },
+            "F": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "support": 0
+            }
+        },
+        "confusion_matrix": [
+            [
+                2469,
+                0,
+                1,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                0
+            ]
+        ]
+    },
+    "deltas": {
+        "accuracy_delta": 0.0,
+        "macro_f1_delta": 0.0,
+        "per_class_deltas": {
+            "N": {
+                "precision_delta": 0.0,
+                "recall_delta": 0.0,
+                "f1_delta": 0.0
+            },
+            "S": {
+                "precision_delta": 0.0,
+                "recall_delta": 0.0,
+                "f1_delta": 0.0
+            },
+            "V": {
+                "precision_delta": 0.0,
+                "recall_delta": 0.0,
+                "f1_delta": 0.0
+            },
+            "F": {
+                "precision_delta": 0.0,
+                "recall_delta": 0.0,
+                "f1_delta": 0.0
+            }
+        },
+        "confusion_matrix_delta": [
+            [
+                0,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                0
+            ]
+        ]
+    },
+    "changed_outcomes": {
+        "num_changed": 0,
+        "fp32_correct_int8_wrong": 0,
+        "fp32_wrong_int8_correct": 0,
+        "both_wrong": 0,
+        "net_correct_change": 0,
+        "by_ground_truth_class": {
+            "N": {
+                "fp32_correct_int8_wrong": 0,
+                "fp32_wrong_int8_correct": 0,
+                "both_wrong": 0
+            },
+            "S": {
+                "fp32_correct_int8_wrong": 0,
+                "fp32_wrong_int8_correct": 0,
+                "both_wrong": 0
+            },
+            "V": {
+                "fp32_correct_int8_wrong": 0,
+                "fp32_wrong_int8_correct": 0,
+                "both_wrong": 0
+            },
+            "F": {
+                "fp32_correct_int8_wrong": 0,
+                "fp32_wrong_int8_correct": 0,
+                "both_wrong": 0
+            }
+        }
+    },
+    "transition_outcomes": {},
+    "fp32_logit_margin_medians": {
+        "agreeing": 5.183233261108398,
+        "fp32_correct_int8_wrong": null,
+        "fp32_wrong_int8_correct": null,
+        "both_wrong": null
+    }
+}
