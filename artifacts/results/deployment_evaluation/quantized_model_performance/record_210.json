@@ -1,0 +1,229 @@
+{
+    "record_name": "210",
+    "chunk_size": 36,
+    "streaming_sequences_observed": 2591,
+    "labelled_sequences_evaluated": 2583,
+    "unlabelled_sequences_excluded": 8,
+    "changed_predictions_excluded_from_ground_truth": 0,
+    "fp32": {
+        "num_sequences": 2583,
+        "accuracy": 0.9667053813395277,
+        "macro_f1": 0.5875187506560613,
+        "per_class": {
+            "N": {
+                "precision": 0.9899413243922883,
+                "recall": 0.9776490066225165,
+                "f1": 0.9837567680133278,
+                "support": 2416
+            },
+            "S": {
+                "precision": 0.5217391304347826,
+                "recall": 0.6666666666666666,
+                "f1": 0.5853658536585366,
+                "support": 18
+            },
+            "V": {
+                "precision": 0.7109826589595376,
+                "recall": 0.8661971830985915,
+                "f1": 0.780952380952381,
+                "support": 142
+            },
+            "F": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "support": 7
+            }
+        },
+        "confusion_matrix": [
+            [
+                2362,
+                10,
+                44,
+                0
+            ],
+            [
+                1,
+                12,
+                5,
+                0
+            ],
+            [
+                17,
+                1,
+                123,
+                1
+            ],
+            [
+                6,
+                0,
+                1,
+                0
+            ]
+        ]
+    },
+    "int8": {
+        "num_sequences": 2583,
+        "accuracy": 0.9670925280681378,
+        "macro_f1": 0.5965609693767017,
+        "per_class": {
+            "N": {
+                "precision": 0.9899413243922883,
+                "recall": 0.9776490066225165,
+                "f1": 0.9837567680133278,
+                "support": 2416
+            },
+            "S": {
+                "precision": 0.5416666666666666,
+                "recall": 0.7222222222222222,
+                "f1": 0.6190476190476191,
+                "support": 18
+            },
+            "V": {
+                "precision": 0.7151162790697675,
+                "recall": 0.8661971830985915,
+                "f1": 0.7834394904458599,
+                "support": 142
+            },
+            "F": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "support": 7
+            }
+        },
+        "confusion_matrix": [
+            [
+                2362,
+                10,
+                44,
+                0
+            ],
+            [
+                1,
+                13,
+                4,
+                0
+            ],
+            [
+                17,
+                1,
+                123,
+                1
+            ],
+            [
+                6,
+                0,
+                1,
+                0
+            ]
+        ]
+    },
+    "deltas": {
+        "accuracy_delta": 0.00038714672861017707,
+        "macro_f1_delta": 0.009042218720640371,
+        "per_class_deltas": {
+            "N": {
+                "precision_delta": 0.0,
+                "recall_delta": 0.0,
+                "f1_delta": 0.0
+            },
+            "S": {
+                "precision_delta": 0.019927536231884035,
+                "recall_delta": 0.05555555555555558,
+                "f1_delta": 0.03368176538908252
+            },
+            "V": {
+                "precision_delta": 0.004133620110229885,
+                "recall_delta": 0.0,
+                "f1_delta": 0.0024871094934789673
+            },
+            "F": {
+                "precision_delta": 0.0,
+                "recall_delta": 0.0,
+                "f1_delta": 0.0
+            }
+        },
+        "confusion_matrix_delta": [
+            [
+                0,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                1,
+                -1,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                0
+            ]
+        ]
+    },
+    "changed_outcomes": {
+        "num_changed": 5,
+        "fp32_correct_int8_wrong": 2,
+        "fp32_wrong_int8_correct": 3,
+        "both_wrong": 0,
+        "net_correct_change": 1,
+        "by_ground_truth_class": {
+            "N": {
+                "fp32_correct_int8_wrong": 2,
+                "fp32_wrong_int8_correct": 2,
+                "both_wrong": 0
+            },
+            "S": {
+                "fp32_correct_int8_wrong": 0,
+                "fp32_wrong_int8_correct": 1,
+                "both_wrong": 0
+            },
+            "V": {
+                "fp32_correct_int8_wrong": 0,
+                "fp32_wrong_int8_correct": 0,
+                "both_wrong": 0
+            },
+            "F": {
+                "fp32_correct_int8_wrong": 0,
+                "fp32_wrong_int8_correct": 0,
+                "both_wrong": 0
+            }
+        }
+    },
+    "transition_outcomes": {
+        "N_to_V": {
+            "count": 2,
+            "fp32_correct_int8_wrong": 2,
+            "fp32_wrong_int8_correct": 0,
+            "both_wrong": 0
+        },
+        "V_to_N": {
+            "count": 2,
+            "fp32_correct_int8_wrong": 0,
+            "fp32_wrong_int8_correct": 2,
+            "both_wrong": 0
+        },
+        "V_to_S": {
+            "count": 1,
+            "fp32_correct_int8_wrong": 0,
+            "fp32_wrong_int8_correct": 1,
+            "both_wrong": 0
+        }
+    },
+    "fp32_logit_margin_medians": {
+        "agreeing": 6.096224784851074,
+        "fp32_correct_int8_wrong": 0.24449622631072998,
+        "fp32_wrong_int8_correct": 0.0854640007019043,
+        "both_wrong": null
+    }
+}
