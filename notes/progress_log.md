@@ -1480,3 +1480,76 @@ Dynamic INT8 quantisation preserved the FP32 model's predicted class on **99.35%
 The substantially smaller FP32 margins observed on disagreeing sequences indicate that quantisation primarily changed borderline decisions rather than predictions with strongly separated class logits.
 
 This establishes that the INT8 model retains very high behavioural agreement with the FP32 deployment model. The next step is to compare both models against ground-truth labels to determine whether the remaining prediction changes improve or degrade classification performance.
+
+## Milestone 27 — FP32 vs INT8 Ground-Truth Classification Performance
+
+### Implemented
+
+- Added `evaluate_quantized_model_performance.py` to determine whether INT8 quantisation changes actual classification quality relative to the FP32 deployment model.
+- Evaluated the FP32 and INT8 ONNX models against the same supported ground-truth AAMI labels using identical streaming-emitted sequences.
+- Added ground-truth alignment using detected target R-peaks so both models are scored on exactly the same labelled subset.
+- Added classification metrics for:
+  - accuracy;
+  - macro F1;
+  - per-class precision;
+  - per-class recall;
+  - per-class F1;
+  - per-class support;
+  - confusion matrices.
+- Added signed INT8-minus-FP32 metric deltas for overall and per-class performance.
+- Added analysis of changed predictions to determine whether each FP32-to-INT8 disagreement was:
+  - FP32 correct and INT8 wrong;
+  - FP32 wrong and INT8 correct;
+  - wrong under both models.
+- Added per-ground-truth-class changed-prediction counts and a net correct-prediction change.
+- Recomputed aggregate metrics from pooled labelled predictions across all validation records rather than averaging per-record scores.
+- Added `quantized_model_performance_plots.py` for:
+  - FP32 ground-truth confusion matrix;
+  - INT8 ground-truth confusion matrix;
+  - per-class F1 comparison;
+  - per-class recall comparison;
+  - INT8-minus-FP32 metric deltas;
+  - changed-prediction outcome counts.
+- Added unit tests for ground-truth alignment, classification metrics, metric deltas, changed-prediction outcomes, aggregate pooling and plot generation.
+
+### Results
+
+| **Metric** | **FP32** | **INT8** | **Change** |
+|---|---:|---:|---:|
+| Accuracy | 0.96357 | **0.96563** | **+0.00206** |
+| Macro F1 | 0.67577 | **0.69014** | **+0.01437** |
+| N F1 | 0.98065 | **0.98176** | +0.00111 |
+| S F1 | 0.79353 | **0.83895** | **+0.04542** |
+| V F1 | 0.92891 | **0.93207** | +0.00316 |
+| F F1 | 0.00000 | **0.00778** | +0.00778 |
+
+INT8 therefore did not introduce a classification-performance penalty on the validation data.
+
+Despite the small number of class changes identified during the FP32-vs-INT8 agreement evaluation, the quantised model produced slightly higher accuracy and macro F1.
+
+The largest improvement was on the minority `S` class, where F1 increased from `0.79353` to `0.83895`.
+
+### Saved Outputs
+
+```text
+artifacts/results/deployment_evaluation/quantized_model_performance/
+    quantized_model_performance_summary.json
+    quantized_model_performance_arrays.npz
+
+artifacts/figures/quantized_model_performance/
+    fp32_confusion_matrix.png
+    int8_confusion_matrix.png
+    per_class_f1_comparison.png
+    per_class_recall_comparison.png
+    metric_deltas.png
+    changed_prediction_outcomes.png
+```
+
+### Key Lesson
+
+Dynamic INT8 quantisation preserved the classification quality of the FP32 deployment model and produced a small improvement on the validation data.
+
+The increase in macro F1 from `0.67577` to `0.69014`, together with improvements across all four per-class F1 scores, shows that the prediction changes introduced by quantisation did not degrade ground-truth performance.
+
+This establishes that the substantially smaller INT8 model retains the predictive quality required for deployment evaluation. The next step is to benchmark FP32 and INT8 inference performance under identical conditions to determine whether quantisation also provides a computational advantage.
+
