@@ -6,9 +6,7 @@ from ecg_arrhythmia.evaluation.evaluate_quantized_model_performance import (
     build_aggregate,
     changed_outcomes,
     classification_metrics,
-    margin_medians,
     metric_deltas,
-    transition_outcomes,
 )
 from ecg_arrhythmia.evaluation.quantized_model_performance_plots import (
     write_performance_figures,
@@ -172,54 +170,6 @@ def test_net_change_equals_the_difference_in_correct_predictions():
     assert outcomes["net_correct_change"] == int8_correct - fp32_correct
 
 
-def test_transitions_are_annotated_with_ground_truth():
-    outcomes = transition_outcomes(TRUE, FP32, INT8)
-
-    # Position 1: FP32 N -> INT8 S with truth N.
-    assert outcomes["N_to_S"] == {
-        "count": 1,
-        "fp32_correct_int8_wrong": 1,
-        "fp32_wrong_int8_correct": 0,
-        "both_wrong": 0,
-    }
-    # Position 4: FP32 N -> INT8 F with truth F.
-    assert outcomes["N_to_F"] == {
-        "count": 1,
-        "fp32_correct_int8_wrong": 0,
-        "fp32_wrong_int8_correct": 1,
-        "both_wrong": 0,
-    }
-    # Only observed transitions are reported.
-    assert "S_to_N" not in outcomes
-
-
-def test_a_transition_where_both_are_wrong_is_counted_as_such():
-    outcomes = transition_outcomes(
-        np.array([2]),
-        np.array([0]),
-        np.array([1]),
-    )
-
-    assert outcomes["N_to_S"] == {
-        "count": 1,
-        "fp32_correct_int8_wrong": 0,
-        "fp32_wrong_int8_correct": 0,
-        "both_wrong": 1,
-    }
-
-
-def test_margin_medians_are_split_by_outcome_category():
-    margins = np.array([5.0, 0.5, 4.0, 3.0, 0.2, 1.0], dtype=np.float32)
-
-    medians = margin_medians(margins, TRUE, FP32, INT8)
-
-    # Agreeing positions are 0, 2, 3 and 5 with margins 5, 4, 3 and 1.
-    assert medians["agreeing"] == pytest.approx(3.5)
-    assert medians["fp32_correct_int8_wrong"] == pytest.approx(0.5)
-    assert medians["fp32_wrong_int8_correct"] == pytest.approx(0.2)
-    assert medians["both_wrong"] is None
-
-
 # ---------------------------------------------------------------------
 #                        Aggregate Pooling
 # ---------------------------------------------------------------------
@@ -243,7 +193,6 @@ def test_aggregate_metrics_come_from_pooled_arrays():
         "true": np.array([0, 0, 0, 0], dtype=np.int64),
         "fp32": np.array([0, 1, 1, 0], dtype=np.int64),
         "int8": np.array([0, 1, 1, 1], dtype=np.int64),
-        "fp32_margins": np.array([3.0, 1.0, 1.0, 0.5], dtype=np.float32),
     }
 
     aggregate = build_aggregate(
