@@ -254,7 +254,7 @@ def comparison_metrics(fp32_summary: dict, int8_summary: dict) -> dict:
     """
 
     # returns the change, precentage change, and speedup for
-    # each metric. 
+    # each metric.
     return {
         "mean_latency": latency_comparison(
             fp32_summary["mean"]["mean"],
@@ -305,13 +305,9 @@ def per_record_results(
 
         # For each model and the repeats durations
         for model_name, repeats in durations.items():
-            # Extract the values from each repeats slice that correspond 
+            # Extract the values from each repeats slice that correspond
             # to this record
-            pooled = [
-                duration
-                for repeat in repeats
-                for duration in repeat[start:stop]
-            ]
+            pooled = [duration for repeat in repeats for duration in repeat[start:stop]]
             # Calculate the min, max, mean, median, p95 of this slice
             summary = latency_summary_ms(pooled)
             # Calculate the throughput of this slice.
@@ -319,14 +315,14 @@ def per_record_results(
                 len(pooled),
                 total_seconds(pooled),
             )
-            # Append this models result for this record 
+            # Append this models result for this record
             record_result[model_name] = summary
 
         # Also adds a comparison key to the record result dict that will hold
-        # the speedup between the mean duration of the fp32 predictions for this 
+        # the speedup between the mean duration of the fp32 predictions for this
         # record and the mean duration of the int8 predictions for this record.
         # Similarly for p95. It will also hold the throughput percentage change
-        # between fp32 and int8 on this record. 
+        # between fp32 and int8 on this record.
         record_result["comparison"] = {
             "mean_latency_speedup": (
                 record_result["fp32"]["mean"] / record_result["int8"]["mean"]
@@ -344,7 +340,7 @@ def per_record_results(
             ),
         }
         # Appends this records record_result to the results dict,
-        # which will be a list of dicts, each holding summaries of 
+        # which will be a list of dicts, each holding summaries of
         # the metrics per record
         results.append(record_result)
 
@@ -479,21 +475,17 @@ def main() -> None:
         ("fp32", fp32_initialisation_ms),
         ("int8", int8_initialisation_ms),
     ):
-        # returns a dictionary describing the min, max, median, mean, p95, 
+        # returns a dictionary describing the min, max, median, mean, p95,
         # and throughout of each duration
         per_repeat = repeat_summaries(durations[model_name], len(sequences))
 
         # Combines all FP32 per prediction durations into a list. Same
         # for INT8.
-        pooled = [
-            duration
-            for repeat in durations[model_name]
-            for duration in repeat
-        ]
+        pooled = [duration for repeat in durations[model_name] for duration in repeat]
         # Computes min, max, median, mean, and p95 metrics across all repeats.
         pooled_summary = latency_summary_ms(pooled)
 
-        # Combines results into one dictionary. It includes the classifiers 
+        # Combines results into one dictionary. It includes the classifiers
         # intialisation_ms, its per repeat metrics, its summary across repeat,
         # and metrics across all repeats
         model_results[model_name] = {
@@ -504,7 +496,7 @@ def main() -> None:
         }
 
     # Returns the delta, percentage change, and speedup across each
-    # across repeats metric. 
+    # across repeats metric.
     comparison = comparison_metrics(
         model_results["fp32"]["across_repeats"],
         model_results["int8"]["across_repeats"],
