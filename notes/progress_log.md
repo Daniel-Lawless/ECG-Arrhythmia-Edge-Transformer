@@ -1553,3 +1553,114 @@ The increase in macro F1 from `0.67577` to `0.69014`, together with improvements
 
 This establishes that the substantially smaller INT8 model retains the predictive quality required for deployment evaluation. The next step is to benchmark FP32 and INT8 inference performance under identical conditions to determine whether quantisation also provides a computational advantage.
 
+## Milestone 28 — FP32 vs INT8 Inference Performance Benchmark
+
+### Implemented
+
+- Added `benchmark_quantized_inference.py` to directly compare the computational performance of the FP32 and dynamically quantised INT8 ONNX models.
+- Benchmarked both models using the exact same streaming-emitted `BeatSequence` inputs across all six validation records.
+- Reused the same ONNX Runtime CPU execution provider and identical session configuration for both models.
+- Added 100 warm-up inference calls before each timed pass so the benchmark measures steady-state inference rather than first-call setup effects such as lazy initialisation and buffer allocation.
+- Added five repeated full benchmark passes for each model rather than relying on a single timing run.
+- Added deterministic counterbalancing of model execution order:
+
+```text
+FP32 -> INT8
+INT8 -> FP32
+FP32 -> INT8
+INT8 -> FP32
+FP32 -> INT8
+```
+
+- Alternating which model runs first reduces systematic bias from machine-load, CPU-state and thermal drift during the benchmark.
+- Recorded per-repeat:
+  - minimum latency;
+  - mean latency;
+  - median latency;
+  - p95 latency;
+  - maximum latency;
+  - throughput.
+- Added across-repeat summaries to measure run-to-run variation.
+- Added pooled latency statistics across every timed prediction.
+- Timed FP32 and INT8 classifier initialisation separately from steady-state model inference.
+- Added direct INT8-minus-FP32 comparisons for:
+  - mean latency;
+  - median latency;
+  - p95 latency;
+  - throughput;
+  - classifier initialisation time.
+- Added latency and throughput percentage changes and speedup ratios.
+- Added direct model-size comparison including:
+  - FP32 and INT8 size in bytes and MiB;
+  - absolute size reduction;
+  - percentage reduction;
+  - compression ratio.
+- Preserved record boundaries within the pooled sequence collection so FP32 and INT8 latency could also be compared separately for each validation record.
+- Added `onnx_benchmark_plots.py` for:
+  - FP32-vs-INT8 latency comparison;
+  - FP32-vs-INT8 throughput comparison;
+  - model-size comparison;
+  - per-record mean-latency comparison.
+- Added unit tests for counterbalanced ordering, repeated benchmarking, warm-up behaviour, summary statistics, comparison metrics, model-size calculations, per-record pooling and plot generation.
+
+### Results
+
+The controlled benchmark used all six validation records and the same `14,556` streaming-emitted sequences for both models, with five full timed passes per model and 100 warm-up calls before each pass.
+
+| **Metric** | **FP32** | **INT8** | **INT8 vs FP32** |
+|---|---:|---:|---:|
+| Mean latency | 0.681 ms | 3.658 ms | +436.79% |
+| Median latency | 0.618 ms | 3.493 ms | +465.25% |
+| p95 latency | 1.013 ms | 4.447 ms | +339.15% |
+| Throughput | 1,473.46 sequences/s | 273.41 sequences/s | -81.44% |
+| Classifier initialisation | 88.152 ms | 29.064 ms | -67.03% |
+| Model size | 2.310 MiB | 0.813 MiB | -64.79% |
+
+INT8 reduced the model size by `1.496 MiB`, corresponding to a `64.79%` reduction and approximately `2.84×` compression.
+
+However, this storage benefit did not translate into faster inference on the development-machine CPU:
+
+- INT8 mean latency was approximately `5.37×` slower than FP32.
+- INT8 median latency was approximately `5.65×` slower.
+- INT8 p95 latency was approximately `4.39×` slower.
+- FP32 delivered approximately `5.39×` the throughput of INT8.
+- INT8 classifier initialisation was faster, taking `29.064 ms` compared with `88.152 ms` for FP32.
+
+The same pattern was observed across every validation record:
+
+| **Record** | **FP32 mean latency** | **INT8 mean latency** | **INT8 slowdown** |
+|---|---:|---:|---:|
+| 114 | 0.700 | 3.667 | 5.24× slower |
+| 122 | 0.674 | 3.662 | 5.44× slower |
+| 209 | 0.671 | 3.670 | 5.47× slower |
+| 210 | 0.680 | 3.658 | 5.38× slower |
+| 231 | 0.687 | 3.648 | 5.31× slower |
+| 233 | 0.685 | 3.640 | 5.31× slower |
+
+The repeated and counterbalanced benchmark therefore showed that the slower INT8 inference was consistent across records and was not simply caused by one unusually slow timing pass.
+
+### Saved Outputs
+
+```text
+artifacts/results/deployment_evaluation/onnx_benchmarking/
+    fp32_vs_int8_benchmark.json
+
+artifacts/figures/onnx_benchmarking/
+    fp32_vs_int8_latency.png
+    fp32_vs_int8_throughput.png
+    fp32_vs_int8_model_size.png
+    per_record_mean_latency.png
+```
+
+### Key Lesson
+
+Quantisation does not automatically make a model faster.
+
+Dynamic INT8 quantisation reduced the ONNX model from `2.310 MiB` to `0.813 MiB`, a `64.79%` reduction, while the previous evaluations showed that its prediction behaviour and classification quality remained highly comparable to FP32.
+
+However, the controlled inference benchmark showed that INT8 was slower on the development-machine x86 CPU. Mean latency increased from `0.681 ms` to `3.658 ms`, while throughput fell from `1,473.46` to `273.41` sequences per second.
+
+This shows why model size, predictive quality and runtime performance must be evaluated separately. A quantised model can provide a storage advantage without providing a computational-speed advantage on a particular hardware and runtime combination.
+
+Section 4 now provides the complete deployment evidence for both model precisions: 
+FP32 baseline performance, INT8 model-size reduction, inference agreement, ground-truth classification impact and controlled computational-performance comparison. The next stage is to evaluate both deployment candidates on the target Raspberry Pi hardware.
