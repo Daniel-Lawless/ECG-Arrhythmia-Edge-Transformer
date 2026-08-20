@@ -262,7 +262,7 @@ def compare_runs(
     a small number of decisions.
     """
 
-    # Tells us is both models received/traversed the same sequence stream 
+    # Tells us is both models received/traversed the same sequence stream
     # and produced predictions for the same target beats.
     targets_identical = fp32.target_peaks == int8.target_peaks
 
@@ -281,7 +281,7 @@ def compare_runs(
         # Firs combines each label from each model into a list
         # of tuples, then returns True if they match, False otherwise,
         # and lastly sums over the values. This tells us on how many
-        # events did they agree 
+        # events did they agree
         agreements = sum(
             fp32_label == int8_label
             for fp32_label, int8_label in zip(
@@ -290,7 +290,7 @@ def compare_runs(
                 strict=True,
             )
         )
-        # Update the comparison dictionary to include agreements, disagreements, 
+        # Update the comparison dictionary to include agreements, disagreements,
         # and agreement percentage.
         comparison["class_agreements"] = agreements
         comparison["class_disagreements"] = fp32.num_events - agreements
@@ -396,7 +396,7 @@ def overall_status(
     if not comparison["target_peaks_identical"]:
         reasons.append("FP32 and INT8 traversed different target peaks")
 
-    # If no errors were appended to reasons, then PASSED, else FAILED 
+    # If no errors were appended to reasons, then PASSED, else FAILED
     return {
         "status": "PASSED" if not reasons else "FAILED",
         "reasons": reasons,
@@ -508,6 +508,7 @@ def main() -> None:
 
     if validation["status"] != "PASSED":
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
