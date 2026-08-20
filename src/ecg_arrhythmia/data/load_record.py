@@ -2,7 +2,6 @@ import logging
 from pathlib import Path
 from typing import Any
 
-import matplotlib.pyplot as plt
 import numpy as np
 import wfdb
 
@@ -115,6 +114,10 @@ def plot_record(
     record_name: str, signal: np.ndarray, annotation: wfdb.Annotation, lead_name: str
 ) -> None:
 
+    # Imported here rather than at module level so the record-loading path
+    # stays importable on the matplotlib-free edge runtime.
+    import matplotlib.pyplot as plt
+
     # Plot the first 3000 amplitudes/ 3000/360 ≈ 8.3 seconds
     # of ECG recording for this record
     start = 0
@@ -190,6 +193,10 @@ def plot_r_peak_comparison(
     output_path:
         Location where the generated plot should be saved.
     """
+
+    # Imported here rather than at module level so the record-loading path
+    # stays importable on the matplotlib-free edge runtime.
+    import matplotlib.pyplot as plt
 
     if signal.ndim != 1:
         raise ValueError(
