@@ -1,0 +1,96 @@
+{
+    "environment": {
+        "timestamp": "2026-08-12T16:22:04.759043+00:00",
+        "architecture": "aarch64",
+        "platform": "Linux-6.18.39+rpt-rpi-2712-aarch64-with-glibc2.41",
+        "python_version": "3.13.5",
+        "onnxruntime_version": "1.28.0",
+        "execution_providers": [
+            "CPUExecutionProvider"
+        ],
+        "provider": "CPUExecutionProvider"
+    },
+    "record": {
+        "record_name": "114",
+        "lead_name": "MLII",
+        "sampling_rate": 360.0,
+        "num_samples": 650000,
+        "num_chunks": 18056
+    },
+    "stream_configuration": {
+        "chunk_size": 36,
+        "replay_mode": "accelerated"
+    },
+    "fp32_run": {
+        "precision": "fp32",
+        "model_path": "artifacts/models/ecg_sequence_transformer.onnx",
+        "chunks_processed": 18056,
+        "chunks_accepted": 18056,
+        "samples_accepted": 650000,
+        "prediction_events": 1873,
+        "class_counts": {
+            "N": 1673,
+            "S": 5,
+            "V": 48,
+            "F": 147
+        },
+        "first_target_peak": 2358,
+        "last_target_peak": 649784,
+        "flush_called": true,
+        "flush_prediction_events": 3,
+        "integrity": {
+            "passed": true,
+            "failure_count": 0,
+            "failures": []
+        }
+    },
+    "int8_run": {
+        "precision": "int8",
+        "model_path": "artifacts/models/ecg_sequence_transformer_int8.onnx",
+        "chunks_processed": 18056,
+        "chunks_accepted": 18056,
+        "samples_accepted": 650000,
+        "prediction_events": 1873,
+        "class_counts": {
+            "N": 1656,
+            "S": 5,
+            "V": 48,
+            "F": 164
+        },
+        "first_target_peak": 2358,
+        "last_target_peak": 649784,
+        "flush_called": true,
+        "flush_prediction_events": 3,
+        "integrity": {
+            "passed": true,
+            "failure_count": 0,
+            "failures": []
+        }
+    },
+    "comparison": {
+        "fp32_prediction_events": 1873,
+        "int8_prediction_events": 1873,
+        "target_peaks_identical": true,
+        "class_agreements": 1854,
+        "class_disagreements": 19,
+        "class_agreement_percentage": 98.98558462359851
+    },
+    "hardware_health": {
+        "before": {
+            "total_ram_mib": 990.6875,
+            "available_ram_mib": 664.640625,
+            "temperature_c": 47.2,
+            "throttled": "0x0"
+        },
+        "after": {
+            "total_ram_mib": 990.6875,
+            "available_ram_mib": 656.296875,
+            "temperature_c": 63.1,
+            "throttled": "0x0"
+        }
+    },
+    "runtime_validation": {
+        "status": "PASSED",
+        "reasons": []
+    }
+}
