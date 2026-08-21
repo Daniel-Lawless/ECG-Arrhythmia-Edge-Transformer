@@ -1664,3 +1664,63 @@ This shows why model size, predictive quality and runtime performance must be ev
 
 Section 4 now provides the complete deployment evidence for both model precisions: 
 FP32 baseline performance, INT8 model-size reduction, inference agreement, ground-truth classification impact and controlled computational-performance comparison. The next stage is to evaluate both deployment candidates on the target Raspberry Pi hardware.
+
+## Milestone 29 — Raspberry Pi Target-Hardware Streaming Runtime Validation
+
+### Implemented
+
+- Added `validate_edge_streaming_runtime.py` to validate the production streaming-inference path on the physical Raspberry Pi 5.
+- Ran both FP32 and INT8 ONNX models through the full streaming pipeline using record `114` and 36-sample chunks.
+- Added lightweight event accumulation and integrity checks for:
+  - valid class labels and indices;
+  - finite `(4,)` logits;
+  - strictly increasing target R-peaks;
+  - correct flush behaviour.
+- Confirmed FP32 and INT8 traversed the same target beats without treating class disagreements as runtime failures.
+- Added Raspberry Pi hardware-health monitoring for:
+  - available RAM;
+  - CPU temperature;
+  - throttling status.
+- Recorded the target runtime environment, including ARM64 architecture, Python version, ONNX Runtime version and execution provider.
+- Added unit tests for event integrity, flush handling, FP32-vs-INT8 comparison, telemetry parsing and overall PASS/FAIL behaviour.
+
+### Results
+
+The complete record `114` runtime validation passed on the Raspberry Pi.
+
+| **Metric** | **Result** |
+|---|---:|
+| Samples processed | 650,000 |
+| Chunks processed | 18,056 |
+| FP32 prediction events | 1,873 |
+| INT8 prediction events | 1,873 |
+| Target peaks identical | Yes |
+| FP32-vs-INT8 class agreement | 98.99% |
+| FP32 integrity failures | 0 |
+| INT8 integrity failures | 0 |
+| Final validation status | **PASSED** |
+
+Hardware health remained acceptable throughout the run:
+
+| **Metric** | **Before** | **After** |
+|---|---:|---:|
+| Available RAM | 664.64 MiB | 656.30 MiB |
+| CPU temperature | 47.2 °C | 63.1 °C |
+| Throttled | `0x0` | `0x0` |
+
+No throttling condition was observed.
+
+### Saved Output
+
+```text
+artifacts/results/deployment_evaluation/edge_runtime_validation/
+    record_114_edge_runtime_validation.json
+```
+
+### Key Lesson
+
+The existing streaming-inference pipeline runs successfully on the Raspberry Pi with both FP32 and INT8 ONNX models.
+
+Both precisions processed the full ECG record, emitted predictions for the same target beats, passed all event-integrity checks and completed without observed throttling.
+
+Milestone 29 confirms target-hardware compatibility. The next step is to benchmark FP32 and INT8 inference directly on the Raspberry Pi.
