@@ -1,0 +1,482 @@
+{
+    "model_paths": {
+        "fp32": "artifacts/models/ecg_sequence_transformer.onnx",
+        "int8": "artifacts/models/ecg_sequence_transformer_int8.onnx"
+    },
+    "size": {
+        "fp32_bytes": 2421745,
+        "fp32_mib": 2.309556007385254,
+        "int8_bytes": 852650,
+        "int8_mib": 0.8131504058837891,
+        "reduction_mib": 1.4964056015014648,
+        "reduction_percentage": 64.79191657255409,
+        "compression_ratio": 2.840256846302703
+    },
+    "benchmark": {
+        "target": "raspberry_pi",
+        "record_names": [
+            "114",
+            "122",
+            "209",
+            "210",
+            "231",
+            "233"
+        ],
+        "num_records": 6,
+        "num_sequences": 14556,
+        "sequences_per_record": {
+            "114": 1873,
+            "122": 2471,
+            "209": 2999,
+            "210": 2591,
+            "231": 1564,
+            "233": 3058
+        },
+        "chunk_size": 36,
+        "warmup_calls": 100,
+        "benchmark_repeats": 5,
+        "benchmark_order": [
+            [
+                "fp32",
+                "int8"
+            ],
+            [
+                "int8",
+                "fp32"
+            ],
+            [
+                "fp32",
+                "int8"
+            ],
+            [
+                "int8",
+                "fp32"
+            ],
+            [
+                "fp32",
+                "int8"
+            ]
+        ],
+        "per_record_execution": true,
+        "provider": "CPUExecutionProvider",
+        "session_configuration": "onnxruntime defaults, identical for both"
+    },
+    "fp32": {
+        "classifier_initialisation_ms": 76.913398,
+        "per_repeat": [
+            {
+                "minimum": 1.290335,
+                "mean": 1.3312656651552626,
+                "median": 1.3221954999999999,
+                "p95": 1.3665935,
+                "maximum": 1.553464,
+                "throughput": 751.1648697732862
+            },
+            {
+                "minimum": 1.288501,
+                "mean": 1.3314642035586701,
+                "median": 1.322491,
+                "p95": 1.3667837500000002,
+                "maximum": 1.57563,
+                "throughput": 751.0528614492607
+            },
+            {
+                "minimum": 1.287759,
+                "mean": 1.3315820324951908,
+                "median": 1.3230564999999999,
+                "p95": 1.36679575,
+                "maximum": 1.467517,
+                "throughput": 750.9864023368846
+            },
+            {
+                "minimum": 1.290075,
+                "mean": 1.332385357447101,
+                "median": 1.3231855000000001,
+                "p95": 1.36764725,
+                "maximum": 1.54274,
+                "throughput": 750.5336158272083
+            },
+            {
+                "minimum": 1.288444,
+                "mean": 1.3321226202940366,
+                "median": 1.32324,
+                "p95": 1.367543,
+                "maximum": 1.589796,
+                "throughput": 750.6816450420097
+            }
+        ],
+        "across_repeats": {
+            "mean": {
+                "mean": 1.3317639757900521,
+                "median": 1.3315820324951908,
+                "minimum": 1.3312656651552626,
+                "maximum": 1.332385357447101
+            },
+            "median": {
+                "mean": 1.3228337,
+                "median": 1.3230564999999999,
+                "minimum": 1.3221954999999999,
+                "maximum": 1.32324
+            },
+            "p95": {
+                "mean": 1.3670726500000001,
+                "median": 1.36679575,
+                "minimum": 1.3665935,
+                "maximum": 1.36764725
+            },
+            "maximum": {
+                "mean": 1.5458294000000001,
+                "median": 1.553464,
+                "minimum": 1.467517,
+                "maximum": 1.589796
+            },
+            "minimum": {
+                "mean": 1.2890228000000001,
+                "median": 1.288501,
+                "minimum": 1.287759,
+                "maximum": 1.290335
+            },
+            "throughput": {
+                "mean": 750.8838788857299,
+                "median": 750.9864023368846,
+                "minimum": 750.5336158272083,
+                "maximum": 751.1648697732862
+            }
+        },
+        "pooled_all_repeats": {
+            "minimum": 1.287759,
+            "mean": 1.3317639757900523,
+            "median": 1.322853,
+            "p95": 1.367074,
+            "maximum": 1.589796
+        }
+    },
+    "int8": {
+        "classifier_initialisation_ms": 38.822792,
+        "per_repeat": [
+            {
+                "minimum": 3.81223,
+                "mean": 3.8488238537372905,
+                "median": 3.848432,
+                "p95": 3.86151225,
+                "maximum": 4.601413,
+                "throughput": 259.8196326986954
+            },
+            {
+                "minimum": 3.813451,
+                "mean": 3.849630595561967,
+                "median": 3.848609,
+                "p95": 3.86413675,
+                "maximum": 4.879089,
+                "throughput": 259.76518400306935
+            },
+            {
+                "minimum": 3.811378,
+                "mean": 3.8509413288678207,
+                "median": 3.8491085,
+                "p95": 3.8623054999999997,
+                "maximum": 16.959789,
+                "throughput": 259.6767685094804
+            },
+            {
+                "minimum": 3.816481,
+                "mean": 3.8505625364798024,
+                "median": 3.8492035,
+                "p95": 3.8635805000000003,
+                "maximum": 6.879322,
+                "throughput": 259.70231375964187
+            },
+            {
+                "minimum": 3.815911,
+                "mean": 3.8502734572684805,
+                "median": 3.848339,
+                "p95": 3.86147925,
+                "maximum": 20.719334,
+                "throughput": 259.7218122552353
+            }
+        ],
+        "across_repeats": {
+            "mean": {
+                "mean": 3.850046354383072,
+                "median": 3.8502734572684805,
+                "minimum": 3.8488238537372905,
+                "maximum": 3.8509413288678207
+            },
+            "median": {
+                "mean": 3.8487384,
+                "median": 3.848609,
+                "minimum": 3.848339,
+                "maximum": 3.8492035
+            },
+            "p95": {
+                "mean": 3.8626028499999996,
+                "median": 3.8623054999999997,
+                "minimum": 3.86147925,
+                "maximum": 3.86413675
+            },
+            "maximum": {
+                "mean": 10.8077894,
+                "median": 6.879322,
+                "minimum": 4.601413,
+                "maximum": 20.719334
+            },
+            "minimum": {
+                "mean": 3.8138902000000003,
+                "median": 3.813451,
+                "minimum": 3.811378,
+                "maximum": 3.816481
+            },
+            "throughput": {
+                "mean": 259.73714224522445,
+                "median": 259.7218122552353,
+                "minimum": 259.6767685094804,
+                "maximum": 259.8196326986954
+            }
+        },
+        "pooled_all_repeats": {
+            "minimum": 3.811378,
+            "mean": 3.8500463543830725,
+            "median": 3.848742,
+            "p95": 3.862628,
+            "maximum": 20.719334
+        }
+    },
+    "per_record": [
+        {
+            "record_name": "114",
+            "num_sequences": 1873,
+            "fp32": {
+                "minimum": 1.295095,
+                "mean": 1.3342427771489591,
+                "median": 1.325262,
+                "p95": 1.3702764,
+                "maximum": 1.463132,
+                "throughput": 749.488786543648
+            },
+            "int8": {
+                "minimum": 3.811378,
+                "mean": 3.846784474746396,
+                "median": 3.84434,
+                "p95": 3.8602244000000003,
+                "maximum": 16.959789,
+                "throughput": 259.95737649583975
+            },
+            "comparison": {
+                "mean_latency": {
+                    "delta_ms": 2.512541697597437,
+                    "change_percentage": 188.31218280726196,
+                    "speedup": 0.34684625195616675
+                },
+                "p95_latency_speedup": 0.3549732497416471,
+                "throughput_change_percentage": -65.31537480438332
+            }
+        },
+        {
+            "record_name": "122",
+            "num_sequences": 2471,
+            "fp32": {
+                "minimum": 1.290335,
+                "mean": 1.3305809774180495,
+                "median": 1.320724,
+                "p95": 1.365557,
+                "maximum": 1.490928,
+                "throughput": 751.55140271167
+            },
+            "int8": {
+                "minimum": 3.815911,
+                "mean": 3.851326784216916,
+                "median": 3.848357,
+                "p95": 3.8643121000000002,
+                "maximum": 20.719334,
+                "throughput": 259.6507790764705
+            },
+            "comparison": {
+                "mean_latency": {
+                    "delta_ms": 2.5207458067988666,
+                    "change_percentage": 189.44700469792485,
+                    "speedup": 0.34548638741092813
+                },
+                "p95_latency_speedup": 0.3533764780541406,
+                "throughput_change_percentage": -65.45136125890718
+            }
+        },
+        {
+            "record_name": "209",
+            "num_sequences": 2999,
+            "fp32": {
+                "minimum": 1.287759,
+                "mean": 1.326930765321774,
+                "median": 1.318686,
+                "p95": 1.3621544,
+                "maximum": 1.553464,
+                "throughput": 753.6188218211257
+            },
+            "int8": {
+                "minimum": 3.817778,
+                "mean": 3.8485961477159054,
+                "median": 3.847836,
+                "p95": 3.861501,
+                "maximum": 4.215149,
+                "throughput": 259.8350051858488
+            },
+            "comparison": {
+                "mean_latency": {
+                    "delta_ms": 2.5216653823941315,
+                    "change_percentage": 190.0374494506984,
+                    "speedup": 0.3447830622886454
+                },
+                "p95_latency_speedup": 0.35275256953189965,
+                "throughput_change_percentage": -65.52169377113546
+            }
+        },
+        {
+            "record_name": "210",
+            "num_sequences": 2591,
+            "fp32": {
+                "minimum": 1.296185,
+                "mean": 1.3323012442300268,
+                "median": 1.32213,
+                "p95": 1.366611,
+                "maximum": 1.589796,
+                "throughput": 750.5809998533231
+            },
+            "int8": {
+                "minimum": 3.816481,
+                "mean": 3.849538978232343,
+                "median": 3.849055,
+                "p95": 3.860981,
+                "maximum": 3.94687,
+                "throughput": 259.7713662998645
+            },
+            "comparison": {
+                "mean_latency": {
+                    "delta_ms": 2.5172377340023164,
+                    "change_percentage": 188.93908152559723,
+                    "speedup": 0.3460937145366435
+                },
+                "p95_latency_speedup": 0.3539543447636753,
+                "throughput_change_percentage": -65.39062854633565
+            }
+        },
+        {
+            "record_name": "231",
+            "num_sequences": 1564,
+            "fp32": {
+                "minimum": 1.300407,
+                "mean": 1.3373731277493608,
+                "median": 1.328638,
+                "p95": 1.3715929,
+                "maximum": 1.5065,
+                "throughput": 747.7344798178207
+            },
+            "int8": {
+                "minimum": 3.819628,
+                "mean": 3.851609422634271,
+                "median": 3.850424,
+                "p95": 3.8632200500000002,
+                "maximum": 5.219016,
+                "throughput": 259.63172540897455
+            },
+            "comparison": {
+                "mean_latency": {
+                    "delta_ms": 2.51423629488491,
+                    "change_percentage": 187.99811680948528,
+                    "speedup": 0.34722449267316347
+                },
+                "p95_latency_speedup": 0.3550387713482694,
+                "throughput_change_percentage": -65.27755073268365
+            }
+        },
+        {
+            "record_name": "233",
+            "num_sequences": 3058,
+            "fp32": {
+                "minimum": 1.288444,
+                "mean": 1.3326176108567693,
+                "median": 1.3227585,
+                "p95": 1.366684,
+                "maximum": 1.534406,
+                "throughput": 750.4028101182589
+            },
+            "int8": {
+                "minimum": 3.824238,
+                "mean": 3.852062280183126,
+                "median": 3.850608,
+                "p95": 3.864534,
+                "maximum": 4.879089,
+                "throughput": 259.6012024895039
+            },
+            "comparison": {
+                "mean_latency": {
+                    "delta_ms": 2.519444669326357,
+                    "change_percentage": 189.05983597999656,
+                    "speedup": 0.34594913423710716
+                },
+                "p95_latency_speedup": 0.3536478136820636,
+                "throughput_change_percentage": -65.40508657628929
+            }
+        }
+    ],
+    "comparison": {
+        "mean_latency": {
+            "delta_ms": 2.51828237859302,
+            "change_percentage": 189.09374516599917,
+            "speedup": 0.3459085562109947
+        },
+        "median_latency": {
+            "delta_ms": 2.5259047,
+            "change_percentage": 190.9465037063994,
+            "speedup": 0.34370579720357197
+        },
+        "p95_latency": {
+            "delta_ms": 2.4955301999999993,
+            "change_percentage": 182.54554357443982,
+            "speedup": 0.3539252424048722
+        },
+        "throughput": {
+            "delta": -491.1467366405055,
+            "change_percentage": -65.40914653399405,
+            "speedup": 0.3459085346600595
+        }
+    },
+    "cross_platform": {
+        "x86_fp32_mean_latency_ms": 0.6813652722039023,
+        "pi_fp32_mean_latency_ms": 1.3317639757900521,
+        "fp32_pi_over_x86_latency_ratio": 1.9545521765181986,
+        "x86_int8_mean_latency_ms": 3.6575194830585325,
+        "pi_int8_mean_latency_ms": 3.850046354383072,
+        "int8_pi_over_x86_latency_ratio": 1.0526386454580257,
+        "x86_int8_vs_fp32_speedup": 0.1862916316262855,
+        "pi_int8_vs_fp32_speedup": 0.3459085562109947
+    },
+    "hardware_health": {
+        "before": {
+            "total_ram_mib": 990.6875,
+            "available_ram_mib": 668.21875,
+            "temperature_c": 51.0,
+            "throttled": "0x0",
+            "cpu_governor": "ondemand",
+            "cpu_frequency_khz": 2400000
+        },
+        "after": {
+            "total_ram_mib": 990.6875,
+            "available_ram_mib": 619.0625,
+            "temperature_c": 69.2,
+            "throttled": "0x0",
+            "cpu_governor": "ondemand",
+            "cpu_frequency_khz": 2400000
+        }
+    },
+    "timing_interpretation_warning": null,
+    "environment": {
+        "timestamp": "2026-08-12T16:57:01.586365+00:00",
+        "python_version": "3.13.5",
+        "platform": "Linux-6.18.39+rpt-rpi-2712-aarch64-with-glibc2.41",
+        "machine": "aarch64",
+        "processor": "",
+        "onnxruntime_version": "1.28.0",
+        "execution_providers": [
+            "CPUExecutionProvider"
+        ]
+    }
+}

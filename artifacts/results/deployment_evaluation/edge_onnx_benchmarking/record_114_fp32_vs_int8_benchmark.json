@@ -1,0 +1,327 @@
+{
+    "model_paths": {
+        "fp32": "artifacts/models/ecg_sequence_transformer.onnx",
+        "int8": "artifacts/models/ecg_sequence_transformer_int8.onnx"
+    },
+    "size": {
+        "fp32_bytes": 2421745,
+        "fp32_mib": 2.309556007385254,
+        "int8_bytes": 852650,
+        "int8_mib": 0.8131504058837891,
+        "reduction_mib": 1.4964056015014648,
+        "reduction_percentage": 64.79191657255409,
+        "compression_ratio": 2.840256846302703
+    },
+    "benchmark": {
+        "target": "raspberry_pi",
+        "record_names": [
+            "114"
+        ],
+        "num_records": 1,
+        "num_sequences": 1873,
+        "sequences_per_record": {
+            "114": 1873
+        },
+        "chunk_size": 36,
+        "warmup_calls": 100,
+        "benchmark_repeats": 5,
+        "benchmark_order": [
+            [
+                "fp32",
+                "int8"
+            ],
+            [
+                "int8",
+                "fp32"
+            ],
+            [
+                "fp32",
+                "int8"
+            ],
+            [
+                "int8",
+                "fp32"
+            ],
+            [
+                "fp32",
+                "int8"
+            ]
+        ],
+        "per_record_execution": true,
+        "provider": "CPUExecutionProvider",
+        "session_configuration": "onnxruntime defaults, identical for both"
+    },
+    "fp32": {
+        "classifier_initialisation_ms": 124.543063,
+        "per_repeat": [
+            {
+                "minimum": 1.288153,
+                "mean": 1.3264016284036306,
+                "median": 1.317339,
+                "p95": 1.3633282,
+                "maximum": 1.543266,
+                "throughput": 753.919460430348
+            },
+            {
+                "minimum": 1.286561,
+                "mean": 1.3253776433529099,
+                "median": 1.317005,
+                "p95": 1.3622428,
+                "maximum": 1.45682,
+                "throughput": 754.5019376290542
+            },
+            {
+                "minimum": 1.288449,
+                "mean": 1.3255844965296317,
+                "median": 1.31619,
+                "p95": 1.3627904,
+                "maximum": 1.651044,
+                "throughput": 754.384200040051
+            },
+            {
+                "minimum": 1.278487,
+                "mean": 1.3256055306994128,
+                "median": 1.316505,
+                "p95": 1.3631457999999999,
+                "maximum": 1.441524,
+                "throughput": 754.3722297781773
+            },
+            {
+                "minimum": 1.287634,
+                "mean": 1.3262397303790712,
+                "median": 1.317283,
+                "p95": 1.3637716,
+                "maximum": 1.931192,
+                "throughput": 754.0114936190128
+            }
+        ],
+        "across_repeats": {
+            "mean": {
+                "mean": 1.325841805872931,
+                "median": 1.3256055306994128,
+                "minimum": 1.3253776433529099,
+                "maximum": 1.3264016284036306
+            },
+            "median": {
+                "mean": 1.3168644,
+                "median": 1.317005,
+                "minimum": 1.31619,
+                "maximum": 1.317339
+            },
+            "p95": {
+                "mean": 1.36305576,
+                "median": 1.3631457999999999,
+                "minimum": 1.3622428,
+                "maximum": 1.3637716
+            },
+            "maximum": {
+                "mean": 1.6047692000000002,
+                "median": 1.543266,
+                "minimum": 1.441524,
+                "maximum": 1.931192
+            },
+            "minimum": {
+                "mean": 1.2858568,
+                "median": 1.287634,
+                "minimum": 1.278487,
+                "maximum": 1.288449
+            },
+            "throughput": {
+                "mean": 754.2378642993286,
+                "median": 754.3722297781773,
+                "minimum": 753.919460430348,
+                "maximum": 754.5019376290542
+            }
+        },
+        "pooled_all_repeats": {
+            "minimum": 1.278487,
+            "mean": 1.325841805872931,
+            "median": 1.316838,
+            "p95": 1.3630942,
+            "maximum": 1.931192
+        }
+    },
+    "int8": {
+        "classifier_initialisation_ms": 38.551643,
+        "per_repeat": [
+            {
+                "minimum": 3.828941,
+                "mean": 3.85978266417512,
+                "median": 3.858553,
+                "p95": 3.8712086,
+                "maximum": 4.62089,
+                "throughput": 259.0819450228583
+            },
+            {
+                "minimum": 3.832627,
+                "mean": 3.8603813459690337,
+                "median": 3.85896,
+                "p95": 3.8716192,
+                "maximum": 5.222595,
+                "throughput": 259.0417656649877
+            },
+            {
+                "minimum": 3.830386,
+                "mean": 3.8613768419647623,
+                "median": 3.860959,
+                "p95": 3.8743374000000004,
+                "maximum": 3.956441,
+                "throughput": 258.97498248090585
+            },
+            {
+                "minimum": 3.833663,
+                "mean": 3.8615327394554195,
+                "median": 3.860737,
+                "p95": 3.873408,
+                "maximum": 4.479942,
+                "throughput": 258.9645271636431
+            },
+            {
+                "minimum": 3.833144,
+                "mean": 3.865744332621463,
+                "median": 3.85944,
+                "p95": 3.8708658000000002,
+                "maximum": 11.914488,
+                "throughput": 258.68239437393777
+            }
+        ],
+        "across_repeats": {
+            "mean": {
+                "mean": 3.86176358483716,
+                "median": 3.8613768419647623,
+                "minimum": 3.85978266417512,
+                "maximum": 3.865744332621463
+            },
+            "median": {
+                "mean": 3.8597298,
+                "median": 3.85944,
+                "minimum": 3.858553,
+                "maximum": 3.860959
+            },
+            "p95": {
+                "mean": 3.8722878,
+                "median": 3.8716192,
+                "minimum": 3.8708658000000002,
+                "maximum": 3.8743374000000004
+            },
+            "maximum": {
+                "mean": 6.0388712,
+                "median": 4.62089,
+                "minimum": 3.956441,
+                "maximum": 11.914488
+            },
+            "minimum": {
+                "mean": 3.8317521999999995,
+                "median": 3.832627,
+                "minimum": 3.828941,
+                "maximum": 3.833663
+            },
+            "throughput": {
+                "mean": 258.9491229412665,
+                "median": 258.97498248090585,
+                "minimum": 258.68239437393777,
+                "maximum": 259.0819450228583
+            }
+        },
+        "pooled_all_repeats": {
+            "minimum": 3.828941,
+            "mean": 3.86176358483716,
+            "median": 3.859757,
+            "p95": 3.8724968,
+            "maximum": 11.914488
+        }
+    },
+    "per_record": [
+        {
+            "record_name": "114",
+            "num_sequences": 1873,
+            "fp32": {
+                "minimum": 1.278487,
+                "mean": 1.325841805872931,
+                "median": 1.316838,
+                "p95": 1.3630942,
+                "maximum": 1.931192,
+                "throughput": 754.2377948639222
+            },
+            "int8": {
+                "minimum": 3.828941,
+                "mean": 3.86176358483716,
+                "median": 3.859757,
+                "p95": 3.8724968,
+                "maximum": 11.914488,
+                "throughput": 258.9490469914842
+            },
+            "comparison": {
+                "mean_latency": {
+                    "delta_ms": 2.5359217789642288,
+                    "change_percentage": 191.26880505133747,
+                    "speedup": 0.34332547209226383
+                },
+                "p95_latency_speedup": 0.3519936285034503,
+                "throughput_change_percentage": -65.66745279077361
+            }
+        }
+    ],
+    "comparison": {
+        "mean_latency": {
+            "delta_ms": 2.5359217789642288,
+            "change_percentage": 191.26880505133747,
+            "speedup": 0.34332547209226383
+        },
+        "median_latency": {
+            "delta_ms": 2.5428654,
+            "change_percentage": 193.10001849848777,
+            "speedup": 0.34118046294328686
+        },
+        "p95_latency": {
+            "delta_ms": 2.50923204,
+            "change_percentage": 184.08873016317398,
+            "speedup": 0.3520026997993279
+        },
+        "throughput": {
+            "delta": -495.2887413580621,
+            "change_percentage": -65.6674458817014,
+            "speedup": 0.34332554118298597
+        }
+    },
+    "cross_platform": {
+        "x86_fp32_mean_latency_ms": 0.6813652722039023,
+        "pi_fp32_mean_latency_ms": 1.325841805872931,
+        "fp32_pi_over_x86_latency_ratio": 1.9458605537444615,
+        "x86_int8_mean_latency_ms": 3.6575194830585325,
+        "pi_int8_mean_latency_ms": 3.86176358483716,
+        "int8_pi_over_x86_latency_ratio": 1.0558422457418688,
+        "x86_int8_vs_fp32_speedup": 0.1862916316262855,
+        "pi_int8_vs_fp32_speedup": 0.34332547209226383
+    },
+    "hardware_health": {
+        "before": {
+            "total_ram_mib": 990.6875,
+            "available_ram_mib": 662.453125,
+            "temperature_c": 52.1,
+            "throttled": "0x0",
+            "cpu_governor": "ondemand",
+            "cpu_frequency_khz": 2400000
+        },
+        "after": {
+            "total_ram_mib": 990.6875,
+            "available_ram_mib": 648.484375,
+            "temperature_c": 70.8,
+            "throttled": "0x0",
+            "cpu_governor": "ondemand",
+            "cpu_frequency_khz": 2400000
+        }
+    },
+    "timing_interpretation_warning": null,
+    "environment": {
+        "timestamp": "2026-08-12T16:44:46.220981+00:00",
+        "python_version": "3.13.5",
+        "platform": "Linux-6.18.39+rpt-rpi-2712-aarch64-with-glibc2.41",
+        "machine": "aarch64",
+        "processor": "",
+        "onnxruntime_version": "1.28.0",
+        "execution_providers": [
+            "CPUExecutionProvider"
+        ]
+    }
+}
