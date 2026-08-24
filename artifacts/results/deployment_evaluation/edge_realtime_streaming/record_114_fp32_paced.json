@@ -1,0 +1,118 @@
+{
+    "precision": "fp32",
+    "model_path": "artifacts/models/ecg_sequence_transformer.onnx",
+    "record_name": "114",
+    "sampling_rate": 360.0,
+    "chunk_size": 36,
+    "chunk_period_ms": 100.0,
+    "num_samples": 650000,
+    "signal_duration_seconds": 1805.5555555555557,
+    "truncated": false,
+    "chunks_processed": 18056,
+    "paced_wall_seconds": 1805.500067433,
+    "chunk_processing_ms": {
+        "minimum": 0.009314,
+        "mean": 1.750627976295968,
+        "median": 0.016204,
+        "p95": 0.03456975,
+        "maximum": 112.614753
+    },
+    "deadline_utilisation": {
+        "mean_fraction": 0.01750627976295968,
+        "p95_fraction": 0.0003456975
+    },
+    "scheduling_lateness_ms": {
+        "mean": 0.11396895137350466,
+        "median": 0.055589,
+        "p95": 0.06127825,
+        "maximum": 12.774795,
+        "final": 0.054229
+    },
+    "deadline": {
+        "total_chunks": 18056,
+        "deadline_misses": 164,
+        "deadline_miss_percentage": 0.9082853345148427,
+        "maximum_deadline_lateness_ms": 12.672221,
+        "mean_missed_deadline_lateness_ms": 6.326794719512194,
+        "missed_chunk_indices": [
+            299,
+            399,
+            499,
+            599,
+            699,
+            799,
+            899,
+            999,
+            1099,
+            1199
+        ]
+    },
+    "flush_ms": 65.266298,
+    "emission_split": {
+        "prediction_emitting_chunks": 360,
+        "non_prediction_emitting_chunks": 17696,
+        "prediction_emitting_latency_ms": {
+            "minimum": 38.357642,
+            "mean": 87.028810375,
+            "median": 76.91634450000001,
+            "p95": 109.3567302,
+            "maximum": 112.614753
+        },
+        "non_prediction_emitting_latency_ms": {
+            "minimum": 0.009314,
+            "mean": 0.015764410318716095,
+            "median": 0.016166,
+            "p95": 0.02598125,
+            "maximum": 0.10774
+        }
+    },
+    "prediction_events": 1873,
+    "flush_prediction_events": 3,
+    "class_counts": {
+        "N": 1673,
+        "S": 5,
+        "V": 48,
+        "F": 147
+    },
+    "integrity": {
+        "passed": true,
+        "failure_count": 0,
+        "failures": []
+    },
+    "provider": "CPUExecutionProvider",
+    "hardware_health": {
+        "before": {
+            "total_ram_mib": 990.6875,
+            "available_ram_mib": 688.671875,
+            "temperature_c": 49.4,
+            "throttled": "0x0",
+            "cpu_governor": "ondemand",
+            "cpu_frequency_khz": 2400000
+        },
+        "after": {
+            "total_ram_mib": 990.6875,
+            "available_ram_mib": 665.796875,
+            "temperature_c": 48.3,
+            "throttled": "0x0",
+            "cpu_governor": "ondemand",
+            "cpu_frequency_khz": 2400000
+        }
+    },
+    "timing_interpretation_warning": null,
+    "runtime_validation": {
+        "status": "PASSED",
+        "reasons": []
+    },
+    "environment": {
+        "timestamp": "2026-08-12T17:58:40.143258+00:00",
+        "python_version": "3.13.5",
+        "platform": "Linux-6.18.39+rpt-rpi-2712-aarch64-with-glibc2.41",
+        "machine": "aarch64",
+        "processor": "",
+        "onnxruntime_version": "1.28.0",
+        "execution_providers": [
+            "CPUExecutionProvider"
+        ]
+    },
+    "paced_fp32_vs_int8": null
+}
