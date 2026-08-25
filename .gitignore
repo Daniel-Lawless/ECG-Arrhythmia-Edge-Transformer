@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 .pytest_cache/
 *.npy
+*.npz
 /data/
 *.egg-info/
 artifacts/models/
