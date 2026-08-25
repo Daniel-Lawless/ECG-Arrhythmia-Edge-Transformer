@@ -1724,3 +1724,80 @@ The existing streaming-inference pipeline runs successfully on the Raspberry Pi 
 Both precisions processed the full ECG record, emitted predictions for the same target beats, passed all event-integrity checks and completed without observed throttling.
 
 Milestone 29 confirms target-hardware compatibility. The next step is to benchmark FP32 and INT8 inference directly on the Raspberry Pi.
+
+## Milestone 30 — Raspberry Pi Real-Time Streaming and CPU Governor Evaluation
+
+### Implemented
+
+- Added `benchmark_edge_realtime_streaming.py` to benchmark the complete production streaming pipeline on the Raspberry Pi at the ECG signal's real arrival rate.
+- Replayed record `114` using:
+  - 360 Hz sampling;
+  - 36-sample chunks;
+  - a 100 ms chunk period;
+  - 18,056 paced chunks across the full 650,000-sample record.
+- Anchored each chunk to an absolute schedule from the replay start so processing delays could not shift later nominal arrival times.
+- Recorded per-chunk:
+  - scheduled arrival time;
+  - actual processing start time;
+  - processing completion time;
+  - processing latency.
+- Added real-time timing statistics for:
+  - mean, median, p95 and maximum chunk-processing latency;
+  - scheduling lateness;
+  - deadline utilisation;
+  - deadline misses and deadline lateness.
+- Timed final stream flushing separately from normal chunk processing.
+- Added Raspberry Pi health snapshots around each benchmark run.
+- Added `edge_realtime_streaming_plots.py` for latency distributions, scheduling-lateness plots and direct CPU-governor comparison.
+- Added unit tests for the paced scheduling logic, deadline calculations, timing boundaries, flush accounting and runtime-light imports.
+- Repeated the FP32 and INT8 paced benchmark under both the `ondemand` and `performance` CPU governors.
+
+### Results
+
+Each run processed the complete record using a 100 ms real-time chunk deadline.
+
+| **Metric** | **FP32 — ondemand** | **FP32 — performance** | **INT8 — ondemand** | **INT8 — performance** |
+|:---:|:---:|:---:|:---:|:---:|
+| Mean chunk latency | 1.7506 ms | **1.3732 ms** | 2.0410 ms | **1.6349 ms** |
+| Maximum chunk latency | 112.6148 ms | **78.4367 ms** | 135.5550 ms | **92.9398 ms** |
+| Maximum scheduling lateness | 12.7748 ms | **0.0724 ms** | 35.7326 ms | **0.0742 ms** |
+| Deadline misses | 164 | **0** | 178 | **0** |
+| Deadline miss rate | 0.9083% | **0.0000%** | 0.9858% | **0.0000%** |
+| Worst deadline lateness | +12.6722 ms | **-21.5089 ms** | +35.6119 ms | **-7.0065 ms** |
+
+A negative worst deadline-lateness value means every chunk completed before its deadline. Under the `performance` governor, FP32 retained at least 21.51 ms of deadline headroom and INT8 retained at least 7.01 ms.
+
+The `ondemand` governor produced repeated latency excursions beyond the 100 ms chunk period, causing 164 FP32 and 178 INT8 deadline misses. Switching to `performance` removed all deadline misses for both models and reduced maximum scheduling lateness to below 0.08 ms.
+
+All four runs completed with valid prediction-event integrity and no observed throttling. The `performance` runs also completed at the full 2.4 GHz governor configuration.
+
+### Saved Outputs
+
+```text
+artifacts/results/deployment_evaluation/edge_realtime_streaming/
+    record_114_fp32_paced.json
+    record_114_int8_paced.json
+
+artifacts/results/deployment_evaluation/edge_realtime_streaming_perf_governor/
+    record_114_fp32_paced.json
+    record_114_int8_paced.json
+```
+
+Saved figures:
+
+```text
+artifacts/figures/edge_realtime_streaming/
+    governor_comparison_latency.png
+    ondemand_paced_latency_distribution.png
+    ondemand_paced_scheduling_lateness.png
+    performance_paced_latency_distribution.png
+    performance_paced_scheduling_lateness.png
+```
+
+### Key Lesson
+
+A pipeline can be fast on average while still failing real-time requirements because rare latency spikes can exceed the next chunk's deadline.
+
+The original `ondemand` configuration produced isolated deadline misses for both FP32 and INT8 even though typical chunk-processing latency was far below the 100 ms budget. Running the Raspberry Pi with the `performance` governor removed these misses, greatly reduced scheduling jitter and kept the worst processing latency below the chunk period for both precisions.
+
+The `performance` governor was therefore selected for the remaining sustained Raspberry Pi deployment evaluation.
