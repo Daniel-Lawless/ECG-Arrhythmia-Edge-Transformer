@@ -1801,3 +1801,116 @@ A pipeline can be fast on average while still failing real-time requirements bec
 The original `ondemand` configuration produced isolated deadline misses for both FP32 and INT8 even though typical chunk-processing latency was far below the 100 ms budget. Running the Raspberry Pi with the `performance` governor removed these misses, greatly reduced scheduling jitter and kept the worst processing latency below the chunk period for both precisions.
 
 The `performance` governor was therefore selected for the remaining sustained Raspberry Pi deployment evaluation.
+
+## Milestone 31 — Raspberry Pi Sustained Resource and Stability Evaluation
+
+### Implemented
+
+- Added `monitor_edge_sustained_resources.py` to evaluate the production streaming pipeline over sustained real-time Raspberry Pi runs.
+- Reused the existing real-time pacing logic so ECG chunks continued to arrive according to their true 360 Hz signal timing.
+- Cycled through the validation records: `114`, `122`, `209`, `210`, `231`, `233`.
+- Ran matched 60-minute sustained evaluations for FP32 and INT8 ONNX using the `performance` CPU governor.
+- Added periodic Raspberry Pi telemetry collection for:
+  - CPU temperature and frequency;
+  - process and system CPU utilisation;
+  - process RSS and available RAM;
+  - throttling state.
+- Continued recording streaming behaviour including:
+  - processed chunks and predictions;
+  - processing latency and scheduling lateness;
+  - deadline misses and minimum deadline margin;
+  - prediction-event integrity.
+- Added RSS trend estimation using total RSS change, fitted MiB/hour trend and residual scatter.
+- Added correlation of deadline misses with the nearest hardware-telemetry sample for later investigation.
+- Added `edge_sustained_resource_plots.py` for sustained telemetry and FP32-vs-INT8 comparisons.
+- Added an extended 210-minute FP32 endurance run to investigate longer-term memory behaviour.
+- Added unit tests for the sustained monitoring and plotting utilities.
+
+### Results
+
+Both matched 60-minute runs processed 36,000 real-time chunks without a deadline miss or prediction-integrity failure.
+
+| Metric | FP32 — 60 min | INT8 — 60 min |
+|:---:|:---:|:---:|
+| Chunks processed | 36,000 | 36,000 |
+| Predictions | 4,329 | 4,329 |
+| Deadline misses | **0** | **0** |
+| Integrity failures | **0** | **0** |
+| Maximum processing latency | **84.59 ms** | 97.57 ms |
+| Minimum deadline margin | **15.36 ms** | 2.38 ms |
+| Mean process CPU | **3.46%** | 4.67% |
+| Mean system CPU | **0.88%** | 1.18% |
+| Maximum temperature | 49.6 °C | 49.6 °C |
+| Mean temperature | 47.41 °C | 47.40 °C |
+| RSS change | +6.70 MiB | +7.63 MiB |
+| Fitted RSS trend | +5.42 MiB/hour | +4.85 MiB/hour |
+| Throttling observed | No | No |
+
+The two runs produced an identical 4,329 predictions because R-peak detection occurs before model inference. XQRS therefore processed the same signal and emitted the same beats for both precisions, ensuring that both models classified the same sequences.
+
+FP32 retained substantially more worst-case real-time headroom. Its slowest chunk required 84.59 ms compared with 97.57 ms for INT8, leaving minimum deadline margins of 15.36 ms and 2.38 ms respectively. Both met the 100 ms deadline throughout the hour, but INT8 operated much closer to the limit.
+
+FP32 also used less process CPU on average: 3.46% of one logical core compared with 4.67% for INT8. Whole-system CPU utilisation remained low for both runs, supporting the conclusion that background system load was limited during the experiment.
+
+Thermal behaviour was effectively identical. Both runs averaged approximately 47.4 °C, reached 49.6 °C and remained at the full 2.4 GHz CPU frequency without observed throttling.
+
+Process RSS increased by 6.70 MiB for FP32 and 7.63 MiB for INT8, with fitted trends of +5.42 and +4.85 MiB/hour. These trends are reported descriptively rather than being treated as evidence of a memory leak.
+
+### Extended FP32 Endurance Run
+
+FP32 was subsequently streamed for 210 minutes to investigate whether the shorter-run memory trend continued.
+
+| Metric | FP32 — 210 min |
+|:---:|:---:|
+| Paced duration | 210 minutes |
+| Chunks processed | 126,002 |
+| Predictions | 16,381 |
+| Deadline misses | **0** |
+| Integrity failures | **0** |
+| Maximum processing latency | 79.97 ms |
+| Minimum deadline margin | 19.98 ms |
+| Mean process CPU | 3.52% |
+| Mean system CPU | 0.89% |
+| Mean temperature | 47.91 °C |
+| Maximum temperature | 50.7 °C |
+| RSS change | +8.80 MiB |
+| Fitted RSS trend | +1.41 MiB/hour |
+| Throttling observed | No |
+
+The extended run processed more than 126,000 paced chunks without a deadline miss, integrity failure or throttling event.
+
+RSS reached 255.55 MiB after 210 minutes, an increase of 8.80 MiB. However, the fitted trend fell to approximately +1.41 MiB/hour and the telemetry shows the initial increase progressively flattening.
+
+The longer run therefore provides stronger evidence that the one-hour RSS slope should not be extrapolated indefinitely. It does not prove the absence of a memory leak, but no runaway memory growth was observed over the tested 3.5-hour period.
+
+### Saved Outputs
+
+```text
+artifacts/results/deployment_evaluation/edge_sustained_resources/
+    fp32_sustained_60min.json
+    fp32_sustained_60min_raw.npz
+    int8_sustained_60min.json
+    int8_sustained_60min_raw.npz
+    fp32_sustained_210min.json
+    fp32_sustained_210min_raw.npz
+```
+
+Saved figures:
+
+```text
+artifacts/figures/edge_sustained_resources/
+    fp32_sustained_timeseries_60min.png
+    int8_sustained_timeseries.png
+    fp32_sustained_timeseries_210min.png
+    sustained_fp32_vs_int8_comparison.png
+```
+
+### Key Lesson
+
+Passing a short real-time benchmark is not enough to show that an edge deployment remains healthy over time.
+
+Both FP32 and INT8 sustained one hour of real-time ECG streaming with zero deadline misses, zero integrity failures, stable temperatures and no throttling. FP32 nevertheless retained substantially more deadline headroom and required less CPU, reinforcing the earlier finding that dynamic INT8 quantisation does not improve computational performance on this Raspberry Pi.
+
+The 210-minute FP32 run strengthened the stability evidence further: more than 126,000 chunks were processed without a missed deadline or throttling event, while the initially rising RSS progressively flattened and its fitted trend fell to approximately 1.41 MiB/hour.
+
+Overall, the production streaming pipeline remained stable during sustained Raspberry Pi operation under the `performance` governor and produced the thermal, CPU, memory and real-time evidence needed for the final FP32-vs-INT8 deployment decision.
