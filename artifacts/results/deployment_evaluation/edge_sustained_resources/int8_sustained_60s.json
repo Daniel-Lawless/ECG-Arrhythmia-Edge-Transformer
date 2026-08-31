@@ -1,0 +1,153 @@
+{
+    "environment": {
+        "timestamp": "2026-08-12T21:32:29.062976+00:00",
+        "python_version": "3.13.5",
+        "platform": "Linux-6.18.39+rpt-rpi-2712-aarch64-with-glibc2.41",
+        "machine": "aarch64",
+        "processor": "",
+        "onnxruntime_version": "1.28.0",
+        "execution_providers": [
+            "CPUExecutionProvider"
+        ]
+    },
+    "precision": "int8",
+    "model_path": "artifacts/models/ecg_sequence_transformer_int8.onnx",
+    "governor_observed": "performance",
+    "governor_warning": null,
+    "requested_duration_seconds": 60.0,
+    "duration_semantics": "requested duration is paced ECG signal time (samples divided by sampling rate); classifier construction and record loading are excluded from the budget, and all records are prefetched into memory before monitoring begins so record transitions are gap-free; the run ends within two chunk periods (0.2 s at 36 samples / 360 Hz) below the requested duration and never exceeds it",
+    "paced_signal_seconds": 60.0,
+    "actual_duration_seconds": 60.05794638,
+    "monitor_interval_seconds": 5.0,
+    "telemetry_samples": 13,
+    "record_cycle": [
+        "114",
+        "122",
+        "209",
+        "210",
+        "231",
+        "233"
+    ],
+    "streaming": {
+        "per_record": [
+            {
+                "record_name": "114",
+                "truncated": true,
+                "chunks_processed": 600,
+                "samples_processed": 21600,
+                "predictions": 49,
+                "flush_predictions": 2,
+                "record_wall_seconds": 59.982500151,
+                "deadline_misses": 0,
+                "max_processing_latency_ms": 82.79864,
+                "integrity_passed": true,
+                "class_counts": {
+                    "N": 49,
+                    "S": 0,
+                    "V": 0,
+                    "F": 0
+                }
+            }
+        ],
+        "totals": {
+            "chunks": 600,
+            "predictions": 49,
+            "flush_predictions": 2,
+            "deadline_misses": 0,
+            "integrity_failures": 0,
+            "max_processing_latency_ms": 82.79864,
+            "max_scheduling_lateness_ms": 0.070352,
+            "final_scheduling_lateness_ms": 0.053733,
+            "minimum_deadline_margin_ms": 17.147893
+        }
+    },
+    "deadline_misses_detail": [],
+    "thermal": {
+        "summary": {
+            "start": 47.4,
+            "end": 48.5,
+            "minimum": 47.4,
+            "mean": 48.16153846153846,
+            "maximum": 49.05,
+            "delta": 1.1000000000000014
+        },
+        "time_to_maximum_seconds": 20.009615432,
+        "final_window_mean_c": 48.16153846153846
+    },
+    "cpu": {
+        "process_cpu_summary": {
+            "start": 0.0,
+            "end": 5.591892628024617,
+            "minimum": 0.0,
+            "mean": 3.7479215675496573,
+            "maximum": 5.591892628024617,
+            "delta": 5.591892628024617
+        },
+        "system_cpu_summary": {
+            "start": 0.04997501249375312,
+            "end": 1.443504230960677,
+            "minimum": 0.04997501249375312,
+            "mean": 0.973944571924763,
+            "maximum": 1.443504230960677,
+            "delta": 1.393529218466924
+        },
+        "frequency_khz_summary": {
+            "start": 2400000,
+            "end": 2400000,
+            "minimum": 2400000.0,
+            "mean": 2400000.0,
+            "maximum": 2400000.0,
+            "delta": 0
+        },
+        "process_cpu_definition": "percent of one logical core from /proc/self/stat jiffy deltas; 400% means all four cores busy"
+    },
+    "memory": {
+        "rss_summary": {
+            "start": 243.96875,
+            "end": 246.8125,
+            "minimum": 243.96875,
+            "mean": 246.17548076923077,
+            "maximum": 246.8125,
+            "delta": 2.84375
+        },
+        "rss_trend": {
+            "status": "trend_estimated",
+            "slope_mib_per_hour": 147.78607557094432,
+            "fitted_change_mib": 2.4644110413614273,
+            "residual_std_mib": 0.6049261516336841
+        },
+        "rss_context": "the prefetched record signals (about 5 MiB per record) are allocated before telemetry begins, so they raise absolute RSS but do not contribute to the sustained trend",
+        "available_ram_summary": {
+            "start": 610.546875,
+            "end": 611.75,
+            "minimum": 609.078125,
+            "mean": 610.7776442307693,
+            "maximum": 612.015625,
+            "delta": 1.203125
+        },
+        "available_ram_slope_mib_per_hour": 175.83480180507638,
+        "assessment": "RSS changed by +2.8 MiB over the run, with a fitted trend of +147.786 MiB/hour (residual scatter 0.60 MiB). No growth threshold is applied; interpret these numbers proportionally to the measured duration."
+    },
+    "throttling": {
+        "samples_with_readings": 13,
+        "any_throttling_observed": false,
+        "first_throttling_elapsed_seconds": null,
+        "unique_values": [
+            "0x0"
+        ],
+        "final_value": "0x0"
+    },
+    "monitoring": {
+        "failure_count": 0,
+        "failures": []
+    },
+    "status": {
+        "runtime_correctness": "PASSED",
+        "real_time_deadline_status": "clean",
+        "throttling_status": "no_throttling_observed",
+        "memory_status": "trend_estimated",
+        "monitoring_status": "completed",
+        "warnings": [],
+        "overall": "PASSED"
+    }
+}
