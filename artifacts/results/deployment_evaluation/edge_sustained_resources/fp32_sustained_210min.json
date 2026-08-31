@@ -1,0 +1,261 @@
+{
+    "environment": {
+        "timestamp": "2026-08-13T13:10:07.251661+00:00",
+        "python_version": "3.13.5",
+        "platform": "Linux-6.18.39+rpt-rpi-2712-aarch64-with-glibc2.41",
+        "machine": "aarch64",
+        "processor": "",
+        "onnxruntime_version": "1.28.0",
+        "execution_providers": [
+            "CPUExecutionProvider"
+        ]
+    },
+    "precision": "fp32",
+    "model_path": "artifacts/models/ecg_sequence_transformer.onnx",
+    "governor_observed": "performance",
+    "governor_warning": null,
+    "requested_duration_seconds": 12600.0,
+    "duration_semantics": "requested duration is paced ECG signal time (samples divided by sampling rate); classifier construction and record loading are excluded from the budget, and all records are prefetched into memory before monitoring begins so record transitions are gap-free; the run ends within two chunk periods (0.2 s at 36 samples / 360 Hz) below the requested duration and never exceeds it",
+    "paced_signal_seconds": 12599.933333336,
+    "actual_duration_seconds": 12600.082801589,
+    "monitor_interval_seconds": 5.0,
+    "telemetry_samples": 2519,
+    "record_cycle": [
+        "114",
+        "122",
+        "209",
+        "210",
+        "231",
+        "233"
+    ],
+    "streaming": {
+        "per_record": [
+            {
+                "record_name": "114",
+                "truncated": false,
+                "chunks_processed": 18056,
+                "samples_processed": 650000,
+                "predictions": 1873,
+                "flush_predictions": 3,
+                "record_wall_seconds": 1805.500067722,
+                "deadline_misses": 0,
+                "max_processing_latency_ms": 76.34421,
+                "integrity_passed": true,
+                "class_counts": {
+                    "N": 1673,
+                    "S": 5,
+                    "V": 48,
+                    "F": 147
+                }
+            },
+            {
+                "record_name": "122",
+                "truncated": false,
+                "chunks_processed": 18056,
+                "samples_processed": 650000,
+                "predictions": 2471,
+                "flush_predictions": 3,
+                "record_wall_seconds": 1805.500068415,
+                "deadline_misses": 0,
+                "max_processing_latency_ms": 76.109262,
+                "integrity_passed": true,
+                "class_counts": {
+                    "N": 2469,
+                    "S": 0,
+                    "V": 2,
+                    "F": 0
+                }
+            },
+            {
+                "record_name": "209",
+                "truncated": false,
+                "chunks_processed": 18056,
+                "samples_processed": 650000,
+                "predictions": 2999,
+                "flush_predictions": 3,
+                "record_wall_seconds": 1805.5000672,
+                "deadline_misses": 0,
+                "max_processing_latency_ms": 79.970307,
+                "integrity_passed": true,
+                "class_counts": {
+                    "N": 2689,
+                    "S": 309,
+                    "V": 1,
+                    "F": 0
+                }
+            },
+            {
+                "record_name": "210",
+                "truncated": false,
+                "chunks_processed": 18056,
+                "samples_processed": 650000,
+                "predictions": 2591,
+                "flush_predictions": 3,
+                "record_wall_seconds": 1805.500067916,
+                "deadline_misses": 0,
+                "max_processing_latency_ms": 75.681559,
+                "integrity_passed": true,
+                "class_counts": {
+                    "N": 2387,
+                    "S": 25,
+                    "V": 178,
+                    "F": 1
+                }
+            },
+            {
+                "record_name": "231",
+                "truncated": false,
+                "chunks_processed": 18056,
+                "samples_processed": 650000,
+                "predictions": 1564,
+                "flush_predictions": 2,
+                "record_wall_seconds": 1805.500068188,
+                "deadline_misses": 0,
+                "max_processing_latency_ms": 70.968589,
+                "integrity_passed": true,
+                "class_counts": {
+                    "N": 1550,
+                    "S": 13,
+                    "V": 1,
+                    "F": 0
+                }
+            },
+            {
+                "record_name": "233",
+                "truncated": false,
+                "chunks_processed": 18056,
+                "samples_processed": 650000,
+                "predictions": 3058,
+                "flush_predictions": 4,
+                "record_wall_seconds": 1805.500067538,
+                "deadline_misses": 0,
+                "max_processing_latency_ms": 76.888471,
+                "integrity_passed": true,
+                "class_counts": {
+                    "N": 2068,
+                    "S": 34,
+                    "V": 884,
+                    "F": 72
+                }
+            },
+            {
+                "record_name": "114",
+                "truncated": true,
+                "chunks_processed": 17666,
+                "samples_processed": 635976,
+                "predictions": 1825,
+                "flush_predictions": 4,
+                "record_wall_seconds": 1766.500067535,
+                "deadline_misses": 0,
+                "max_processing_latency_ms": 78.525725,
+                "integrity_passed": true,
+                "class_counts": {
+                    "N": 1633,
+                    "S": 5,
+                    "V": 47,
+                    "F": 140
+                }
+            }
+        ],
+        "totals": {
+            "chunks": 126002,
+            "predictions": 16381,
+            "flush_predictions": 22,
+            "deadline_misses": 0,
+            "integrity_failures": 0,
+            "max_processing_latency_ms": 79.970307,
+            "max_scheduling_lateness_ms": 2.251642,
+            "final_scheduling_lateness_ms": 0.054812,
+            "minimum_deadline_margin_ms": 19.975309
+        }
+    },
+    "deadline_misses_detail": [],
+    "thermal": {
+        "summary": {
+            "start": 48.5,
+            "end": 47.95,
+            "minimum": 45.75,
+            "mean": 47.90917030567685,
+            "maximum": 50.7,
+            "delta": -0.5499999999999972
+        },
+        "time_to_maximum_seconds": 11082.480945438,
+        "final_window_mean_c": 48.857499999999995
+    },
+    "cpu": {
+        "process_cpu_summary": {
+            "start": 0.0,
+            "end": 3.598452481192775,
+            "minimum": 0.0,
+            "mean": 3.520098818526737,
+            "maximum": 7.396900117454787,
+            "delta": 3.598452481192775
+        },
+        "system_cpu_summary": {
+            "start": 0.04992511233150275,
+            "end": 0.95,
+            "minimum": 0.0,
+            "mean": 0.8875215731156386,
+            "maximum": 1.8490754622688657,
+            "delta": 0.9000748876684972
+        },
+        "frequency_khz_summary": {
+            "start": 2400000,
+            "end": 2400000,
+            "minimum": 2400000.0,
+            "mean": 2400000.0,
+            "maximum": 2400000.0,
+            "delta": 0
+        },
+        "process_cpu_definition": "percent of one logical core from /proc/self/stat jiffy deltas; 400% means all four cores busy"
+    },
+    "memory": {
+        "rss_summary": {
+            "start": 246.75,
+            "end": 255.546875,
+            "minimum": 246.75,
+            "mean": 253.83577932711393,
+            "maximum": 255.546875,
+            "delta": 8.796875
+        },
+        "rss_trend": {
+            "status": "trend_estimated",
+            "slope_mib_per_hour": 1.4055375773612975,
+            "fitted_change_mib": 4.918927820379385,
+            "residual_std_mib": 0.8713714540782134
+        },
+        "rss_context": "the prefetched record signals (about 5 MiB per record) are allocated before telemetry begins, so they raise absolute RSS but do not contribute to the sustained trend",
+        "available_ram_summary": {
+            "start": 494.453125,
+            "end": 498.5,
+            "minimum": 494.453125,
+            "mean": 499.99912539698295,
+            "maximum": 504.4375,
+            "delta": 4.046875
+        },
+        "available_ram_slope_mib_per_hour": -1.3114447683981751,
+        "assessment": "RSS changed by +8.8 MiB over the run, with a fitted trend of +1.406 MiB/hour (residual scatter 0.87 MiB). No growth threshold is applied; interpret these numbers proportionally to the measured duration."
+    },
+    "throttling": {
+        "samples_with_readings": 2519,
+        "any_throttling_observed": false,
+        "first_throttling_elapsed_seconds": null,
+        "unique_values": [
+            "0x0"
+        ],
+        "final_value": "0x0"
+    },
+    "monitoring": {
+        "failure_count": 0,
+        "failures": []
+    },
+    "status": {
+        "runtime_correctness": "PASSED",
+        "real_time_deadline_status": "clean",
+        "throttling_status": "no_throttling_observed",
+        "memory_status": "trend_estimated",
+        "monitoring_status": "completed",
+        "warnings": [],
+        "overall": "PASSED"
+    }
+}

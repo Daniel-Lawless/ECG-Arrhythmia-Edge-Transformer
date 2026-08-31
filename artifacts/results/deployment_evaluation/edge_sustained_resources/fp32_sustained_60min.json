@@ -1,0 +1,171 @@
+{
+    "environment": {
+        "timestamp": "2026-08-12T22:35:53.544196+00:00",
+        "python_version": "3.13.5",
+        "platform": "Linux-6.18.39+rpt-rpi-2712-aarch64-with-glibc2.41",
+        "machine": "aarch64",
+        "processor": "",
+        "onnxruntime_version": "1.28.0",
+        "execution_providers": [
+            "CPUExecutionProvider"
+        ]
+    },
+    "precision": "fp32",
+    "model_path": "artifacts/models/ecg_sequence_transformer.onnx",
+    "governor_observed": "performance",
+    "governor_warning": null,
+    "requested_duration_seconds": 3600.0,
+    "duration_semantics": "requested duration is paced ECG signal time (samples divided by sampling rate); classifier construction and record loading are excluded from the budget, and all records are prefetched into memory before monitoring begins so record transitions are gap-free; the run ends within two chunk periods (0.2 s at 36 samples / 360 Hz) below the requested duration and never exceeds it",
+    "paced_signal_seconds": 3599.955555556,
+    "actual_duration_seconds": 3599.968548548,
+    "monitor_interval_seconds": 5.0,
+    "telemetry_samples": 720,
+    "record_cycle": [
+        "114",
+        "122",
+        "209",
+        "210",
+        "231",
+        "233"
+    ],
+    "streaming": {
+        "per_record": [
+            {
+                "record_name": "114",
+                "truncated": false,
+                "chunks_processed": 18056,
+                "samples_processed": 650000,
+                "predictions": 1873,
+                "flush_predictions": 3,
+                "record_wall_seconds": 1805.500069434,
+                "deadline_misses": 0,
+                "max_processing_latency_ms": 79.407164,
+                "integrity_passed": true,
+                "class_counts": {
+                    "N": 1673,
+                    "S": 5,
+                    "V": 48,
+                    "F": 147
+                }
+            },
+            {
+                "record_name": "122",
+                "truncated": true,
+                "chunks_processed": 17944,
+                "samples_processed": 645984,
+                "predictions": 2456,
+                "flush_predictions": 9,
+                "record_wall_seconds": 1794.300065901,
+                "deadline_misses": 0,
+                "max_processing_latency_ms": 84.589524,
+                "integrity_passed": true,
+                "class_counts": {
+                    "N": 2454,
+                    "S": 0,
+                    "V": 2,
+                    "F": 0
+                }
+            }
+        ],
+        "totals": {
+            "chunks": 36000,
+            "predictions": 4329,
+            "flush_predictions": 12,
+            "deadline_misses": 0,
+            "integrity_failures": 0,
+            "max_processing_latency_ms": 84.589524,
+            "max_scheduling_lateness_ms": 0.202181,
+            "final_scheduling_lateness_ms": 0.053568,
+            "minimum_deadline_margin_ms": 15.357041
+        }
+    },
+    "deadline_misses_detail": [],
+    "thermal": {
+        "summary": {
+            "start": 47.95,
+            "end": 45.75,
+            "minimum": 45.75,
+            "mean": 47.40687500000001,
+            "maximum": 49.6,
+            "delta": -2.200000000000003
+        },
+        "time_to_maximum_seconds": 25.011715564,
+        "final_window_mean_c": 47.26708333333333
+    },
+    "cpu": {
+        "process_cpu_summary": {
+            "start": 0.1998729240727905,
+            "end": 3.5263845405882086,
+            "minimum": 0.1998729240727905,
+            "mean": 3.460416046293909,
+            "maximum": 6.797100272739627,
+            "delta": 3.3265116165154183
+        },
+        "system_cpu_summary": {
+            "start": 0.04995004995004995,
+            "end": 0.9300048947626041,
+            "minimum": 0.04995004995004995,
+            "mean": 0.8763410207123448,
+            "maximum": 4.695304695304695,
+            "delta": 0.8800548448125541
+        },
+        "frequency_khz_summary": {
+            "start": 2400000,
+            "end": 2400000,
+            "minimum": 2400000.0,
+            "mean": 2400000.0,
+            "maximum": 2400000.0,
+            "delta": 0
+        },
+        "process_cpu_definition": "percent of one logical core from /proc/self/stat jiffy deltas; 400% means all four cores busy"
+    },
+    "memory": {
+        "rss_summary": {
+            "start": 246.9375,
+            "end": 253.640625,
+            "minimum": 246.9375,
+            "mean": 251.89581163194444,
+            "maximum": 253.640625,
+            "delta": 6.703125
+        },
+        "rss_trend": {
+            "status": "trend_estimated",
+            "slope_mib_per_hour": 5.415047729488281,
+            "fitted_change_mib": 5.410934410344106,
+            "residual_std_mib": 0.5556329280595409
+        },
+        "rss_context": "the prefetched record signals (about 5 MiB per record) are allocated before telemetry begins, so they raise absolute RSS but do not contribute to the sustained trend",
+        "available_ram_summary": {
+            "start": 605.328125,
+            "end": 607.40625,
+            "minimum": 581.0,
+            "mean": 607.6715277777778,
+            "maximum": 611.875,
+            "delta": 2.078125
+        },
+        "available_ram_slope_mib_per_hour": -3.528947707089905,
+        "assessment": "RSS changed by +6.7 MiB over the run, with a fitted trend of +5.415 MiB/hour (residual scatter 0.56 MiB). No growth threshold is applied; interpret these numbers proportionally to the measured duration."
+    },
+    "throttling": {
+        "samples_with_readings": 720,
+        "any_throttling_observed": false,
+        "first_throttling_elapsed_seconds": null,
+        "unique_values": [
+            "0x0"
+        ],
+        "final_value": "0x0"
+    },
+    "monitoring": {
+        "failure_count": 0,
+        "failures": []
+    },
+    "status": {
+        "runtime_correctness": "PASSED",
+        "real_time_deadline_status": "clean",
+        "throttling_status": "no_throttling_observed",
+        "memory_status": "trend_estimated",
+        "monitoring_status": "completed",
+        "warnings": [],
+        "overall": "PASSED"
+    }
+}
