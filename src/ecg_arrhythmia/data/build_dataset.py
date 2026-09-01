@@ -8,6 +8,12 @@ import numpy as np
 
 from ecg_arrhythmia.data.label_mapping import map_labels_to_aami
 from ecg_arrhythmia.data.load_record import load_record, select_signal_channel
+
+# The record constants live in their own dependency-free module so
+# consumers needing only the names (the dashboard control protocol) do
+# not pull in wfdb. Imported here so build_dataset.MITDB_RECORDS and
+# build_dataset.PACED_RECORDS keep resolving as before.
+from ecg_arrhythmia.data.mitdb_records import MITDB_RECORDS, PACED_RECORDS
 from ecg_arrhythmia.preprocessing.beat_extraction import extract_beats
 
 logger = logging.getLogger(__name__)
@@ -22,21 +28,6 @@ class RecordSegment(TypedDict):
     end_index: int
     num_beats: int
 
-
-# All 48 records in the MIT-BIH Arrhythmia Database.
-# fmt: off
-MITDB_RECORDS = [
-    "100", "101", "102", "103", "104", "105", "106", "107", "108", "109",
-    "111", "112", "113", "114", "115", "116", "117", "118", "119", "121",
-    "122", "123", "124", "200", "201", "202", "203", "205", "207", "208",
-    "209", "210", "212", "213", "214", "215", "217", "219", "220", "221",
-    "222", "223", "228", "230", "231", "232", "233", "234",
-]
-# fmt: on
-
-# These records contain paced beats. We can exclude these later
-# if I want to test a non-pace classifier.
-PACED_RECORDS = {"102", "104", "107", "217"}
 
 # Q has low support, so we can optionally exclude it
 EXCLUDED_AAMI_LABELS = {"Q"}
