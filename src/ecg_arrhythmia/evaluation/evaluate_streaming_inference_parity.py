@@ -11,6 +11,9 @@ from ecg_arrhythmia.data.build_xqrs_centered_dataset import load_split_record_na
 from ecg_arrhythmia.data.label_mapping import NUM_CLASSES
 from ecg_arrhythmia.data.load_record import load_record, select_signal_channel
 from ecg_arrhythmia.deployment.verify_onnx_parity import load_pytorch_model
+from ecg_arrhythmia.evaluation.evaluate_quantized_inference_agreement import (
+    agreement_matrix,
+)
 from ecg_arrhythmia.streaming.onnx_sequence_classifier import (
     ONNXSequenceClassifier,
     PredictionEvent,
@@ -149,25 +152,6 @@ def _stack(rows: list[NDArray[np.float32]]) -> NDArray[np.float32]:
 # ---------------------------------------------------------------------
 #                              Comparison
 # ---------------------------------------------------------------------
-
-
-def agreement_matrix(
-    reference_classes: NDArray[np.integer],
-    comparison_classes: NDArray[np.integer],
-) -> list[list[int]]:
-    """
-    Count how often each reference class met each comparison class.
-
-    Rows are reference predictions and columns are comparison
-    predictions. This is agreement between two inference paths, not
-    accuracy against ground truth, so full parity puts every count on the
-    diagonal.
-    """
-
-    matrix = np.zeros((NUM_CLASSES, NUM_CLASSES), dtype=np.int64)
-    np.add.at(matrix, (reference_classes, comparison_classes), 1)
-
-    return matrix.tolist()
 
 
 def compare_logits(
