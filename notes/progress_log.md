@@ -2169,3 +2169,53 @@ INT8 delivered a substantial model-size reduction, preserved FP32 predictions cl
 The final deployment orientation is therefore **FP32 ONNX inference on the Raspberry Pi 5 using the `performance` CPU governor**, with INT8 retained as a smaller alternative when storage efficiency is the overriding constraint.
 
 A deployment decision is only trustworthy if it shows both why the selected configuration won and what was deliberately given up by rejecting the alternative.
+
+## Milestone 34 — Live Raspberry Pi-to-PC Streaming
+
+### Implemented
+
+- Added a versioned newline-delimited JSON protocol for transmitting:
+  - ECG sample chunks;
+  - prediction events;
+  - live Raspberry Pi runtime status.
+- Added a persistent TCP sender on the Raspberry Pi and a TCP receiver on the PC.
+- Added frame reconstruction so messages remain valid when TCP splits or combines received data.
+- Added `LiveEdgeTelemetry` for reporting:
+  - CPU temperature and frequency;
+  - CPU governor;
+  - process CPU and RSS;
+  - available RAM;
+  - voltage, frequency-capping, throttling and thermal-limit status.
+- Extended `send_record.py` so the existing real-time FP32 inference pipeline streams ECG data, predictions and telemetry to the PC without introducing a second inference path.
+- Added unit tests for the transport protocol, TCP sender/receiver, live telemetry and record-stream orchestration.
+
+### End-to-End Validation
+
+Validated the complete Raspberry Pi-to-PC path using MIT-BIH record `233`.
+
+The PC receiver successfully received all three message types:
+
+```text
+sample_chunk
+prediction
+runtime_status
+```
+
+The streamed ECG chunks preserved the expected `360 Hz` sampling rate and consecutive 36-sample indexing.
+
+The live runtime-status messages also confirmed the selected deployment configuration was active on the Pi, including:
+
+```text
+cpu_governor: performance
+cpu_frequency_mhz: 2400
+```
+
+Prediction events were received alongside the ECG stream, confirming that the deployed ONNX inference pipeline and network transport were operating together successfully.
+
+No result file is produced by this section because the output is the live TCP stream itself.
+
+### Key Lesson
+
+The validated Raspberry Pi inference pipeline can now operate as a networked edge system rather than an isolated process.
+
+A versioned transport protocol and explicit TCP framing allow ECG samples, predictions and runtime telemetry to be transmitted reliably to the PC while keeping the existing real-time inference path unchanged. This provides the data-transport foundation for the live dashboard.
