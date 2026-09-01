@@ -1725,7 +1725,89 @@ Both precisions processed the full ECG record, emitted predictions for the same 
 
 Milestone 29 confirms target-hardware compatibility. The next step is to benchmark FP32 and INT8 inference directly on the Raspberry Pi.
 
-## Milestone 30 — Raspberry Pi Real-Time Streaming and CPU Governor Evaluation
+## Milestone 30 — Raspberry Pi FP32 vs INT8 Inference Performance Benchmark
+
+### Implemented
+
+- Added `benchmark_edge_quantized_inference.py` to benchmark FP32 and dynamically quantised INT8 ONNX inference directly on the Raspberry Pi 5.
+- Reused the controlled timing methodology from the earlier FP32-vs-INT8 benchmark, including:
+  - identical streaming-emitted `BeatSequence` inputs;
+  - 100 warm-up calls;
+  - five repeated benchmark passes;
+  - counterbalanced FP32/INT8 execution order.
+- Benchmarked all six validation records: `114`, `122`, `209`, `210`, `231`, `233`.
+- Compared both models over the same `14,556` sequences.
+- Processed one record at a time to reduce Raspberry Pi memory usage while reusing the same FP32 and INT8 classifier sessions across records and repeats.
+- Measured:
+  - mean, median and p95 model-stage inference latency;
+  - throughput;
+  - classifier initialisation time;
+  - model size;
+  - per-record latency;
+  - run-to-run variation.
+- Added a direct comparison with the earlier development-machine benchmark to check whether the FP32-vs-INT8 ordering changed on ARM hardware.
+- Recorded Raspberry Pi health context before and after benchmarking, including available RAM, CPU temperature, throttling state, CPU governor and CPU frequency.
+- Generated FP32-vs-INT8 latency, throughput, model-size and per-record latency figures.
+
+### Results
+
+The Raspberry Pi benchmark reproduced the same overall behaviour seen on the development machine: INT8 remained substantially smaller, but FP32 was considerably faster at steady-state inference.
+
+| **Metric** | **FP32** | **INT8** | **INT8 vs FP32** |
+|:---:|:---:|:---:|:---:|
+| Mean latency | **1.332 ms** | 3.850 ms | +189.09% |
+| Median latency | **1.323 ms** | 3.849 ms | +190.95% |
+| p95 latency | **1.367 ms** | 3.863 ms | +182.55% |
+| Throughput | **750.884 seq/s** | 259.737 seq/s | -65.41% |
+| Classifier initialisation | 76.913 ms | **38.823 ms** | INT8 faster |
+| Model size | 2.310 MiB | **0.813 MiB** | -64.79% |
+
+INT8 therefore retained the `64.79%` model-size reduction (`2.84×` compression), but its mean inference latency was approximately `2.89×` that of FP32 on the Raspberry Pi.
+
+The same latency ordering was observed across every validation record:
+
+| **Record** | **FP32 mean latency** | **INT8 mean latency** |
+|:---:|:---:|:---:|
+| 114 | **1.334 ms** | 3.847 ms |
+| 122 | **1.331 ms** | 3.851 ms |
+| 209 | **1.327 ms** | 3.849 ms |
+| 210 | **1.332 ms** | 3.850 ms |
+| 231 | **1.337 ms** | 3.852 ms |
+| 233 | **1.333 ms** | 3.852 ms |
+
+INT8 did initialise faster, taking `38.823 ms` compared with `76.913 ms` for FP32, but this is a one-time start-up cost rather than the continuous per-sequence inference cost.
+
+The Raspberry Pi remained unthrottled before and after the benchmark. The recorded CPU governor was `ondemand`, the health snapshots reported a 2.4 GHz CPU frequency, and temperature increased from `51.0 °C` to `69.2 °C`.
+
+### Saved Outputs
+
+```text
+artifacts/results/deployment_evaluation/edge_onnx_benchmarking/
+    raspberry_pi_fp32_vs_int8_benchmark.json
+    raspberry_pi_fp32_vs_int8_benchmark_raw.npz
+    record_114_fp32_vs_int8_benchmark.json
+    record_114_fp32_vs_int8_benchmark_raw.npz
+```
+
+Saved figures:
+
+```text
+artifacts/figures/edge_onnx_benchmarking/
+    fp32_vs_int8_latency.png
+    fp32_vs_int8_throughput.png
+    fp32_vs_int8_model_size.png
+    per_record_mean_latency.png
+```
+
+### Key Lesson
+
+The storage benefit of dynamic INT8 quantisation did not translate into faster inference on the target Raspberry Pi hardware.
+
+FP32 achieved substantially lower mean, median and p95 model-stage latency and approximately `2.89×` the throughput of INT8 across the complete validation benchmark. INT8 remained valuable as the smaller model and also initialised faster, but FP32 was the stronger candidate for continuous model-stage inference.
+
+This target-hardware result confirmed that the slower INT8 behaviour observed on the development machine was not reversed on the Raspberry Pi. The next step is to test whether these model-stage differences translate into meaningful real-time behaviour when the complete streaming pipeline is paced at the ECG signal's true arrival rate.
+
+## Milestone 31 — Raspberry Pi Real-Time Streaming and CPU Governor Evaluation
 
 ### Implemented
 
@@ -1802,7 +1884,7 @@ The original `ondemand` configuration produced isolated deadline misses for both
 
 The `performance` governor was therefore selected for the remaining sustained Raspberry Pi deployment evaluation.
 
-## Milestone 31 — Raspberry Pi Sustained Resource and Stability Evaluation
+## Milestone 32 — Raspberry Pi Sustained Resource and Stability Evaluation
 
 ### Implemented
 
