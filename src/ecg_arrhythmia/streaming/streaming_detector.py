@@ -20,16 +20,16 @@ class DetectorTiming:
     # XQRS will analyse up to the most recent 30 seconds
     # of ECG each time it runs.
     analysis_window_seconds: float = 30.0
-    # After an analysis, another 5 seconds of new ECG must
+    # After an analysis, another 0.5 seconds of new ECG must
     # arrive before XQRS runs again.
-    stride_seconds: float = 5.0
+    stride_seconds: float = 0.5
     # The detector waits until at least 10 seconds of ECG are
     # available before its first analysis.
     warmup_seconds: float = 10.0
     # Peaks found in the newest 2 seconds are temporarily held
     # back until more ECG arrives, giving XQRS time to settle
     # its decision.
-    confirmation_seconds: float = 2.0
+    confirmation_seconds: float = 1.0
 
 
 class StreamingXQRS:
