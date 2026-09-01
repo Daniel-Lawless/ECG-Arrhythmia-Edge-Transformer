@@ -2340,3 +2340,186 @@ A continuously updating browser dashboard benefits from separating data acquisit
 Keeping one authoritative `DashboardState` and exposing atomic snapshots through a lightweight local endpoint allows the browser to refresh independently without duplicating inference or network state.
 
 Incremental ECG updates preserve the real streamed data while avoiding unnecessary full-chart reconstruction, and separating prediction dwell from inference timing keeps presentation behaviour from being confused with model or pipeline latency.
+
+## Milestone 37 — Dashboard-to-Pi Remote Control and Final Live Integration
+
+### Implemented
+
+- Added a dedicated Raspberry Pi control channel so the PC dashboard can start and stop demo streams without SSH.
+- Added `control_config.py` with one shared control-port definition used by both the PC client and Raspberry Pi server.
+- Added a newline-delimited JSON control protocol supporting:
+  - `start_record`;
+  - `stop`;
+  - `status`.
+- Added strict control-message validation so:
+  - unsupported commands are rejected;
+  - unknown or disallowed records are rejected;
+  - unexpected fields are rejected rather than silently ignored;
+  - malformed or oversized frames cannot start a stream.
+- Added a lightweight `mitdb_records.py` module containing the shared MIT-BIH record constants.
+  - The dashboard control path needs only record names and must not pull in the Pi-side WFDB/data-loading stack.
+  - `build_dataset.py` now imports and re-exports the same `MITDB_RECORDS` and `PACED_RECORDS` objects so the project retains one source of truth.
+- Excluded paced MIT-BIH records from the dashboard demo allowlist because paced beats are outside the deployed four-class AAMI target.
+- Refactored `send_record.main()` so its streaming body became a reusable `run_record_stream()` entry point, leaving the CLI as a thin wrapper over the same implementation.
+- Reused that `run_record_stream()` entry point from the Raspberry Pi control agent so dashboard-started streams and CLI-started streams execute the same inference and transport path rather than maintaining separate implementations.
+- Extended the streaming loop with an optional `should_stop` callable:
+  - checked once per ECG chunk;
+  - exits cooperatively at a chunk boundary;
+  - preserves prediction flushing;
+  - reports `stopped_early` in the stream summary;
+  - leaves existing behaviour unchanged when no stop callback is supplied.
+- Added `control_client.py` on the PC side for sending one control request and decoding the Raspberry Pi response.
+- Added `control_server.py` on the Raspberry Pi to:
+  - listen for dashboard commands;
+  - run at most one record-stream worker at a time;
+  - cooperatively stop the current stream;
+  - replace a running record without overlapping TCP data senders;
+  - report worker status and retained stream errors.
+- Added `record_control.py` with:
+  - MIT-BIH record selection;
+  - `Start stream`;
+  - `Stop`;
+  - compact success acknowledgements;
+  - visible connection/control errors.
+- Integrated the control strip, live endpoint, display-mode selector and browser component into the final Streamlit `app.py`.
+- Added unit tests covering:
+  - record allowlisting;
+  - shared configuration constants;
+  - shared MIT-BIH record objects;
+  - control request/response encoding;
+  - malformed and unsupported requests;
+  - fragmented TCP control frames;
+  - oversized control frames;
+  - start/stop/status lifecycle;
+  - replacement of one running record by another;
+  - client/server communication over real loopback sockets;
+  - unreachable-agent error handling;
+  - dashboard-facing control helpers.
+- Added clean-subprocess import-isolation tests which verify that importing dashboard-side control modules does not pull in Pi-side dependencies such as:
+  - `wfdb`;
+  - `control_server`;
+  - `replay_source`;
+  - `build_dataset`.
+
+### Bidirectional Architecture
+
+The completed system uses separate channels for control and live data:
+
+```text
+PC dashboard
+    → control client
+    → TCP control channel
+    → Raspberry Pi control server
+    → run_record_stream()
+
+Raspberry Pi
+    → ECG samples / predictions / runtime telemetry
+    → TCP data channel
+    → DashboardStreamService
+    → DashboardState
+    → local live endpoint
+    → browser component
+```
+
+The default ports remain deliberately separated:
+
+```text
+Pi → PC data:       TCP 8765
+PC-local live HTTP: TCP 8766
+PC → Pi control:    TCP 8767
+```
+
+The control request selects only the command and, where required, the record.
+
+The Raspberry Pi agent retains ownership of the model path, chunk size, replay mode and PC data destination. A dashboard command therefore cannot redirect the outgoing ECG stream or replace the deployment model.
+
+### Shared Streaming Entry Point
+
+Remote control was added without creating a second inference pipeline.
+
+The original `send_record` CLI logic was moved into:
+
+```python
+run_record_stream(...)
+```
+
+The CLI now parses its arguments and calls that function, while the Raspberry Pi control agent calls the same function from its worker thread.
+
+This keeps both entry points on the same path for:
+
+```text
+ReplaySource
+    → StreamingEngine
+    → StreamingPredictor
+    → FP32 ONNX classifier
+    → ECG / prediction / runtime-status transport
+```
+
+The only control-specific addition to the streaming loop is the optional cooperative stop callback.
+
+### Dependency Isolation
+
+The dashboard machine does not load MIT-BIH records itself; it only needs the names of records that may be requested.
+
+Importing those constants through `build_dataset.py` would also import the data-loading stack and its WFDB dependency. The record constants were therefore moved into the lightweight `mitdb_records.py` module.
+
+Both `build_dataset.py` and the control protocol import the same objects from that module, preserving one source of truth without coupling the dashboard to Pi-side dependencies.
+
+Clean-subprocess tests enforce this boundary by importing dashboard-side modules in a fresh interpreter and checking that the Pi-side stack has not appeared in `sys.modules`.
+
+### Stream Lifecycle
+
+A `start_record` command creates one worker thread on the Raspberry Pi.
+
+The returned acknowledgement is deliberately an **acceptance** message. It confirms that the worker has been launched, but does not claim that model loading, record loading or the returning data connection has already completed. Successful streaming is reflected separately by the dashboard's live connection state.
+
+When another record is requested while one is already running, the agent first stops and joins the existing worker before creating the replacement. This guarantees that two Raspberry Pi data senders do not overlap.
+
+A `stop` request sets the worker's cooperative stop flag. The streaming loop checks it once per chunk and exits at the next chunk boundary, after which any already-produced predictions are flushed and the sender closes its socket normally.
+
+### End-to-End Validation
+
+Validated the complete dashboard-controlled path using MIT-BIH record `233`.
+
+The dashboard successfully:
+
+- sent a `start_record` command to the Raspberry Pi;
+- received the Pi agent's acceptance response;
+- established the returning ECG data stream;
+- displayed record `233` as connected;
+- maintained `0` observed dashboard stream discontinuities during the validated run;
+- displayed live ECG samples, prediction markers and class scores;
+- updated recent-beat history and rhythm estimates;
+- displayed Raspberry Pi runtime telemetry;
+- displayed live model-stage latency and throughput;
+- operated with the Raspberry Pi on the `performance` CPU governor;
+- changed between `Presentation` and `Live` display modes without altering the underlying inference path;
+- stopped and restarted the stream from the dashboard controls.
+
+The validated live view confirmed that the browser, PC backend, bidirectional transport and Raspberry Pi inference pipeline operate together as one system.
+
+### Validation Environment
+
+The final integrated run was performed over the home LAN rather than the earlier direct Pi↔PC Ethernet link.
+
+```text
+Raspberry Pi:  home Wi-Fi (`ecg-pi.local` / 192.168.0.44)
+PC:            home Wi-Fi (192.168.0.42)
+Dashboard:     Streamlit on Windows (sources its code from WSL via UNC path)
+Control path:  Windows PC → Pi over TCP
+Data path:     Pi → Windows host over TCP
+Record:        233
+```
+
+The live run used an explicitly configured non-default Pi→PC data port because the original Windows host port `8765` was occupied by another service. The application-level default remains `8765` unless that configuration is changed in the code.
+
+### Limitations
+
+- The control channel uses unauthenticated plaintext TCP with no TLS. It is intended for a trusted local/direct network only; any host able to reach the Raspberry Pi control port can submit one of the supported control commands.
+
+### Key Lesson
+
+Remote control works best when it orchestrates the existing production path rather than creating a second one.
+
+Refactoring the CLI into a reusable `run_record_stream()` entry point kept dashboard-started streams on the same Raspberry Pi inference path, while strict control validation and dependency isolation kept the distributed architecture clear and predictable.
+
