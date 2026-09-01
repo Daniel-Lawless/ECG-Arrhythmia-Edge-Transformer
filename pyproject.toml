@@ -36,6 +36,11 @@ dev = [
     "ruff",
 ]
 
+dashboard = [
+    "streamlit>=1.61",
+    "plotly>=5.18",
+]
+
 
 # Package discovery.
 # Tells setuptools to find the ecg_arrhythmia package inside src/.
