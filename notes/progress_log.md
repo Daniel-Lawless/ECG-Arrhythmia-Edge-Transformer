@@ -2219,3 +2219,124 @@ No result file is produced by this section because the output is the live TCP st
 The validated Raspberry Pi inference pipeline can now operate as a networked edge system rather than an isolated process.
 
 A versioned transport protocol and explicit TCP framing allow ECG samples, predictions and runtime telemetry to be transmitted reliably to the PC while keeping the existing real-time inference path unchanged. This provides the data-transport foundation for the live dashboard.
+
+## Milestone 35 — Live Dashboard Backend and State Management
+
+### Implemented
+
+- Added `DashboardState` as the thread-safe in-memory state store for the live dashboard.
+- Added bounded retention for:
+  - the rolling ECG waveform;
+  - recent prediction events;
+  - the latest Raspberry Pi runtime status.
+- Added stream-continuity handling for:
+  - record changes;
+  - sampling-rate changes;
+  - missing, overlapping or out-of-order sample chunks.
+- Added immutable `DashboardSnapshot` objects so the dashboard can read a consistent view while the receive thread continues updating the live state.
+- Added `DashboardStreamService` to run the TCP receiver on a background thread and apply incoming `sample_chunk`, `prediction` and `runtime_status` messages to the shared dashboard state.
+- Added connection-state tracking for:
+  - listening;
+  - connected;
+  - disconnected.
+- Added presentation helpers for:
+  - class names and colours;
+  - numerically stable softmax-normalised class scores;
+  - recent prediction selection;
+  - RR interval and estimated heart-rate calculation;
+  - runtime and connection-status formatting.
+- Added Plotly helpers for the rolling ECG view and class-score display.
+- Added unit tests for dashboard state, stream-service lifecycle, presentation helpers and plots.
+
+### Dashboard State Design
+
+The dashboard retains only the information needed for the live view.
+
+The ECG waveform is stored as a bounded rolling window, while prediction history is limited to a fixed number of recent events. Runtime telemetry keeps only the latest received status rather than accumulating an unbounded history.
+
+Incoming network messages are applied by the background receive thread, while dashboard consumers read immutable snapshots of the resulting state.
+
+This separates network reception from presentation and avoids holding the state lock while rendering.
+
+### Key Lesson
+
+A live dashboard needs an intermediate state layer rather than rendering directly from the TCP receiver.
+
+Separating transport, state management and presentation allows the network thread to continue receiving data independently while the dashboard works from consistent snapshots. Bounded retention also keeps memory use predictable during sustained streaming.
+
+## Milestone 36 — Real-Time Browser Dashboard Presentation
+
+### Implemented
+
+- Added a persistent client-side live dashboard component for displaying the Raspberry Pi stream in the browser.
+- Added a localhost HTTP endpoint over the existing `DashboardState`.
+- Added `/live` to return one atomic dashboard payload containing:
+  - connection and stream status;
+  - the rolling ECG waveform;
+  - visible and recent prediction events;
+  - latest classification output;
+  - RR interval and estimated heart rate;
+  - Raspberry Pi runtime telemetry;
+  - live model-stage latency and throughput measurements.
+- Added a local `/plotly.js` endpoint so the browser component can load Plotly from the installed Python package.
+- Restricted browser access to loopback origins.
+- Added incremental ECG rendering so contiguous updates append only newly received samples rather than rebuilding the complete chart on every refresh.
+- Added explicit chart rebuilding for:
+  - first render;
+  - record changes;
+  - sampling-rate changes;
+  - sample-index regressions;
+  - unbridgeable stream gaps.
+- Added cosmetic viewport smoothing without modifying ECG samples, prediction positions or timing-derived data.
+- Added sequential prediction presentation so the classification panel, model-output bars and active ECG marker always represent the same prediction event.
+- Added two display modes:
+  - `Presentation`, which holds each prediction longer for readability;
+  - `Live`, which advances the same prediction queue more quickly.
+- Kept both display modes connected to the same real-time edge inference pipeline; the mode changes presentation timing only.
+- Added a Streamlit fragment refresh probe to isolate and measure browser refresh behaviour.
+- Added unit tests for the live HTTP endpoint, dashboard payload construction, incremental ECG update decisions and browser-component configuration.
+
+### Real-Time Presentation Architecture
+
+The browser does not create another inference or streaming pipeline.
+
+Instead, it repeatedly reads the existing dashboard state through the local live endpoint:
+
+```text
+Raspberry Pi
+    → TCP stream
+    → DashboardStreamService
+    → DashboardState
+    → localhost /live
+    → persistent browser component
+```
+
+Each `/live` response is derived from one immutable `DashboardSnapshot`, so the waveform, prediction information and runtime telemetry shown in one browser update come from the same state snapshot.
+
+The browser polls the endpoint at approximately `100 ms`, matching the nominal 36-sample / 360 Hz ECG chunk cadence.
+
+### Incremental ECG Rendering
+
+Normal contiguous stream updates append only the samples that arrived since the previous browser update.
+
+The chart is rebuilt when continuity cannot safely be preserved, including a record change, sampling-rate change, sample-index regression or unbridgeable gap.
+
+Prediction markers remain tied to their absolute target R-peak indices and are recalculated against the current ECG window rather than being positioned independently of the underlying signal.
+
+### Prediction Presentation
+
+The classification panel, model-output bars and active ECG marker share one current presented prediction.
+
+Predictions are processed through the same chronological FIFO presentation path in both display modes.
+
+`Presentation` mode uses a longer dwell so individual predictions remain readable, while `Live` mode advances the same queue more rapidly.
+
+This changes only what the browser displays and does not alter the Raspberry Pi inference pipeline or prediction timing.
+
+### Key Lesson
+
+A continuously updating browser dashboard benefits from separating data acquisition from browser presentation.
+
+Keeping one authoritative `DashboardState` and exposing atomic snapshots through a lightweight local endpoint allows the browser to refresh independently without duplicating inference or network state.
+
+Incremental ECG updates preserve the real streamed data while avoiding unnecessary full-chart reconstruction, and separating prediction dwell from inference timing keeps presentation behaviour from being confused with model or pipeline latency.
