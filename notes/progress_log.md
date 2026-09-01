@@ -1996,3 +1996,176 @@ Both FP32 and INT8 sustained one hour of real-time ECG streaming with zero deadl
 The 210-minute FP32 run strengthened the stability evidence further: more than 126,000 chunks were processed without a missed deadline or throttling event, while the initially rising RSS progressively flattened and its fitted trend fell to approximately 1.41 MiB/hour.
 
 Overall, the production streaming pipeline remained stable during sustained Raspberry Pi operation under the `performance` governor and produced the thermal, CPU, memory and real-time evidence needed for the final FP32-vs-INT8 deployment decision.
+
+## Milestone 33 — Final Raspberry Pi Deployment Decision
+
+### Implemented
+
+- Synthesised the FP32-vs-INT8 deployment evidence collected across Milestones 25–32.
+- Compared the two deployment candidates across:
+  - model size;
+  - prediction agreement;
+  - ground-truth classification performance;
+  - development-machine inference performance;
+  - Raspberry Pi model-stage latency, throughput and initialisation;
+  - target-hardware runtime correctness;
+  - real-time deadline behaviour;
+  - sustained CPU, thermal and memory behaviour.
+- Treated runtime correctness and sustained stability as deployment requirements rather than allowing a strong result in one metric to compensate for a failure in another.
+- Kept the final decision criterion-by-criterion rather than introducing an arbitrary weighted score.
+- Selected the final Raspberry Pi runtime configuration and retained INT8 as a storage-optimised alternative.
+
+### Evidence Chain
+
+| Milestone | Question answered | Main conclusion |
+|:---:|:---:|:---:|
+| 25 | What does INT8 quantisation gain? | **64.79% smaller model** |
+| 26 | Does INT8 materially change model behaviour? | **99.35% class agreement with FP32** |
+| 27 | Does INT8 reduce classification quality? | No observed degradation; validation metrics improved slightly |
+| 28 | Is INT8 faster on the development machine? | No — **FP32 was substantially faster** |
+| 29 | Do both models run correctly on the Raspberry Pi? | **Yes — both passed runtime validation** |
+| 30 | Which precision is faster on the Raspberry Pi? | **FP32 was substantially faster** |
+| 31 | Can the complete pipeline meet real-time deadlines? | Yes under the **`performance` governor**, with more FP32 headroom |
+| 32 | Does the deployment remain healthy over sustained operation? | **Yes**, with FP32 again showing lower CPU use and more deadline headroom |
+
+### Final Comparison
+
+Across 14,556 identical streaming sequences, FP32 and INT8 agreed on **99.35% of predicted classes** (95 disagreements). The disagreements were concentrated on sequences with relatively small FP32 decision margins.
+
+| Criterion | FP32 | INT8 | Outcome |
+|:---:|:---:|:---:|:---:|
+| Model size | 2.310 MiB | **0.813 MiB** | **INT8** |
+| Validation accuracy | 0.96357 | **0.96563** | INT8 (slight) |
+| Validation macro F1 | 0.67577 | **0.69014** | INT8 (slight) |
+| Raspberry Pi mean model-stage inference latency | **1.332 ms** | 3.850 ms | **FP32** |
+| Raspberry Pi model-stage throughput | **750.884 seq/s** | 259.737 seq/s | **FP32** |
+| Raspberry Pi classifier initialisation | 76.913 ms | **38.823 ms** | **INT8** |
+| Raspberry Pi runtime validation | Passed | Passed | Tie |
+| Performance-governor deadline misses | **0** | **0** | Tie |
+| Sustained 60-minute deadline misses | **0** | **0** | Tie |
+| Sustained minimum deadline margin | **15.36 ms** | 2.38 ms | **FP32** |
+| Sustained mean process CPU | **3.46%** | 4.67% | **FP32** |
+| Sustained maximum temperature | 49.6 °C | 49.6 °C | Tie |
+| Sustained throttling observed | No | No | Tie |
+| Sustained memory behaviour | +6.70 MiB / +5.42 MiB/hour | +7.63 MiB / +4.85 MiB/hour | Descriptive — not scored |
+
+### Cross-Platform Context
+
+The earlier development-machine benchmark provides supporting context rather than a deployment verdict:
+
+| Platform | FP32 mean model-stage inference latency | INT8 mean model-stage inference latency |
+|:---:|:---:|:---:|
+| Development machine | **0.681 ms** | 3.658 ms |
+| Raspberry Pi 5 | **1.332 ms** | 3.850 ms |
+
+The magnitude of the difference changed across platforms, but the ordering did not: FP32 remained faster than INT8 on both x86 and the target Raspberry Pi. The Raspberry Pi measurements carry the deployment decision because they were collected on the actual target hardware.
+
+### Decision
+
+**FP32 is selected as the default Raspberry Pi deployment precision.**
+
+INT8 achieved its intended storage benefit, reducing the ONNX model from `2.310 MiB` to `0.813 MiB`, a `64.79%` reduction. It also preserved FP32 behaviour closely, with `99.35%` class agreement across 14,556 identical streaming sequences, and produced slightly higher validation accuracy and macro F1.
+
+Those advantages are real, but they do not outweigh the target-hardware runtime evidence for this deployment.
+
+The controlled Raspberry Pi benchmark showed that FP32 achieved approximately `1.332 ms` mean model-stage inference latency compared with `3.850 ms` for INT8, while throughput increased from approximately `259.7` to `750.9` sequences per second. The same FP32 latency advantage appeared across every validation record.
+
+INT8 did initialise faster on the Raspberry Pi, taking `38.823 ms` compared with `76.913 ms` for FP32. However, this is a one-time start-up advantage of approximately `38.09 ms`, while FP32 saves approximately `2.52 ms` on every subsequent model inference. The initialisation disadvantage is therefore recovered after roughly 15 inference calls, making steady-state inference performance more important for a continuously running stream.
+
+Both precisions successfully ran the complete production streaming pipeline. Under the `performance` CPU governor, both also completed the full real-time record with zero deadline misses. FP32 nevertheless retained greater worst-case headroom, with the governor benchmark leaving at least `21.51 ms` of deadline margin compared with `7.01 ms` for INT8.
+
+The matched one-hour sustained runs reinforced that result. Both precisions completed 36,000 paced chunks with zero deadline misses, zero integrity failures and no throttling, but FP32 retained a minimum deadline margin of `15.36 ms` compared with only `2.38 ms` for INT8. FP32 also used less process CPU on average: `3.46%` of one logical core compared with `4.67%`.
+
+Thermal behaviour did not distinguish the candidates. Both one-hour runs averaged approximately `47.4 °C`, reached a maximum of `49.6 °C` and showed no throttling.
+
+Memory is not scored as an FP32-vs-INT8 decision criterion. Over one hour, FP32 had the smaller absolute RSS increase (`+6.70 MiB` versus `+7.63 MiB`), while INT8 had the slightly lower fitted slope (`+4.85 MiB/hour` versus `+5.42 MiB/hour`). These two summaries point in different directions, and the longer FP32 endurance run showed its fitted slope falling to approximately `+1.41 MiB/hour` as the initial increase flattened. Memory is therefore treated descriptively rather than used to distinguish the deployment candidates. The later 210-minute FP32 run was an endurance validation of the selected deployment candidate, not an additional matched FP32-vs-INT8 comparison.
+
+The small validation-metric advantage for INT8 is also interpreted cautiously. The comparison was made on a single validation split and the difference was not tested for statistical significance. It is therefore not strong enough to override the repeated target-hardware evidence showing lower latency, higher throughput, lower sustained CPU use and greater real-time deadline headroom for FP32.
+
+INT8 is retained as a **storage-optimised alternative** for deployments where reducing model size is more important than continuous inference performance or deadline headroom.
+
+### Final Deployment Configuration
+
+| Setting | Selected Configuration |
+|:---:|:---:|
+| Deployment precision | **FP32** |
+| ONNX model | `artifacts/models/ecg_sequence_transformer.onnx` |
+| Execution provider | `CPUExecutionProvider` |
+| Raspberry Pi CPU governor | **performance** |
+| R-peak detector | XQRS |
+| Sampling rate | 360 Hz |
+| Chunk size | 36 samples |
+| Chunk period | 100 ms |
+| Sequence length | 5 beats |
+| Streaming mode | Causal real-time inference |
+
+The `performance` governor is part of the selected configuration rather than an optional optimisation. Under the original `ondemand` governor, both precisions produced deadline misses; switching to `performance` removed every observed miss and substantially reduced scheduling jitter.
+
+### Supporting Endurance Evidence
+
+The 210-minute FP32 endurance run provides additional evidence for the selected configuration:
+
+| Metric | FP32 — 210 min |
+|:---:|:---:|
+| Chunks processed | 126,002 |
+| Predictions | 16,381 |
+| Deadline misses | **0** |
+| Integrity failures | **0** |
+| Minimum deadline margin | 19.98 ms |
+| Mean process CPU | 3.52% |
+| Maximum temperature | 50.7 °C |
+| RSS change | +8.80 MiB |
+| Fitted RSS trend | +1.41 MiB/hour |
+| Throttling observed | No |
+
+More than 126,000 paced chunks were processed over 3.5 hours without a deadline miss, integrity failure or throttling event. The initially rising RSS also progressively flattened rather than continuing at the rate suggested by the shorter one-hour measurement.
+
+### Evidence Sources
+
+```text
+artifacts/results/deployment_evaluation/quantization/
+    dynamic_int8_quantization_report.json
+
+artifacts/results/deployment_evaluation/quantization_agreement/
+    quantization_agreement_summary.json
+
+artifacts/results/deployment_evaluation/quantized_model_performance/
+    quantized_model_performance_summary.json
+
+artifacts/results/deployment_evaluation/onnx_benchmarking/
+    fp32_vs_int8_benchmark.json
+
+artifacts/results/deployment_evaluation/edge_runtime_validation/
+    record_114_edge_runtime_validation.json
+
+artifacts/results/deployment_evaluation/edge_onnx_benchmarking/
+    raspberry_pi_fp32_vs_int8_benchmark.json
+
+artifacts/results/deployment_evaluation/edge_realtime_streaming/
+    record_114_fp32_paced.json
+    record_114_int8_paced.json
+
+artifacts/results/deployment_evaluation/edge_realtime_streaming_perf_governor/
+    record_114_fp32_paced.json
+    record_114_int8_paced.json
+
+artifacts/results/deployment_evaluation/edge_sustained_resources/
+    fp32_sustained_60min.json
+    int8_sustained_60min.json
+    fp32_sustained_210min.json
+```
+
+### Limitations
+
+- The small FP32-vs-INT8 validation-metric differences should be interpreted descriptively. They show that quantisation produced no observed classification-quality penalty on the evaluated validation data, rather than proving that INT8 is intrinsically more accurate.
+- The `F` class remains weak for both precisions, so neither model should be considered reliable for that class from the current evidence.
+
+### Key Lesson
+
+A deployment decision must consider predictive quality, storage, target-hardware performance and sustained runtime behaviour together.
+
+INT8 delivered a substantial model-size reduction, preserved FP32 predictions closely and did not reduce validation classification quality. However, FP32 consistently provided the stronger computational behaviour on the actual Raspberry Pi: lower inference latency, higher throughput, lower sustained CPU usage and substantially greater worst-case deadline headroom, with equivalent thermal and stability behaviour.
+
+The final deployment orientation is therefore **FP32 ONNX inference on the Raspberry Pi 5 using the `performance` CPU governor**, with INT8 retained as a smaller alternative when storage efficiency is the overriding constraint.
+
+A deployment decision is only trustworthy if it shows both why the selected configuration won and what was deliberately given up by rejecting the alternative.
