@@ -9,6 +9,7 @@ from ecg_arrhythmia.dashboard.live_ecg_server import (
     DEFAULT_LIVE_ECG_HOST,
     DEFAULT_LIVE_ECG_PORT,
     LiveEcgServer,
+    live_endpoint_url,
 )
 from ecg_arrhythmia.dashboard.record_control import (
     control_endpoint,
@@ -91,7 +92,7 @@ _display_mode = render_display_mode()
 _control_host, _control_port = control_endpoint()
 
 mount_live_dashboard(
-    endpoint_base=f"http://{_endpoint.host}:{_endpoint.bound_port}",
+    endpoint_base=live_endpoint_url(_endpoint.host, _endpoint.bound_port),
     poll_ms=int(presentation.ECG_REFRESH_SECONDS * 1000),
     show_diagnostics=False,
     display_mode=_display_mode,

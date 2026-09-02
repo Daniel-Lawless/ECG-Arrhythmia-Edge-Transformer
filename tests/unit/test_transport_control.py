@@ -47,6 +47,11 @@ DASHBOARD_SIDE_MODULES = [
     "ecg_arrhythmia.transport.control_protocol",
     "ecg_arrhythmia.transport.control_client",
     "ecg_arrhythmia.dashboard.record_control",
+    "ecg_arrhythmia.dashboard.state",
+    "ecg_arrhythmia.dashboard.stream_service",
+    "ecg_arrhythmia.dashboard.live_ecg_server",
+    "ecg_arrhythmia.dashboard.live_ecg_component",
+    "ecg_arrhythmia.dashboard.display_mode",
 ]
 
 # Importing any of the above must not reach the Pi-side stack. The
@@ -54,6 +59,10 @@ DASHBOARD_SIDE_MODULES = [
 # importing it pulls replay_source -> load_record -> wfdb.
 PI_SIDE_MODULES = [
     "wfdb",
+    "torch",
+    "onnx",
+    "onnxruntime",
+    "neurokit2",
     "ecg_arrhythmia.transport.control_server",
     "ecg_arrhythmia.streaming.replay_source",
     "ecg_arrhythmia.data.build_dataset",

@@ -1,0 +1,41 @@
+# Local demo on ONE Docker host. See docs/docker.md for the real PC + Pi setup.
+name: ecg-arrhythmia
+
+services:
+  dashboard:
+    build:
+      context: .
+      target: dashboard
+    init: true
+    stop_grace_period: 30s
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    environment:
+      ECG_PI_CONTROL_HOST: edge
+      ECG_PI_CONTROL_PORT: "8767"
+      ECG_DASHBOARD_HOST: "0.0.0.0"
+      ECG_DASHBOARD_PORT: "8765"
+      ECG_LIVE_HTTP_HOST: "0.0.0.0"
+      ECG_LIVE_HTTP_PORT: "8766"
+      ECG_LIVE_HTTP_PUBLIC_URL: "http://127.0.0.1:8766"
+    ports:
+      - "127.0.0.1:8501:8501"
+      - "127.0.0.1:8766:8766"
+    # Port 8765 is reachable by edge on the Compose network, not published.
+
+  edge:
+    build:
+      context: .
+      target: edge
+    init: true
+    stop_grace_period: 30s
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    environment:
+      ECG_DATA_HOST: dashboard
+      ECG_DATA_PORT: "8765"
+    depends_on:
+      dashboard:
+        condition: service_healthy
+    # The dashboard reaches edge:8767 directly; no host control port is needed.
+    # Outbound HTTPS remains available for WFDB record loading.

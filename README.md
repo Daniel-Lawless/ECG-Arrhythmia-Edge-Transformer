@@ -30,6 +30,7 @@
 - [6. Live system: transport, dashboard and remote control](#6-live-system-transport-dashboard-and-remote-control)
 - [Final deployment decision](#final-deployment-decision)
 - [Quick start](#quick-start)
+- [Docker deployment](#docker-deployment)
 - [Evidence index](#evidence-index)
 - [Limitations and responsible interpretation](#limitations-and-responsible-interpretation)
 
@@ -462,6 +463,12 @@ python -m ecg_arrhythmia.deployment.quantize_onnx
 ```
 
 The detector, streaming-parity, quantisation, benchmark and Raspberry Pi evaluation scripts live under `src/ecg_arrhythmia/evaluation/`; each writes a structured JSON result under `artifacts/results/`.
+
+## Docker deployment
+
+Docker is an additional deployment option: one multi-stage Dockerfile separates the lightweight `dashboard` target from the FP32 ONNX `edge` target. See the [Docker guide](docs/docker.md) for the local two-container demo, real PC + Raspberry Pi deployment, amd64/arm64 builds, and validation status.
+
+Source/runtime checks and dependency resolution have been validated; actual image builds and containerised Pi performance still require validation on a Docker host. The native quick start and performance results above remain unchanged.
 
 ## Testing and CI
 

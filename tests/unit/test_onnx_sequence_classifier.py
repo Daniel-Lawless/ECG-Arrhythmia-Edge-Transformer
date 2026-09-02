@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import numpy as np
+import onnxruntime as ort
 import pytest
 
 from ecg_arrhythmia.data.label_mapping import NUM_CLASSES
@@ -77,12 +78,6 @@ def build_classifier(monkeypatch):
     def build(session: FakeSession) -> tuple[ONNXSequenceClassifier, list[Path]]:
         created: list[Path] = []
 
-        monkeypatch.setattr(
-            classifier_module,
-            "validate_onnx_model",
-            lambda onnx_path: None,
-        )
-
         def fake_create_onnx_session(onnx_path: Path) -> FakeSession:
             created.append(onnx_path)
             return session
@@ -131,6 +126,19 @@ def test_the_configured_providers_are_exposed(build_classifier):
     classifier, _ = build_classifier(FakeSession())
 
     assert classifier.providers == ("CPUExecutionProvider",)
+
+
+def test_a_missing_model_still_raises_file_not_found(tmp_path):
+    with pytest.raises(FileNotFoundError, match="No ONNX model found"):
+        ONNXSequenceClassifier(tmp_path / "missing.onnx")
+
+
+def test_onnx_runtime_rejects_a_corrupt_graph_without_the_export_checker(tmp_path):
+    model_path = tmp_path / "corrupt.onnx"
+    model_path.write_bytes(b"not an ONNX graph")
+
+    with pytest.raises(ort.capi.onnxruntime_pybind11_state.InvalidProtobuf):
+        ONNXSequenceClassifier(model_path)
 
 
 # ---------------------------------------------------------------------

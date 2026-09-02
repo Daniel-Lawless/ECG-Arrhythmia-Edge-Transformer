@@ -52,6 +52,9 @@ def create_onnx_session(
     Load the ONNX graph using the CPU execution provider.
     """
 
+    if not onnx_path.is_file():
+        raise FileNotFoundError(f"No ONNX model found at {onnx_path}")
+
     session = ort.InferenceSession(
         onnx_path,
         providers=["CPUExecutionProvider"],

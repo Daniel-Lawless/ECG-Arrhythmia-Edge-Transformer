@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 import socket
 import threading
 from pathlib import Path
@@ -415,9 +416,8 @@ class ControlServer:
         self.close()
 
 
-def main() -> None:
-    logging.basicConfig(level=logging.INFO)
-
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """CLI values override container environment defaults; native CLI is unchanged."""
     parser = argparse.ArgumentParser(
         description=(
             "Run the Pi control agent so the dashboard can start demo "
@@ -446,22 +446,23 @@ def main() -> None:
     parser.add_argument(
         "--host",
         type=str,
-        required=True,
+        default=os.environ.get("ECG_DATA_HOST"),
         metavar="PC_DATA_ADDRESS",
         help=(
             "OUTBOUND: address of the PC dashboard receiver that ECG "
             "data is streamed TO (the PC's Ethernet IP, e.g. "
-            "192.168.137.1). Not the address this agent listens on."
+            "192.168.137.1). Defaults to ECG_DATA_HOST; one must be supplied. "
+            "Not the address this agent listens on."
         ),
     )
     parser.add_argument(
         "--port",
         type=int,
-        default=DEFAULT_DATA_PORT,
+        default=os.environ.get("ECG_DATA_PORT", str(DEFAULT_DATA_PORT)),
         metavar="PC_DATA_PORT",
         help=(
             f"OUTBOUND: port of the PC dashboard data receiver "
-            f"(default {DEFAULT_DATA_PORT})."
+            f"(ECG_DATA_PORT, otherwise {DEFAULT_DATA_PORT})."
         ),
     )
     parser.add_argument(
@@ -508,7 +509,20 @@ def main() -> None:
         ),
     )
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
+
+    if args.host is None or not args.host.strip():
+        parser.error("provide --host or set ECG_DATA_HOST to the PC data address")
+
+    if not 1 <= args.port <= 65535:
+        parser.error("--port / ECG_DATA_PORT must be between 1 and 65535")
+
+    return args
+
+
+def main() -> None:
+    logging.basicConfig(level=logging.INFO)
+    args = parse_args()
 
     runner = RecordStreamRunner(
         host=args.host,

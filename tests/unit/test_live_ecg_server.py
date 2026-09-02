@@ -9,12 +9,64 @@ from ecg_arrhythmia.dashboard.live_ecg_server import (
     LiveEcgServer,
     allowed_origin,
     build_live_payload,
+    live_endpoint_url,
 )
 from ecg_arrhythmia.dashboard.presentation import stable_softmax
 from ecg_arrhythmia.dashboard.state import DashboardState, DashboardStateConfig
 
 # 10 s at 100 Hz -> capacity 1000 samples.
 CONFIG = DashboardStateConfig(ecg_window_seconds=10.0)
+
+
+def test_live_url_preserves_native_defaults_and_actual_bound_port(monkeypatch):
+    monkeypatch.delenv("ECG_LIVE_HTTP_PUBLIC_URL", raising=False)
+
+    assert live_endpoint_url("127.0.0.1", 8766) == "http://127.0.0.1:8766"
+    assert live_endpoint_url("localhost", 15321) == "http://localhost:15321"
+
+
+@pytest.mark.parametrize(
+    ("configured", "expected"),
+    [
+        ("http://127.0.0.1:8766", "http://127.0.0.1:8766"),
+        ("  http://localhost:9876/  ", "http://localhost:9876"),
+        ("https://example.test/ecg/", "https://example.test/ecg"),
+    ],
+)
+def test_live_url_uses_public_override_not_bind_address(
+    monkeypatch, configured, expected
+):
+    monkeypatch.setenv("ECG_LIVE_HTTP_PUBLIC_URL", configured)
+
+    assert live_endpoint_url("0.0.0.0", 12345) == expected
+
+
+@pytest.mark.parametrize(
+    "configured",
+    [
+        "",
+        "   ",
+        "/live",
+        "localhost:8766",
+        "ftp://localhost:8766",
+        "http://0.0.0.0:8766",
+        "http://[::]:8766",
+        "http://localhost:not-a-port",
+        "http://localhost:65536",
+        "http://localhost:0",
+        "http://user:password@localhost:8766",
+        "http://localhost:8766?token=x",
+        "http://localhost:8766#fragment",
+        "http://local host:8766",
+        "http://[invalid",
+    ],
+)
+def test_live_url_rejects_invalid_explicit_configuration(monkeypatch, configured):
+    monkeypatch.setenv("ECG_LIVE_HTTP_PUBLIC_URL", configured)
+
+    with pytest.raises(ValueError, match="ECG_LIVE_HTTP_PUBLIC_URL"):
+        live_endpoint_url("127.0.0.1", 8766)
+
 
 # Argmax 2 = V, consistent with the predicted label used below.
 V_LOGITS = [0.5, 0.2, 4.0, 0.1]
