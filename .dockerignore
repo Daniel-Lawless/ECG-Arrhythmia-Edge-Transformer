@@ -1,0 +1,34 @@
+# Deny by default: no .git, venvs, data, checkpoints, results, IDE files,
+# coverage, local configuration, or credentials enter the build context.
+**
+!Dockerfile
+!.dockerignore
+!pyproject.toml
+!README.md
+!src/
+!src/**
+!artifacts/
+!artifacts/models/
+!artifacts/models/ecg_sequence_transformer.onnx
+
+# Re-exclude development-only code and accidental files inside src/.
+src/ecg_arrhythmia/dashboard/refresh_probe.py
+src/ecg_arrhythmia/training/
+src/ecg_arrhythmia/evaluation/
+src/ecg_arrhythmia/deployment/
+src/ecg_arrhythmia/models/
+src/ecg_arrhythmia/visualisation/
+**/__pycache__/
+**/*.py[cod]
+**/*.egg-info/
+**/.pytest_cache/
+**/.ruff_cache/
+**/.mypy_cache/
+**/.env
+**/.env.*
+**/*.pem
+**/*.key
+**/credentials*
+**/secrets*
+**/.DS_Store
+**/Thumbs.db

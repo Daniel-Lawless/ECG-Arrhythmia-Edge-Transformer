@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse
@@ -25,6 +26,46 @@ RECENT_BEAT_LIMIT = 12
 _LOOPBACK_HOSTS = ("localhost", "127.0.0.1", "::1")
 
 _plotly_js_cache: bytes | None = None
+
+
+def live_endpoint_url(bind_host: str, bound_port: int) -> str:
+    """Separate the browser's URL from the server's listening address.
+
+    With no override, preserve the native dashboard's existing behaviour,
+    including the actual port assigned when binding to port zero in tests.
+    This does not change the bind address or the loopback-only CORS policy.
+    """
+
+    public_url = os.environ.get("ECG_LIVE_HTTP_PUBLIC_URL")
+
+    if public_url is None:
+        return f"http://{bind_host}:{bound_port}"
+
+    public_url = public_url.strip().rstrip("/")
+
+    try:
+        parsed = urlparse(public_url)
+        valid = (
+            parsed.scheme in ("http", "https")
+            and bool(parsed.hostname)
+            and parsed.hostname not in ("0.0.0.0", "::")
+            and parsed.username is None
+            and parsed.password is None
+            and not parsed.query
+            and not parsed.fragment
+            and (parsed.port is None or 1 <= parsed.port <= 65535)
+            and not any(character.isspace() for character in public_url)
+        )
+    except ValueError:
+        valid = False
+
+    if not valid:
+        raise ValueError(
+            "ECG_LIVE_HTTP_PUBLIC_URL must be an absolute HTTP(S) browser URL "
+            "without credentials, query, fragment, or a wildcard host."
+        )
+
+    return public_url
 
 
 def allowed_origin(origin: str | None) -> str | None:

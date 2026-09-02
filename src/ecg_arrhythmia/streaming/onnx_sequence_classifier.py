@@ -17,7 +17,6 @@ from ecg_arrhythmia.streaming.onnx_contract import (
     ONNX_OUTPUT_NAME,
     ONNX_RR_INPUT_NAME,
     create_onnx_session,
-    validate_onnx_model,
     validate_session_contract,
 )
 from ecg_arrhythmia.streaming.sequence_assembler import BeatSequence
@@ -54,8 +53,9 @@ class ONNXSequenceClassifier:
     """
 
     def __init__(self, onnx_path: Path) -> None:
-        validate_onnx_model(onnx_path)
-
+        # ORT loads/checks the graph; the contract below checks our tensor API.
+        # The separate ONNX graph checker belongs to export/parity tooling,
+        # not the inference runtime (which does not install the onnx package).
         # onnx_contract owns the provider choice and every check of what
         # the deployed graph looks like.
         self._session: ort.InferenceSession = create_onnx_session(onnx_path)

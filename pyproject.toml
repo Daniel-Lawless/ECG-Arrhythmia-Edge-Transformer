@@ -5,9 +5,8 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 
-# Project metadata and runtime dependencies.
-# dependencies is similar in purpose to requirements.txt and is installed with:
-# pip install -e .
+# Shared lightweight dependencies. Install a runtime extra for deployment,
+# or [dev,dashboard] for the existing full development workflow.
 [project]
 name = "ecg-arrhythmia"
 version = "0.1.0"
@@ -15,30 +14,36 @@ description = "Edge ECG arrhythmia classification using MIT-BIH beat-level data"
 requires-python = ">=3.12"
 dependencies = [
     "numpy",
-    "wfdb",
-    "matplotlib",
-    "scikit-learn",
-    "torch",
-    # Provides established Hamilton and Elgendi QRS detectors used by the
-    # HamiltonDetector and ElgendiDetector R-peak wrappers.
-    "neurokit2",
-    "onnx",
-    "onnxruntime",
 ]
 
 
-# Optional development dependencies.
-# Installed alongside the runtime dependencies with:
-# pip install -e ".[dev]"
+# Runtime groups do not install training/export dependencies.
 [project.optional-dependencies]
-dev = [
-    "pytest",
-    "ruff",
+edge = [
+    "wfdb",
+    # Version recorded in the committed x86 and Raspberry Pi benchmarks.
+    "onnxruntime==1.28.0",
 ]
 
 dashboard = [
     "streamlit>=1.61",
     "plotly>=5.18",
+]
+
+# Preserve the full native development/CI install: [dev,dashboard].
+research = [
+    "ecg-arrhythmia[edge]",
+    "matplotlib",
+    "scikit-learn",
+    "torch",
+    "neurokit2",
+    "onnx",
+]
+
+dev = [
+    "ecg-arrhythmia[research]",
+    "pytest",
+    "ruff",
 ]
 
 
