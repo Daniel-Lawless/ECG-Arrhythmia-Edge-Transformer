@@ -2,7 +2,7 @@
 
 # Real-Time ECG Arrhythmia Classification on the Edge
 
-**A leakage-aware CNN–Transformer ECG inference system with patient-level train/validation/test splitting, causal five-beat classification, verified ONNX deployment, and real-time Raspberry Pi 5 inference with live predictions, waveform and hardware telemetry streamed to a browser dashboard.**
+**A leakage-aware CNN–Transformer ECG inference system with patient-level train/validation/test splitting, causal five-beat classification, verified ONNX deployment, and a benchmarked Docker edge deployment on Raspberry Pi 5 with live predictions, waveform and hardware telemetry streamed to a browser dashboard.**
 
 <p>
   <strong>▶ Click the image to watch the live demo</strong>
@@ -28,9 +28,9 @@
 - [4. Quantisation](#4-quantisation-smaller-no-worse--and-still-not-selected)
 - [5. Real-time on the Raspberry Pi](#5-real-time-on-the-raspberry-pi)
 - [6. Live system: transport, dashboard and remote control](#6-live-system-transport-dashboard-and-remote-control)
+- [7. Docker deployment and native comparison](#7-docker-deployment-and-native-comparison)
 - [Final deployment decision](#final-deployment-decision)
 - [Quick start](#quick-start)
-- [Docker deployment](#docker-deployment)
 - [Evidence index](#evidence-index)
 - [Limitations and responsible interpretation](#limitations-and-responsible-interpretation)
 
@@ -47,9 +47,10 @@
 | Does INT8 quantisation help? | **2.84× smaller** (2.310 → 0.813 MiB), **99.35%** agreement with FP32 and **no observed validation-set quality loss** — but **2.89× slower** on the Pi, so FP32 was selected | Controlled, counterbalanced benchmarks on x86 and ARM |
 | Does it meet real-time deadlines? | `ondemand` governor: **164 misses**. `performance` governor: **0 misses**, worst chunk 78.4 ms against a 100 ms budget | Paced replay of a full 30-minute record |
 | Is it stable over time? | **210 minutes, 126,002 chunks, 16,381 predictions, 0 deadline misses, 0 integrity failures, no throttling** | Sustained Raspberry Pi endurance run |
-| How is all of this verified? | **730 tests** (715 unit, 15 integration) across 68 modules, Ruff formatting and linting, GitHub Actions CI | This repository |
+| What does Docker cost on the Pi? | The selected deployment added approximately **7–8% complete-path latency**, with **0 deadline misses across 72,224 primary chunks**; a separate 60-minute Docker run also had **0 misses** and **19.900 ms** minimum headroom | Counterbalanced Native → Docker → Docker → Native comparison plus sustained Docker validation |
+| How is all of this verified? | **915 tests** (899 unit, 16 integration) across 75 modules, Ruff formatting and linting, GitHub Actions CI | This repository |
 
-Every number above is backed by a committed, machine-readable result under [`artifacts/results/`](artifacts/results/); the [evidence index](#evidence-index) maps each claim to its file. The full 37-milestone engineering record is in [`notes/progress_log.md`](notes/progress_log.md).
+Every number above is backed by a committed, machine-readable result under [`artifacts/results/`](artifacts/results/); the [evidence index](#evidence-index) maps each claim to its file. The full 38-milestone engineering record is in [`notes/progress_log.md`](notes/progress_log.md).
 
 ## What makes this project different
 
@@ -62,6 +63,7 @@ Many ECG classification projects focus primarily on offline metrics. This projec
 - **Parity is proven at every hand-off.** Offline → streaming preprocessing, PyTorch → ONNX, and offline ONNX → live streaming ONNX are each verified on identical inputs.
 - **Hardware decisions are evidence-led.** INT8 was smaller and showed no observed validation-set quality loss — and still lost, because it was slower on the actual Raspberry Pi and left only 2.38 ms of worst-case deadline headroom versus 15.36 ms for FP32.
 - **Real-time claims include the worst case.** Deadline misses, scheduling jitter, CPU governor behaviour, temperature, throttling flags and memory growth were all measured over hours, not seconds.
+- **Containerisation was benchmarked, not assumed free.** Native and Docker used the same production `run_record_stream()` path in a counterbalanced comparison. The selected Docker deployment added measurable complete-path cost of approximately 7–8%, while every declared deadline, integrity and continuity gate still passed.
 - **Production-shaped software.** Immutable events, strict tensor contracts, bounded dashboard state, TCP frame reconstruction, strict control-message validation, dependency isolation enforced by clean-subprocess tests, and structured JSON outputs for every experiment.
 
 ## System architecture
@@ -332,7 +334,7 @@ Matched one-hour real-time runs cycled through all six validation records with p
   <img src="artifacts/figures/edge_sustained_resources/sustained_fp32_vs_int8_comparison.png" width="90%" alt="One-hour Raspberry Pi FP32 versus INT8 temperature and process RSS">
 </p>
 
-Both precisions passed, but INT8 came within 2.38 ms of a missed deadline while FP32 kept more than six times that margin. The selected FP32 configuration was then run for **210 minutes**:
+Both precisions passed, but INT8 came within 2.38 ms of a missed deadline while FP32 kept more than six times that margin. Before containerisation, the selected native FP32 configuration was then run for **210 minutes**:
 
 <p align="center">
   <img src="artifacts/figures/edge_sustained_resources/fp32_sustained_timeseries_210min.png" width="90%" alt="210-minute Raspberry Pi FP32 telemetry — temperature, CPU frequency, process RSS and CPU">
@@ -365,6 +367,58 @@ The validated Pi pipeline is wrapped as a networked edge system with two deliber
 
 The complete path — dashboard start command, Pi acceptance, returning ECG stream, live predictions and telemetry, stop and restart — was validated end-to-end over a home LAN with zero observed stream discontinuities, running on the `performance` governor at 2.4 GHz.
 
+## 7. Docker deployment and native comparison
+
+### Deployment packaging
+
+The completed live system is packaged with one multi-stage [`Dockerfile`](Dockerfile). Separate `dashboard` and `edge` targets keep the PC image free of the Pi inference stack and the Pi image free of research, training and dashboard dependencies. The targets use architecture-native Python bases and wheels for amd64 and arm64 deployment; the edge image contains the selected FP32 ONNX model and runs it through ONNX Runtime `CPUExecutionProvider`. [`compose.yaml`](compose.yaml) provides the same two-target topology for a local single-host demonstration.
+
+### Hardware telemetry outside the critical path
+
+Benchmarking exposed synchronous Raspberry Pi hardware queries in the latency-critical streaming path. Hardware polling now runs in a background collector, while `run_record_stream()` consumes complete cached snapshots with age and staleness metadata. Hardware queries are therefore no longer issued synchronously from the streaming loop, keeping their latency outside the critical ECG-processing path.
+
+### Native vs Docker comparison
+
+The formal primary benchmark used a counterbalanced **Native → Docker → Docker → Native** order. Every run used the same FP32 model, `CPUExecutionProvider`, causal XQRS streaming pipeline, 360 Hz signal, 36-sample / 100 ms cadence, TCP production path and Raspberry Pi 5 `performance` governor at 2.4 GHz.
+
+| Complete-path metric | Native | Docker | Change |
+|:--|--:|--:|--:|
+| Mean latency | 12.642 ms | 13.639 ms | +7.89% |
+| p95 latency | 64.399 ms | 69.459 ms | +7.86% |
+| p99 latency | 66.208 ms | 70.750 ms | +6.86% |
+| Deadline misses | 0 | 0 | — |
+
+Across the four fresh-process runs, **72,224 chunks** produced **7,492 predictions** with zero integrity failures, zero stream discontinuities and **21.857 ms** worst-case Docker deadline headroom.
+
+<p align="center">
+  <img src="artifacts/figures/deployment_evaluation/docker_vs_native/native_vs_docker_paced_latency.png" width="90%" alt="Native versus Docker complete-path mean, p95 and p99 paced streaming latency on Raspberry Pi 5, with the 100 ms deadline">
+</p>
+
+In these runs, the isolated ONNX model stage was not slower in Docker. The selected Docker deployment nevertheless increased complete production-path latency by approximately 7–8%, so the added cost lay outside the measured ONNX call. This characterises the tested image, runtime and userland stack; it is not a measurement of pure container namespace overhead.
+
+### 60-minute Docker sustained validation
+
+| Metric | Result |
+|:--|--:|
+| Paced signal duration | 60.0 min |
+| Chunks | 36,000 |
+| Predictions | 4,329 |
+| Deadline misses | 0 |
+| Integrity failures / stream discontinuities | 0 / 0 |
+| Minimum deadline margin | 19.900 ms |
+| Mean process CPU | 23.71% |
+| Maximum temperature | 50.7 °C |
+| Maximum RSS | 198.36 MiB |
+| Throttling | None |
+
+<p align="center">
+  <img src="artifacts/figures/deployment_evaluation/docker_vs_native/docker_sustained_resources.png" width="90%" alt="Aggregate temperature, CPU frequency, process RSS and process CPU statistics from the 60-minute Docker sustained validation">
+</p>
+
+The figure shows aggregate run-wide resource statistics for the 60-minute Docker validation. RSS increased during startup and at a record transition before settling into a narrow 0.0625 MiB range over the final 20 minutes. No runaway memory growth was observed during the tested hour.
+
+The Docker deployment therefore **passed the operational real-time gates with measurable, but acceptable, complete-path overhead**.
+
 ## Final deployment decision
 
 | Setting | Selected value |
@@ -373,21 +427,28 @@ The complete path — dashboard start command, Pi acceptance, returning ECG stre
 | Model | [`artifacts/models/ecg_sequence_transformer.onnx`](artifacts/models/ecg_sequence_transformer.onnx) |
 | Runtime | ONNX Runtime `CPUExecutionProvider` |
 | Target | Raspberry Pi 5, `performance` CPU governor |
+| Packaging | Docker, with separate multi-architecture `edge` and `dashboard` targets |
+| Docker validation | Passed with measurable complete-path overhead |
 | R-peak detector | XQRS (causal, overlapping-window) |
 | Signal cadence | 360 Hz, 36 samples/chunk, 100 ms/chunk |
 | Model input | Five causal beats × (240 ECG samples + 2 RR features) |
 
-The decision was made criterion by criterion rather than with a weighted score. INT8 won on model size and initialisation time and tied on runtime correctness, thermal behaviour and zero-miss stability. FP32 won on mean, median and p95 latency, throughput, sustained CPU use and worst-case deadline headroom on the target hardware. INT8 is retained as the storage-optimised alternative for deployments where model size is the overriding constraint.
+The decision was made criterion by criterion rather than with a weighted score. INT8 won on model size and initialisation time and tied on runtime correctness, thermal behaviour and zero-miss stability. FP32 won on mean, median and p95 latency, throughput, sustained CPU use and worst-case deadline headroom on the target hardware. The final packaged deployment therefore uses the FP32 ONNX graph in the Docker `edge` target, paired with the separate dashboard target; native execution remains the development and performance-baseline path. INT8 is retained as the storage-optimised alternative for deployments where model size is the overriding constraint.
 
 ## Quick start
 
 ### Installation
 
-Requirements: Python 3.12+, network access on first run (WFDB fetches MIT-BIH records from PhysioNet), and a Raspberry Pi 5 to reproduce the target-hardware measurements.
+The recommended container path requires Docker on both the PC and Raspberry Pi. Native development and ML reproduction require Python 3.12+; network access is needed on first record load because WFDB fetches MIT-BIH data from PhysioNet. A Raspberry Pi 5 is required for the physical edge deployment and to reproduce the reported target-hardware measurements; the local Docker Compose smoke test can run on a single host.
 
 ```bash
 git clone https://github.com/Daniel-Lawless/ECG-Arrhythmia-Edge-Transformer.git
 cd ECG-Arrhythmia-Edge-Transformer
+```
+
+For native development and ML reproduction:
+
+```bash
 python3.12 -m venv .venv
 source .venv/bin/activate          # Windows PowerShell: .venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
@@ -397,6 +458,36 @@ pip install -e ".[dev,dashboard]"
 On CPU-only machines, install PyTorch from the CPU index first (as CI does): `pip install torch --index-url https://download.pytorch.org/whl/cpu`.
 
 ### Running the live edge demo
+
+#### A. Docker deployment — recommended for the completed edge system
+
+Build and run the dashboard target on the PC, replacing `<PI_IP>` with the Raspberry Pi address:
+
+```bash
+docker build --target dashboard -t ecg-dashboard .
+docker run --rm --init --name ecg-dashboard \
+  -p 127.0.0.1:8501:8501 \
+  -p 127.0.0.1:8766:8766 \
+  -p 8765:8765 \
+  -e ECG_PI_CONTROL_HOST=<PI_IP> \
+  -e ECG_PI_CONTROL_PORT=8767 \
+  ecg-dashboard
+```
+
+Build and run the ARM64 edge target on the Raspberry Pi, replacing `<PC_IP>` with the PC address reachable from the Pi:
+
+```bash
+docker build --target edge --build-arg VCS_REF="$(git rev-parse HEAD)" -t ecg-edge .
+docker run --rm --init --name ecg-edge \
+  -p 8767:8767 \
+  -e ECG_DATA_HOST=<PC_IP> \
+  -e ECG_DATA_PORT=8765 \
+  ecg-edge
+```
+
+Open `http://127.0.0.1:8501` on the PC, select a record and press **Start stream**. Build each target on the architecture where it will run; for a local single-host smoke test, use `docker compose up --build`.
+
+#### B. Native execution — development and debugging
 
 **1. Start the dashboard on the PC**, pointing it at the Pi's hostname or LAN IP:
 
@@ -464,19 +555,13 @@ python -m ecg_arrhythmia.deployment.quantize_onnx
 
 The detector, streaming-parity, quantisation, benchmark and Raspberry Pi evaluation scripts live under `src/ecg_arrhythmia/evaluation/`; each writes a structured JSON result under `artifacts/results/`.
 
-## Docker deployment
-
-Docker is an additional deployment option: one multi-stage Dockerfile separates the lightweight `dashboard` target from the FP32 ONNX `edge` target. See the [Docker guide](docs/docker.md) for the local two-container demo, real PC + Raspberry Pi deployment, amd64/arm64 builds, and validation status.
-
-Source/runtime checks and dependency resolution have been validated; actual image builds and containerised Pi performance still require validation on a Docker host. The native quick start and performance results above remain unchanged.
-
 ## Testing and CI
 
 ```bash
 ruff format --check .
 ruff check .
-pytest tests/unit/           # 715 tests across 56 modules
-pytest tests/integration/    # 15 tests across 12 modules, real MIT-BIH records
+pytest tests/unit/           # 899 tests across 63 modules
+pytest tests/integration/    # 16 tests across 12 modules, real MIT-BIH records
 ```
 
 GitHub Actions runs formatting, linting and the unit suite on every push and pull request; the real-data integration suite runs on manual dispatch. Coverage spans preprocessing, split safety, models, R-peak detection and matching, ONNX contracts, three-way parity, quantisation, benchmark statistics, Pi telemetry parsing, real-time scheduling logic, TCP framing, dashboard state, control-channel lifecycle and clean-process dependency isolation.
@@ -487,18 +572,18 @@ GitHub Actions runs formatting, linting and the unit suite on every push and pul
 .
 ├── .github/workflows/ci.yml
 ├── artifacts/
-│   ├── figures/                 # model, detector, parity, quantisation and Pi plots
+│   ├── figures/                 # model, detector, parity, Pi and Docker deployment plots
 │   ├── models/                  # selected FP32 ONNX deployment graph
 │   └── results/                 # structured JSON evidence and selected raw arrays
 ├── assets/                      # dataset exploration figures
 ├── data/                        # committed lightweight split metadata
-├── notes/progress_log.md        # 37-milestone engineering record
+├── notes/progress_log.md        # 38-milestone engineering record
 ├── src/ecg_arrhythmia/
 │   ├── dashboard/               # Streamlit shell, live endpoint, state, presentation, control strip
 │   ├── data/                    # WFDB loading, AAMI labels, datasets, patient-level splitting
 │   ├── deployment/              # ONNX export, parity verification, INT8 quantisation
 │   ├── detection/               # XQRS, Hamilton and Elgendi detector interfaces
-│   ├── evaluation/              # detector, parity, quantisation, benchmark and endurance tools
+│   ├── evaluation/              # detector, parity, benchmark, endurance and Docker plotting tools
 │   ├── models/                  # CNN baselines, beat/RR encoders, sequence Transformer
 │   ├── preprocessing/           # beat windows and shared RR-feature calculation
 │   ├── streaming/               # chunks, buffers, causal detection, assembly, ONNX inference
@@ -529,6 +614,8 @@ GitHub Actions runs formatting, linting and the unit suite on every push and pul
 | Pi runtime validation | [`record_114_edge_runtime_validation.json`](artifacts/results/deployment_evaluation/edge_runtime_validation/record_114_edge_runtime_validation.json) |
 | CPU governor and deadline behaviour | [`edge_realtime_streaming/`](artifacts/results/deployment_evaluation/edge_realtime_streaming/), [`edge_realtime_streaming_perf_governor/`](artifacts/results/deployment_evaluation/edge_realtime_streaming_perf_governor/) |
 | Sustained 60-minute and 210-minute runs | [`edge_sustained_resources/`](artifacts/results/deployment_evaluation/edge_sustained_resources/) |
+| Native vs Docker deployment | [`summary.json`](artifacts/results/deployment_evaluation/docker_vs_native/summary.json) |
+| Docker 60-minute sustained validation | [`sustained.json`](artifacts/results/deployment_evaluation/docker_vs_native/sustained.json) |
 
 ## Limitations and responsible interpretation
 
@@ -539,6 +626,8 @@ GitHub Actions runs formatting, linting and the unit suite on every push and pul
 - XQRS-centred labelled evaluation is necessarily expert-influenced: unmatched detections shape rhythm context, but only detections matched to expert annotations are scored.
 - The small INT8 validation gain is based on one split and was not tested for statistical significance.
 - Runtime results are specific to the tested Raspberry Pi 5, ONNX Runtime CPU provider and governor. Quantisation may behave differently on hardware with optimised INT8 kernels.
+- The native/Docker comparison has two primary runs per condition and is descriptive, not an equivalence study.
+- The Docker result characterises the selected image, runtime and userland configuration; it is neither pure namespace overhead nor a universal Docker performance result.
 - The live source is a real-time replay of MIT-BIH records. A physical sensor/ADC needs a source adapter plus fresh signal-quality and safety validation.
 - The control and data channels have no authentication or encryption and are intended for a trusted LAN only.
 
@@ -556,4 +645,4 @@ This project uses the [MIT-BIH Arrhythmia Database](https://physionet.org/conten
 
 ---
 
-Built by [Daniel Lawless](https://github.com/Daniel-Lawless) as an end-to-end study in biomedical signal processing, imbalanced learning, causal sequence modelling, model export and quantisation, edge benchmarking, real-time systems and live visualisation.
+Built by [Daniel Lawless](https://github.com/Daniel-Lawless) as an end-to-end study in biomedical signal processing, imbalanced learning, causal sequence modelling, model export and quantisation, edge benchmarking, containerised deployment, real-time systems and live visualisation.
