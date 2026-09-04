@@ -168,6 +168,8 @@ def build_live_payload(snapshot) -> dict:
                 status.model_throughput_sequences_per_second
             ),
             "model_measurement_age_seconds": status.model_measurement_age_seconds,
+            "hardware_sample_age_seconds": status.hardware_sample_age_seconds,
+            "hardware_sample_stale": status.hardware_sample_stale,
         }
 
     return {

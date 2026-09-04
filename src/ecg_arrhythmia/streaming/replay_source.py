@@ -123,7 +123,7 @@ class ReplaySource:
     # this function, it creates a generator object. It runs when we do
     # next(chunk_iterator) or for chunk in chunk_iterator (Python calls
     # next() when we use a for loop)
-    def iter_chunks(self) -> Iterator[SampleChunk]:
+    def iter_chunks(self, on_schedule=None) -> Iterator[SampleChunk]:
         """
         Yield the record as consecutive chunks in sample order.
 
@@ -171,6 +171,9 @@ class ReplaySource:
                 # until we deliever the chunk to stay at real time.
                 if remaining_seconds > 0:
                     self._sleep(remaining_seconds)
+
+            if on_schedule is not None:
+                on_schedule(chunk, target_time if real_time else None)
 
             yield chunk
 

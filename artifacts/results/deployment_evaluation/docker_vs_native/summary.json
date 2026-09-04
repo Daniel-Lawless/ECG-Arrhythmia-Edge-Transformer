@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "status": "passed_with_measurable_docker_overhead",
+  "evidence": {
+    "formal_session_id": "b3f84877-96b9-43d9-9d19-cd1638f86bbc",
+    "formal_session_archive": "session_04_wired_attempt02_with_sustained.tar.gz",
+    "formal_session_archive_sha256": "2fb444b6230331b9bc69cead2d8529684d5c78e692d9611ecef68d20042fc86",
+    "formal_source_revision": "bd034ad3036ff6293ebfa5a7fb4e0b01bf561a91",
+    "formal_source_sha256": "eb2eb51d16a737ff01357f41ed48cd61fa534300ca4f22bc6d11df43f7b7d653",
+    "model_sha256": "74d9c32ac8159123a6f6eeb95ffcbee21704d395d2da4133d9f78db2fc0390d8",
+    "docker_image_id": "sha256:d0c64ec62b960df77fc60136d54445e9227de411d8953cfc6b512fa1f6ad8570"
+  },
+  "methodology": {
+    "platform": "Raspberry Pi 5 Model B Rev 1.1 / ARM64",
+    "precision": "FP32",
+    "provider": "CPUExecutionProvider",
+    "order": [
+      "native",
+      "docker",
+      "docker",
+      "native"
+    ],
+    "fresh_process_runs_per_condition": 2,
+    "sampling_rate_hz": 360.0,
+    "chunk_size_samples": 36,
+    "chunk_period_ms": 100.0,
+    "deadline_ms": 100.0,
+    "replay_mode": "real_time",
+    "cpu_governor": "performance",
+    "cpu_frequency_mhz": 2400.0,
+    "production_streaming_path": true,
+    "aggregation": "equal weight per fresh-process run"
+  },
+  "native": {
+    "runs": 2,
+    "model": {
+      "latency_ms": {
+        "mean": 1.3697223186332086,
+        "median": 1.3618945,
+        "p95": 1.4051319,
+        "p99": 1.4352052000000004,
+        "maximum": 3.8397129999999997
+      },
+      "throughput_sequences_per_second": 730.4336417345243,
+      "sequences_per_run": 1873,
+      "timed_inferences_per_run": 9365
+    },
+    "paced": {
+      "full_path_ms": {
+        "mean": 12.641769907066905,
+        "median": 0.09214800000000001,
+        "p95": 64.399404875,
+        "p99": 66.2082892,
+        "maximum": 71.0859375
+      },
+      "deadline_misses": 0,
+      "minimum_deadline_margin_ms": 28.519046,
+      "chunks_per_run": 18056,
+      "predictions_per_run": 1873,
+      "integrity_failures": 0,
+      "source_discontinuities": 0,
+      "resources": {
+        "process_cpu_percent": {
+          "mean": 21.134929305653536,
+          "maximum": 26.81942427173389
+        },
+        "rss_mib": {
+          "mean": 171.51331578038673,
+          "maximum": 171.8359375
+        },
+        "temperature_c": {
+          "mean": 47.86491712707182,
+          "maximum": 50.15
+        },
+        "throttling_observed": false
+      }
+    }
+  },
+  "docker": {
+    "runs": 2,
+    "model": {
+      "latency_ms": {
+        "mean": 1.3364203670048052,
+        "median": 1.326358,
+        "p95": 1.3702803,
+        "p99": 1.4083347000000004,
+        "maximum": 13.7117355
+      },
+      "throughput_sequences_per_second": 748.6498298276067,
+      "sequences_per_run": 1873,
+      "timed_inferences_per_run": 9365
+    },
+    "paced": {
+      "full_path_ms": {
+        "mean": 13.638615883390564,
+        "median": 0.10347200000000001,
+        "p95": 69.45925775,
+        "p99": 70.75024425000001,
+        "maximum": 75.934117
+      },
+      "deadline_misses": 0,
+      "minimum_deadline_margin_ms": 21.856864,
+      "chunks_per_run": 18056,
+      "predictions_per_run": 1873,
+      "integrity_failures": 0,
+      "source_discontinuities": 0,
+      "resources": {
+        "process_cpu_percent": {
+          "mean": 22.141193496887404,
+          "maximum": 28.13814468749142
+        },
+        "rss_mib": {
+          "mean": 171.20910307320443,
+          "maximum": 171.6171875
+        },
+        "temperature_c": {
+          "mean": 47.839848066298345,
+          "maximum": 49.6
+        },
+        "throttling_observed": false
+      }
+    }
+  },
+  "docker_change_percent": {
+    "model_latency_ms": {
+      "mean": -2.4312921805665058,
+      "median": -2.609343087882364,
+      "p95": -2.4803080764161782,
+      "p99": -1.8722409868637608,
+      "maximum": 257.10313505202083
+    },
+    "model_throughput_sequences_per_second": 2.49388678892519,
+    "paced_full_path_ms": {
+      "mean": 7.885335547567668,
+      "median": 12.28892650952815,
+      "p95": 7.856987009152085,
+      "p99": 6.860100305990104,
+      "maximum": 6.8201667875590735
+    }
+  },
+  "validation": {
+    "total_primary_chunks": 72224,
+    "total_primary_predictions": 7492,
+    "deadline_misses": 0,
+    "integrity_failures": 0,
+    "source_discontinuities": 0
+  },
+  "limitations": [
+    "Two runs per condition are descriptive, not an equivalence study.",
+    "The Docker image userland differs from native, so this measures the selected deployment rather than pure namespace overhead.",
+    "The larger isolated Docker model-stage maxima were not representative of its faster mean, median, p95 and p99 distribution.",
+    "Finite successful runs do not establish a hard-real-time guarantee.",
+    "An earlier exploratory campaign repeatedly associated rare native outliers with hardware-query 108, but isolated no actionable mechanism; that relationship is historical context, not formal benchmark evidence."
+  ]
+}

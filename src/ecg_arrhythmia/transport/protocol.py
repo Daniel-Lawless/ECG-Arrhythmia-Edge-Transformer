@@ -191,6 +191,8 @@ def encode_runtime_status(
     model_inference_mean_ms: float | None,
     model_throughput_sequences_per_second: float | None,
     model_measurement_age_seconds: float | None,
+    hardware_sample_age_seconds: float | None = None,
+    hardware_sample_stale: bool | None = None,
 ) -> bytes:
     """
     One live edge-telemetry frame (schema version 3).
@@ -211,38 +213,39 @@ def encode_runtime_status(
     model_measurement_age_seconds rather than re-labelled as fresh.
     """
 
-    return _encode(
-        {
-            "schema_version": SCHEMA_VERSION,
-            "message_type": MESSAGE_TYPE_RUNTIME_STATUS,
-            "record_name": record_name,
-            "latest_sample_index": (
-                None if latest_sample_index is None else int(latest_sample_index)
-            ),
-            "temperature_c": _optional_float(temperature_c),
-            "process_cpu_percent": _optional_float(process_cpu_percent),
-            "process_rss_mib": _optional_float(process_rss_mib),
-            "available_ram_mib": _optional_float(available_ram_mib),
-            "cpu_frequency_mhz": _optional_float(cpu_frequency_mhz),
-            "cpu_governor": None if cpu_governor is None else str(cpu_governor),
-            "under_voltage_active": _optional_bool(under_voltage_active),
-            "frequency_capped_active": _optional_bool(frequency_capped_active),
-            "throttling_active": _optional_bool(throttling_active),
-            "soft_temp_limit_active": _optional_bool(soft_temp_limit_active),
-            "runtime_condition_occurred": _optional_bool(runtime_condition_occurred),
-            "window_max_chunk_processing_ms": float(window_max_chunk_processing_ms),
-            "window_min_processing_headroom_ms": float(
-                window_min_processing_headroom_ms
-            ),
-            "model_inference_mean_ms": _optional_float(model_inference_mean_ms),
-            "model_throughput_sequences_per_second": _optional_float(
-                model_throughput_sequences_per_second
-            ),
-            "model_measurement_age_seconds": _optional_float(
-                model_measurement_age_seconds
-            ),
-        }
-    )
+    payload = {
+        "schema_version": SCHEMA_VERSION,
+        "message_type": MESSAGE_TYPE_RUNTIME_STATUS,
+        "record_name": record_name,
+        "latest_sample_index": (
+            None if latest_sample_index is None else int(latest_sample_index)
+        ),
+        "temperature_c": _optional_float(temperature_c),
+        "process_cpu_percent": _optional_float(process_cpu_percent),
+        "process_rss_mib": _optional_float(process_rss_mib),
+        "available_ram_mib": _optional_float(available_ram_mib),
+        "cpu_frequency_mhz": _optional_float(cpu_frequency_mhz),
+        "cpu_governor": None if cpu_governor is None else str(cpu_governor),
+        "under_voltage_active": _optional_bool(under_voltage_active),
+        "frequency_capped_active": _optional_bool(frequency_capped_active),
+        "throttling_active": _optional_bool(throttling_active),
+        "soft_temp_limit_active": _optional_bool(soft_temp_limit_active),
+        "runtime_condition_occurred": _optional_bool(runtime_condition_occurred),
+        "window_max_chunk_processing_ms": float(window_max_chunk_processing_ms),
+        "window_min_processing_headroom_ms": float(window_min_processing_headroom_ms),
+        "model_inference_mean_ms": _optional_float(model_inference_mean_ms),
+        "model_throughput_sequences_per_second": _optional_float(
+            model_throughput_sequences_per_second
+        ),
+        "model_measurement_age_seconds": _optional_float(model_measurement_age_seconds),
+    }
+    if hardware_sample_stale is not None or hardware_sample_age_seconds is not None:
+        payload.update(
+            hardware_sample_age_seconds=_optional_float(hardware_sample_age_seconds),
+            hardware_sample_stale=hardware_sample_stale,
+        )
+
+    return _encode(payload)
 
 
 def decode_message(frame: bytes | str) -> dict:
@@ -348,5 +351,21 @@ def decode_message(frame: bytes | str) -> dict:
                 raise ProtocolError(
                     f"{message_type} field {field!r} must be null or positive"
                 )
+
+    if message_type == MESSAGE_TYPE_RUNTIME_STATUS:
+        age = message.get("hardware_sample_age_seconds")
+        if age is not None and (
+            isinstance(age, bool)
+            or not isinstance(age, int | float)
+            or not math.isfinite(age)
+            or age < 0
+        ):
+            raise ProtocolError(
+                "hardware_sample_age_seconds must be finite/nonnegative"
+            )
+
+        stale = message.get("hardware_sample_stale")
+        if stale is not None and not isinstance(stale, bool):
+            raise ProtocolError("hardware_sample_stale must be a boolean or null")
 
     return message

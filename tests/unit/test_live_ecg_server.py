@@ -179,6 +179,8 @@ def test_the_live_payload_is_one_coherent_snapshot_view():
     assert runtime["model_inference_mean_ms"] is None
     assert runtime["model_throughput_sequences_per_second"] is None
     assert runtime["model_measurement_age_seconds"] is None
+    assert runtime["hardware_sample_age_seconds"] is None
+    assert runtime["hardware_sample_stale"] is None
 
 
 def test_model_measurements_reach_the_payload_from_the_same_snapshot():
@@ -198,6 +200,22 @@ def test_model_measurements_reach_the_payload_from_the_same_snapshot():
     assert runtime["model_inference_mean_ms"] == pytest.approx(1.41)
     assert runtime["model_throughput_sequences_per_second"] == pytest.approx(709.2)
     assert runtime["model_measurement_age_seconds"] == pytest.approx(0.25)
+
+
+def test_hardware_cache_freshness_reaches_the_live_payload():
+    state = DashboardState(CONFIG, clock=FakeClock(100.0))
+    state.apply_message(
+        _runtime_status_message(
+            temperature_c=None,
+            hardware_sample_age_seconds=4.5,
+            hardware_sample_stale=True,
+        )
+    )
+
+    runtime = build_live_payload(state.snapshot())["runtime_status"]
+    assert runtime["hardware_sample_age_seconds"] == 4.5
+    assert runtime["hardware_sample_stale"] is True
+    assert runtime["temperature_c"] is None
 
 
 def test_one_prediction_appears_coherently_in_every_section():

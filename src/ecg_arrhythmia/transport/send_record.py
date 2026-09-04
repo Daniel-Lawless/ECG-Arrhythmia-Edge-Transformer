@@ -1,6 +1,7 @@
 import argparse
 import logging
 import time
+from contextlib import nullcontext
 from pathlib import Path
 
 from ecg_arrhythmia.streaming.onnx_sequence_classifier import ONNXSequenceClassifier
@@ -11,6 +12,7 @@ from ecg_arrhythmia.streaming.replay_source import (
 )
 from ecg_arrhythmia.streaming.streaming_engine import StreamingEngine
 from ecg_arrhythmia.streaming.streaming_predictor import StreamingPredictor
+from ecg_arrhythmia.telemetry.background import BackgroundEdgeTelemetry
 from ecg_arrhythmia.telemetry.live import LiveEdgeTelemetry
 from ecg_arrhythmia.transport.tcp_receiver import DEFAULT_PORT
 from ecg_arrhythmia.transport.tcp_sender import TCPStreamSender
@@ -70,7 +72,8 @@ class ModelTimingAccumulator:
     is called after each runtime_status captures the interval.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, on_timing=None) -> None:
+        self.on_timing = on_timing
         self.reset()
 
     def reset(self) -> None:
@@ -82,6 +85,8 @@ class ModelTimingAccumulator:
         self.calls += 1
         self.sequences += sequences
         self.total_ns += elapsed_ns
+        if self.on_timing is not None:
+            self.on_timing(elapsed_ns)
 
     @property
     def mean_latency_ms(self) -> float | None:
@@ -147,6 +152,7 @@ def stream_record_to_sender(
     should_stop=None,
     clock=time.monotonic,
     timer=time.perf_counter_ns,
+    observer=None,
 ) -> dict:
     """
     Drive the pipeline and transport in the documented message order.
@@ -154,8 +160,10 @@ def stream_record_to_sender(
     For every chunk: the sample_chunk frame first, then any predictions
     that chunk completed, then one runtime_status if telemetry is
     enabled and its interval is due; flush predictions after all
-    chunks. Only predictor.process_chunk() is timed - sends, telemetry
-    sampling and pacing are outside the timer. When model_timing is
+    chunks. The dashboard metric times predictor.process_chunk(); an optional
+    benchmark observer measures the same production path without replacing
+    inference, transport or replay scheduling. Hardware telemetry is a cached
+    read here; sensor I/O runs on a background thread. When model_timing is
     provided (fed by a TimedClassifier inside the predictor), each
     runtime_status carries the latest interval's model-stage mean
     latency and throughput; quiet intervals retain the most recent
@@ -196,7 +204,13 @@ def stream_record_to_sender(
 
     stopped_early = False
 
-    for chunk in source.iter_chunks():
+    chunks = (
+        source.iter_chunks()
+        if observer is None
+        else source.iter_chunks(on_schedule=observer.on_schedule)
+    )
+
+    for chunk in chunks:
         if should_stop is not None and should_stop():
             # Leave the loop at a chunk boundary: predictions already
             # produced are still flushed below.
@@ -204,12 +218,14 @@ def stream_record_to_sender(
 
             break
 
+        chunk_started = timer() if observer is not None else None
         sender.send_sample_chunk(chunk, record_name=record_name)
         chunks_sent += 1
 
         started = timer()
         events = predictor.process_chunk(chunk)
-        accumulator.record((timer() - started) / NANOSECONDS_PER_MILLISECOND)
+        processing_ended = timer()
+        accumulator.record((processing_ended - started) / NANOSECONDS_PER_MILLISECOND)
         latest_sample_index = chunk.last_index
 
         for event in events:
@@ -221,8 +237,12 @@ def stream_record_to_sender(
             and clock() >= next_status_time
             and accumulator.window_max_ms is not None
         ):
-            # Sample hardware telemetry outside the processing timer.
+            # Read the cache outside the processing timer. Sensor I/O is not on
+            # this thread, so a slow vcgencmd call cannot consume chunk headroom.
             hardware = telemetry.sample()
+            on_snapshot = getattr(observer, "on_hardware_snapshot", None)
+            if on_snapshot is not None:
+                on_snapshot(hardware)
 
             # Capture this interval's model-stage measurement if any
             # inference ran; otherwise retain the previous one. The
@@ -258,11 +278,25 @@ def stream_record_to_sender(
             accumulator.reset()
             next_status_time = clock() + status_interval_seconds
 
+        if observer is not None:
+            observer.on_chunk(
+                chunk,
+                chunk_started,
+                started,
+                processing_ended,
+                timer(),
+                events,
+            )
+
     flush_predictions_sent = 0
 
-    for event in predictor.flush():
+    flush_events = predictor.flush()
+    for event in flush_events:
         sender.send_prediction(event, record_name=record_name)
         flush_predictions_sent += 1
+
+    if observer is not None:
+        observer.on_flush(flush_events)
 
     return {
         "chunks_sent": chunks_sent,
@@ -282,6 +316,8 @@ def run_record_stream(
     mode: str = ReplayMode.REAL_TIME.value,
     runtime_status_interval: float = DEFAULT_RUNTIME_STATUS_INTERVAL_SECONDS,
     should_stop=None,
+    source=None,
+    observer=None,
 ) -> dict:
     """
     Build the pipeline and stream one record to a receiver.
@@ -301,32 +337,66 @@ def run_record_stream(
     caller to end the replay early at a chunk boundary.
     """
 
-    source = ReplaySource.from_record(
-        record_name=record,
-        chunk_size=chunk_size,
-        mode=mode,
+    if source is None:
+        source = ReplaySource.from_record(
+            record_name=record,
+            chunk_size=chunk_size,
+            mode=mode,
+        )
+    elif (
+        source.record_name != record
+        or source.chunk_size != chunk_size
+        or source.mode != ReplayMode(mode)
+    ):
+        raise ValueError(
+            "Supplied source must match record, chunk size and replay mode"
+        )
+
+    if observer is not None:
+        observer.on_source(source)
+
+    model_timing = ModelTimingAccumulator(
+        on_timing=None if observer is None else observer.on_model_timing
     )
-    model_timing = ModelTimingAccumulator()
+    initialisation_started = time.perf_counter_ns()
+    classifier = ONNXSequenceClassifier(model_path)
+    if observer is not None:
+        observer.on_initialisation(time.perf_counter_ns() - initialisation_started)
+
     predictor = StreamingPredictor(
         engine=StreamingEngine(),
         classifier=TimedClassifier(
-            ONNXSequenceClassifier(model_path),
+            classifier,
             model_timing,
         ),
     )
 
-    telemetry = LiveEdgeTelemetry() if runtime_status_interval > 0 else None
-
-    with TCPStreamSender(host=host, port=port) as sender:
-        return stream_record_to_sender(
-            sender,
-            source,
-            predictor,
-            telemetry=telemetry,
-            model_timing=model_timing,
-            status_interval_seconds=runtime_status_interval,
-            should_stop=should_stop,
+    telemetry = (
+        BackgroundEdgeTelemetry(
+            LiveEdgeTelemetry(),
+            interval_seconds=runtime_status_interval,
         )
+        if runtime_status_interval > 0
+        else None
+    )
+
+    # Connect before polling begins, and close the sender before the collector
+    # is joined. Collection and shutdown therefore remain outside chunk timing.
+    with telemetry if telemetry is not None else nullcontext():
+        with TCPStreamSender(host=host, port=port) as sender:
+            if telemetry is not None:
+                telemetry.start()
+
+            return stream_record_to_sender(
+                sender,
+                source,
+                predictor,
+                telemetry=telemetry,
+                model_timing=model_timing,
+                status_interval_seconds=runtime_status_interval,
+                should_stop=should_stop,
+                observer=observer,
+            )
 
 
 def main() -> None:

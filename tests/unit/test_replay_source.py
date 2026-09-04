@@ -257,3 +257,26 @@ def test_real_time_replay_returns_the_same_samples_as_accelerated():
 
     np.testing.assert_array_equal(accelerated_samples, real_time_samples)
     np.testing.assert_array_equal(real_time_samples, signal)
+
+
+def test_optional_schedule_observer_sees_production_chunks_after_pacing():
+    clock = FakeClock()
+    source = _source(
+        np.arange(8, dtype=np.float64),
+        chunk_size=4,
+        mode=ReplayMode.REAL_TIME,
+        clock=clock,
+    )
+    observed = []
+
+    chunks = list(
+        source.iter_chunks(
+            on_schedule=lambda chunk, target: observed.append(
+                (chunk.start_index, target, clock())
+            )
+        )
+    )
+
+    assert [chunk.start_index for chunk in chunks] == [0, 4]
+    assert [row[0] for row in observed] == [0, 4]
+    assert all(target == actual for _, target, actual in observed)

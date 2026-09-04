@@ -33,6 +33,7 @@ COPY src/ecg_arrhythmia/detection/__init__.py src/ecg_arrhythmia/detection/r_pea
 COPY src/ecg_arrhythmia/preprocessing/__init__.py src/ecg_arrhythmia/preprocessing/beat_extraction.py ./src/ecg_arrhythmia/preprocessing/
 COPY src/ecg_arrhythmia/streaming/ ./src/ecg_arrhythmia/streaming/
 COPY src/ecg_arrhythmia/telemetry/ ./src/ecg_arrhythmia/telemetry/
+COPY src/ecg_arrhythmia/evaluation/__init__.py src/ecg_arrhythmia/evaluation/validate_edge_streaming_runtime.py src/ecg_arrhythmia/evaluation/benchmark_docker_vs_native.py src/ecg_arrhythmia/evaluation/benchmark_docker_sustained.py ./src/ecg_arrhythmia/evaluation/
 COPY src/ecg_arrhythmia/transport/tcp_receiver.py src/ecg_arrhythmia/transport/tcp_sender.py src/ecg_arrhythmia/transport/send_record.py src/ecg_arrhythmia/transport/control_server.py ./src/ecg_arrhythmia/transport/
 RUN python -m pip install --prefix=/install --only-binary=:all: ".[edge]"
 
@@ -57,12 +58,15 @@ STOPSIGNAL SIGINT
 CMD ["python", "-m", "streamlit", "run", "/app/dashboard.py", "--server.address=0.0.0.0", "--server.port=8501", "--server.headless=true"]
 
 FROM base AS edge
+ARG VCS_REF=unknown
+LABEL org.opencontainers.image.revision=$VCS_REF
+ENV ECG_SOURCE_REVISION=$VCS_REF
 COPY --from=edge-build /install/ /usr/local/
 COPY artifacts/models/ecg_sequence_transformer.onnx /app/artifacts/models/ecg_sequence_transformer.onnx
 ENV ECG_DATA_PORT=8765 \
     MPLCONFIGDIR=/tmp/matplotlib
 RUN python -m pip check \
-    && python -c "import importlib.util as u; assert all(u.find_spec(m) is None for m in ('torch', 'onnx', 'neurokit2', 'streamlit', 'plotly', 'ecg_arrhythmia.dashboard')); import ecg_arrhythmia.transport.control_server" \
+    && python -c "import importlib.util as u; assert all(u.find_spec(m) is None for m in ('torch', 'onnx', 'neurokit2', 'streamlit', 'plotly', 'ecg_arrhythmia.dashboard')); import ecg_arrhythmia.transport.control_server, ecg_arrhythmia.evaluation.benchmark_docker_sustained" \
     && python -c "from pathlib import Path; from ecg_arrhythmia.streaming.onnx_sequence_classifier import ONNXSequenceClassifier; ONNXSequenceClassifier(Path('artifacts/models/ecg_sequence_transformer.onnx'))"
 USER ecg
 EXPOSE 8767

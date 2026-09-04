@@ -237,9 +237,48 @@ def test_runtime_status_round_trips_with_all_fields_preserved():
 
     assert message["schema_version"] == SCHEMA_VERSION == 3
     assert message["message_type"] == "runtime_status"
+    assert "hardware_sample_age_seconds" not in message
+    assert "hardware_sample_stale" not in message
 
     for key, value in fields.items():
         assert message[key] == value
+
+
+@pytest.mark.parametrize("age,stale", [(None, True), (0.0, False), (3.1, True)])
+def test_optional_hardware_cache_metadata_round_trips(age, stale):
+    message = decode_message(
+        encode_runtime_status(
+            **_runtime_status_fields(
+                hardware_sample_age_seconds=age,
+                hardware_sample_stale=stale,
+            )
+        )
+    )
+
+    assert message["hardware_sample_age_seconds"] == age
+    assert message["hardware_sample_stale"] is stale
+
+
+@pytest.mark.parametrize("age", [-1, float("nan"), float("inf"), True, "1"])
+def test_invalid_hardware_cache_age_is_rejected(age):
+    frame = _mutated_frame(
+        encode_runtime_status(**_runtime_status_fields()),
+        hardware_sample_age_seconds=age,
+    )
+
+    with pytest.raises(ProtocolError, match="hardware_sample_age_seconds"):
+        decode_message(frame)
+
+
+@pytest.mark.parametrize("stale", [0, 1, "true", []])
+def test_invalid_hardware_cache_stale_flag_is_rejected(stale):
+    frame = _mutated_frame(
+        encode_runtime_status(**_runtime_status_fields()),
+        hardware_sample_stale=stale,
+    )
+
+    with pytest.raises(ProtocolError, match="hardware_sample_stale"):
+        decode_message(frame)
 
 
 def test_runtime_status_hardware_fields_may_be_null():

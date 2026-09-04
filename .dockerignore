@@ -14,7 +14,11 @@
 # Re-exclude development-only code and accidental files inside src/.
 src/ecg_arrhythmia/dashboard/refresh_probe.py
 src/ecg_arrhythmia/training/
-src/ecg_arrhythmia/evaluation/
+src/ecg_arrhythmia/evaluation/**
+!src/ecg_arrhythmia/evaluation/__init__.py
+!src/ecg_arrhythmia/evaluation/validate_edge_streaming_runtime.py
+!src/ecg_arrhythmia/evaluation/benchmark_docker_vs_native.py
+!src/ecg_arrhythmia/evaluation/benchmark_docker_sustained.py
 src/ecg_arrhythmia/deployment/
 src/ecg_arrhythmia/models/
 src/ecg_arrhythmia/visualisation/
