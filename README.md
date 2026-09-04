@@ -2,6 +2,9 @@
 
 # Real-Time ECG Arrhythmia Classification on the Edge
 
+[![CI](https://github.com/Daniel-Lawless/ECG-Arrhythmia-Edge-Transformer/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Daniel-Lawless/ECG-Arrhythmia-Edge-Transformer/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Daniel-Lawless/ECG-Arrhythmia-Edge-Transformer)](https://github.com/Daniel-Lawless/ECG-Arrhythmia-Edge-Transformer/releases/latest)
+
 **A leakage-aware CNN–Transformer ECG inference system with patient-level train/validation/test splitting, causal five-beat classification, verified ONNX deployment, and a benchmarked Docker edge deployment on Raspberry Pi 5 with live predictions, waveform and hardware telemetry streamed to a browser dashboard.**
 
 <p>
