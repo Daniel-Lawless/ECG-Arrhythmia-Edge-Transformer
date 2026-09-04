@@ -87,6 +87,8 @@ class ReceivedRuntimeStatus:
     model_inference_mean_ms: float | None = None
     model_throughput_sequences_per_second: float | None = None
     model_measurement_age_seconds: float | None = None
+    hardware_sample_age_seconds: float | None = None
+    hardware_sample_stale: bool | None = None
 
     @property
     def runtime_condition_active(self) -> bool | None:
@@ -403,6 +405,10 @@ class DashboardState:
             model_measurement_age_seconds=_optional_float(
                 message.get("model_measurement_age_seconds")
             ),
+            hardware_sample_age_seconds=_optional_float(
+                message.get("hardware_sample_age_seconds")
+            ),
+            hardware_sample_stale=message.get("hardware_sample_stale"),
         )
 
         with self._lock:

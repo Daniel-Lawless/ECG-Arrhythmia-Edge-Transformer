@@ -1,4 +1,5 @@
 .venv/
+.venv-benchmark/
 __pycache__/
 *.pyc
 .pytest_cache/
@@ -11,3 +12,9 @@ artifacts/models/
 *.pth
 *.onnx
 .vscode/
+*.bundle
+
+# Keep only the public, curated Docker benchmark results.
+artifacts/results/deployment_evaluation/docker_vs_native/*
+!artifacts/results/deployment_evaluation/docker_vs_native/summary.json
+!artifacts/results/deployment_evaluation/docker_vs_native/sustained.json

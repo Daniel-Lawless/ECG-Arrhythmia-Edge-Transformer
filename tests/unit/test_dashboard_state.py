@@ -415,6 +415,22 @@ def _runtime_status_message(**overrides):
     return message
 
 
+def test_optional_hardware_cache_metadata_is_preserved():
+    state = DashboardState(SMALL_CONFIG)
+    state.apply_message(
+        _runtime_status_message(
+            temperature_c=None,
+            hardware_sample_age_seconds=4.5,
+            hardware_sample_stale=True,
+        )
+    )
+
+    status = state.snapshot().runtime_status
+    assert status.hardware_sample_age_seconds == 4.5
+    assert status.hardware_sample_stale is True
+    assert status.temperature_c is None
+
+
 def test_runtime_status_appears_immutably_in_the_snapshot():
     import dataclasses
 

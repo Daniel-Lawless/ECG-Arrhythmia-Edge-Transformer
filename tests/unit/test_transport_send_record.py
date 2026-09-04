@@ -1,6 +1,10 @@
+import threading
+from types import SimpleNamespace
+
 import numpy as np
 import pytest
 
+import ecg_arrhythmia.transport.send_record as send_record_module
 from ecg_arrhythmia.streaming.onnx_sequence_classifier import PredictionEvent
 from ecg_arrhythmia.streaming.sample_chunk import SampleChunk
 from ecg_arrhythmia.transport.protocol import decode_message, encode_runtime_status
@@ -650,3 +654,79 @@ def test_the_loop_status_dict_matches_the_protocol_encoder_exactly():
 
         assert message["message_type"] == "runtime_status"
         assert message["model_inference_mean_ms"] == pytest.approx(2.0)
+
+
+def test_model_timing_can_feed_a_read_only_benchmark_observer():
+    observed = []
+    accumulator = ModelTimingAccumulator(on_timing=observed.append)
+
+    accumulator.record(1_250_000)
+
+    assert observed == [1_250_000]
+    assert accumulator.mean_latency_ms == pytest.approx(1.25)
+
+
+def test_run_record_stream_polls_hardware_in_a_background_thread(monkeypatch):
+    polled = threading.Event()
+    polling_threads = []
+    stream_threads = []
+
+    class FakeLiveTelemetry:
+        def sample(self):
+            polling_threads.append(threading.get_ident())
+            polled.set()
+            return {
+                "temperature_c": 48.0,
+                "process_cpu_percent": 5.0,
+                "process_rss_mib": 100.0,
+                "available_ram_mib": 500.0,
+                "cpu_frequency_mhz": 2400.0,
+                "cpu_governor": "performance",
+                "under_voltage_active": False,
+                "frequency_capped_active": False,
+                "throttling_active": False,
+                "soft_temp_limit_active": False,
+                "runtime_condition_occurred": False,
+            }
+
+    class FakeSenderContext:
+        def __init__(self, host, port):
+            self.host = host
+            self.port = port
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return None
+
+    def fake_stream(sender, source, predictor, **kwargs):
+        stream_threads.append(threading.get_ident())
+        assert polled.wait(1)
+        snapshot = kwargs["telemetry"].sample()
+        assert snapshot["hardware_sample_stale"] is False
+        return {"chunks_sent": 0}
+
+    source = SimpleNamespace(
+        record_name="114",
+        chunk_size=36,
+        mode=send_record_module.ReplayMode.REAL_TIME,
+    )
+    monkeypatch.setattr(send_record_module, "LiveEdgeTelemetry", FakeLiveTelemetry)
+    monkeypatch.setattr(send_record_module, "TCPStreamSender", FakeSenderContext)
+    monkeypatch.setattr(
+        send_record_module,
+        "ONNXSequenceClassifier",
+        lambda path: object(),
+    )
+    monkeypatch.setattr(send_record_module, "stream_record_to_sender", fake_stream)
+
+    result = send_record_module.run_record_stream(
+        host="127.0.0.1",
+        source=source,
+        runtime_status_interval=100.0,
+    )
+
+    assert result == {"chunks_sent": 0}
+    assert polling_threads and stream_threads
+    assert polling_threads[0] != stream_threads[0]

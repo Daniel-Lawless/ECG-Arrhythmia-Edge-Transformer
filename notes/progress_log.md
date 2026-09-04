@@ -2523,3 +2523,144 @@ Remote control works best when it orchestrates the existing production path rath
 
 Refactoring the CLI into a reusable `run_record_stream()` entry point kept dashboard-started streams on the same Raspberry Pi inference path, while strict control validation and dependency isolation kept the distributed architecture clear and predictable.
 
+## Milestone 38 — Docker Deployment Benchmarking and Sustained Validation
+
+### Implemented
+
+Added two focused benchmarks for the completed Raspberry Pi edge deployment:
+
+```text
+src/ecg_arrhythmia/evaluation/
+    benchmark_docker_vs_native.py
+    benchmark_docker_sustained.py
+```
+
+The benchmark reuses the existing production `run_record_stream()` path rather than creating a separate inference pipeline.
+
+Both native and Docker runs use the same FP32 ONNX Transformer, `CPUExecutionProvider`, XQRS streaming pipeline, 360 Hz ECG replay, 36-sample chunks every 100 ms, TCP transport to the PC, and Raspberry Pi 5 running the `performance` governor at 2.4 GHz.
+
+The primary comparison uses a counterbalanced order:
+
+```text
+Native → Docker → Docker → Native
+```
+
+Each run records complete-path latency, model-stage latency, deadline margin, prediction and stream-integrity checks, CPU usage, RSS, temperature, frequency and throttling state.
+
+### Production Telemetry Fix
+
+Early benchmark runs exposed an issue in the live telemetry path.
+
+Raspberry Pi hardware queries such as `vcgencmd` were being performed synchronously from the streaming thread. A slow hardware query could therefore consume part of the 100 ms chunk-processing budget even though telemetry was not required to produce a prediction.
+
+Hardware polling was moved to a background collector. The streaming path now reads the latest cached snapshot, including age/staleness information, instead of issuing hardware commands directly.
+
+This keeps hardware monitoring outside the latency-critical ECG processing loop.
+
+### Primary Native vs Docker Results
+
+Each primary run used MIT-BIH record `114` and processed:
+
+```text
+650,000 samples
+18,056 chunks
+1,873 predictions
+```
+
+Across all four runs:
+
+```text
+72,224 chunks
+7,492 predictions
+0 deadline misses
+0 integrity failures
+0 source discontinuities
+```
+
+#### Model-stage performance
+
+| Metric | Native | Docker | Docker change |
+|---|---:|---:|---:|
+| Mean ONNX latency | 1.370 ms | 1.336 ms | -2.43% |
+| p95 ONNX latency | 1.405 ms | 1.370 ms | -2.48% |
+| p99 ONNX latency | 1.435 ms | 1.408 ms | -1.87% |
+| Throughput | 730.43 seq/s | 748.65 seq/s | +2.49% |
+
+The ONNX inference call itself was not slower in Docker.
+
+#### Complete paced path
+
+| Metric | Native | Docker | Docker change |
+|---|---:|---:|---:|
+| Mean full-path latency | 12.642 ms | 13.639 ms | +7.89% |
+| p95 full-path latency | 64.399 ms | 69.459 ms | +7.86% |
+| p99 full-path latency | 66.208 ms | 70.750 ms | +6.86% |
+
+The selected Docker deployment therefore introduced approximately `7–8%` additional latency across the complete production path, while still remaining inside the 100 ms deadline.
+
+Worst Docker primary deadline headroom:
+
+```text
+21.857 ms
+```
+
+Mean process CPU usage was also close:
+
+```text
+Native: 21.13%
+Docker: 22.14%
+```
+
+RSS and CPU temperature remained similar between conditions.
+
+### 60-Minute Docker Sustained Validation
+
+The Docker deployment was then run continuously for approximately one hour.
+
+```text
+Signal duration:       3,599.956 s
+Measured wall time:    3,600.298 s
+Chunks:                36,000
+Predictions:            4,329
+Deadline misses:            0
+Integrity failures:         0
+Source discontinuities:     0
+```
+
+| Metric | Result |
+|---|---:|
+| Mean full-path latency | 13.895 ms |
+| p95 full-path latency | 70.914 ms |
+| p99 full-path latency | 73.018 ms |
+| Maximum full-path latency | 80.044 ms |
+| Minimum deadline margin | **19.900 ms** |
+| Mean process CPU | 23.71% |
+| Mean RSS | 196.91 MiB |
+| Maximum RSS | 198.36 MiB |
+| Maximum CPU temperature | 50.7 °C |
+
+The Pi remained at 2.4 GHz under the `performance` governor, and all `720` throttling readings were clear.
+
+RSS increased during initialisation and once at the record transition, then remained approximately stable for the rest of the run. No runaway memory growth was observed during the tested hour.
+
+### Saved Outputs
+
+```text
+artifacts/results/deployment_evaluation/docker_vs_native/
+    summary.json
+    sustained.json
+```
+
+Only the two curated result files are retained in the final public implementation. Temporary forensic diagnostics and raw benchmark-session evidence are excluded.
+
+### Final Decision
+
+The Docker deployment **passed with measurable overhead**.
+
+Docker increased complete-path latency by approximately `7–8%`, but every tested primary and sustained chunk remained within the 100 ms processing deadline. The one-hour run also completed without integrity failures, stream discontinuities, thermal throttling or runaway memory growth.
+
+This should not be interpreted as proof of native/Docker equivalence or as a hard-real-time guarantee.
+
+### Key Lesson
+
+The important result is that the Docker deployment adds measurable overhead, but still meets the real-time requirement of this workload with useful deadline headroom.

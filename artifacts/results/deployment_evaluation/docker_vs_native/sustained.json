@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "status": "completed",
+  "result": "passed",
+  "condition": "docker",
+  "evidence": {
+    "formal_session_id": "b3f84877-96b9-43d9-9d19-cd1638f86bbc",
+    "formal_session_archive": "session_04_wired_attempt02_with_sustained.tar.gz",
+    "formal_session_archive_sha256": "2fb444b6230331b9bc69cead2d8529684d5c78e692d9611ecef68d20042fc86",
+    "formal_source_revision": "bd034ad3036ff6293ebfa5a7fb4e0b01bf561a91",
+    "formal_source_sha256": "eb2eb51d16a737ff01357f41ed48cd61fa534300ca4f22bc6d11df43f7b7d653",
+    "model_sha256": "74d9c32ac8159123a6f6eeb95ffcbee21704d395d2da4133d9f78db2fc0390d8",
+    "docker_image_id": "sha256:d0c64ec62b960df77fc60136d54445e9227de411d8953cfc6b512fa1f6ad8570"
+  },
+  "methodology": {
+    "platform": "Raspberry Pi 5 Model B Rev 1.1 / ARM64",
+    "precision": "FP32",
+    "provider": "CPUExecutionProvider",
+    "sampling_rate_hz": 360.0,
+    "chunk_size_samples": 36,
+    "chunk_period_ms": 100.0,
+    "deadline_ms": 100.0,
+    "replay_mode": "real_time",
+    "cpu_governor": "performance",
+    "cpu_frequency_mhz": 2400.0,
+    "production_streaming_path": true
+  },
+  "duration": {
+    "requested_seconds": 3600.0,
+    "signal_seconds": 3599.9555555555557,
+    "measured_wall_seconds": 3600.297783223
+  },
+  "metrics": {
+    "chunks_processed": 36000,
+    "samples_processed": 1295984,
+    "prediction_events": 4329,
+    "integrity_failures": 0,
+    "source_discontinuities": 0,
+    "processing_ms": {
+      "mean": 13.799819602777777,
+      "median": 0.028556,
+      "p95": 70.73517685,
+      "p99": 72.80116675000002,
+      "maximum": 79.839658
+    },
+    "full_path_ms": {
+      "mean": 13.894956763916667,
+      "median": 0.101889,
+      "p95": 70.91411925,
+      "p99": 73.01800446000001,
+      "maximum": 80.044176
+    },
+    "deadline": {
+      "total_chunks": 36000,
+      "deadline_misses": 0,
+      "minimum_deadline_margin_ms": 19.900014
+    },
+    "records": [
+      {
+        "record_name": "114",
+        "samples_processed": 650000,
+        "chunks_processed": 18056,
+        "prediction_events": 1873
+      },
+      {
+        "record_name": "122",
+        "samples_processed": 645984,
+        "chunks_processed": 17944,
+        "prediction_events": 2456
+      }
+    ]
+  },
+  "resources": {
+    "sample_count": 720,
+    "process_cpu_percent": {
+      "mean": 23.706209288258098,
+      "maximum": 27.35733074934442
+    },
+    "rss_mib": {
+      "start": 180.921875,
+      "end": 198.34375,
+      "mean": 196.91078559027778,
+      "maximum": 198.359375,
+      "whole_run_linear_slope_mib_per_hour": 4.373143033190347
+    },
+    "rss_interpretation": {
+      "record_114_after_startup_range_mib": [
+        195.4375,
+        195.71875
+      ],
+      "record_transition_step_mib": [
+        195.71875,
+        198.234375
+      ],
+      "final_20_minutes_range_mib": [
+        198.296875,
+        198.359375
+      ],
+      "plateau_observed": true,
+      "interpretation": "RSS rose during startup and once at the record transition, then remained in a 0.0625 MiB range over the final 20 minutes; no runaway growth was observed."
+    },
+    "temperature_c": {
+      "mean": 48.442708333333336,
+      "maximum": 50.7
+    },
+    "cpu_frequency_mhz": {
+      "mean": 2400.0,
+      "maximum": 2400.0
+    },
+    "governors": [
+      "performance"
+    ],
+    "throttling": {
+      "reading_count": 720,
+      "active_count": 0,
+      "observed": false,
+      "values": [
+        "0x0"
+      ]
+    }
+  },
+  "validation": {
+    "deadline_misses": 0,
+    "integrity_failures": 0,
+    "source_discontinuities": 0,
+    "throttling_observed": false
+  },
+  "limitations": [
+    "The finite run demonstrates sustained operation, not indefinitely bounded memory or a hard-real-time guarantee.",
+    "A one-off record-transition allocation is included in the whole-run RSS slope; the final window is more representative of steady state.",
+    "An earlier exploratory campaign repeatedly associated rare native outliers with hardware-query 108, but isolated no actionable mechanism; that relationship is retained only as historical context."
+  ]
+}
